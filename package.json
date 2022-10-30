@@ -1,0 +1,35 @@
+{
+  "name": "element-backend",
+  "engines": {
+    "node": "16"
+  },
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/app.js",
+  "scripts": {
+    "docker:build": "docker build -t elements-backend .",
+    "docker:run": "npm run docker:build && docker run -p 3000:3000 elements-backend",
+    "build": "tsc",
+    "dev": "concurrently \"tsc -w\" \"nodemon dist/app.js\"",
+    "start": "npm run build && node dist/app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "1.20.1",
+    "cors": "2.8.5",
+    "dotenv": "8.2.0",
+    "express": "4.17.1"
+  },
+  "devDependencies": {
+    "@types/body-parser": "1.19.0",
+    "@types/cors": "2.8.7",
+    "@types/express": "4.17.7",
+    "@types/node": "14.0.27",
+    "concurrently": "5.3.0",
+    "nodemon": "2.0.4",
+    "ts-node": "8.10.2",
+    "typescript": "3.9.7"
+  }
+}
