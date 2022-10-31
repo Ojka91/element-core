@@ -15,9 +15,3 @@ RUN tsc
 
 
 CMD ["pm2-runtime", "./dist/app.js"]
-
-# RUN chmod +x scripts/deploy_aws_ecs.sh
-# CMD ["bash", "-c", "scripts/deploy_aws_ecs.sh"]
-# CMD ["npm start", "dist/app.js"]
-# docker build -t api-service .
-# docker run -it -p 80:80 api-service
