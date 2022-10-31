@@ -11,11 +11,11 @@ app.use(bodyParser.json());
 require('dotenv').config();
 
 app.get('/', async (req: Request, res: Response) => {
-  return res.send({ error: false, v: 5, jwt: process.env.jwtSecret });
+  return res.send({status: 'ok'});
 });
 
 const server = app.listen(process.env.PORT || 3000, () => {
-  console.log("Server listening on port 3000")
+  console.log('Server listening on port 3000')
 });
 
 if (process.env.NODE_ENV === 'production') {
