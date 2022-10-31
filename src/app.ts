@@ -1,28 +1,21 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import { routes } from './routes';
 
 const app: Express = express();
 app.use(cors({ exposedHeaders: ['*', 'token'] }));
 app.options('*', cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use('/', routes)
 
 require('dotenv').config();
 
-app.get('/', async (req: Request, res: Response) => {
+app.get('/health', async (_req: Request, res: Response) => {
   return res.send({status: 'ok'});
 });
 
-const server = app.listen(process.env.PORT || 3000, () => {
+app.listen(process.env.PORT || 3000, () => {
   console.log('Server listening on port 3000')
 });
-
-if (process.env.NODE_ENV === 'production') {
-  process.on('SIGINT', () => {
-    server.close(() => {
-      // close database
-        process.exit(0);
-    });
-  });
-}
