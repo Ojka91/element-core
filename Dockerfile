@@ -1,17 +1,14 @@
-FROM node:16
+FROM node:16-alpine
 
 EXPOSE 3000
-ENV ENV=production
 
 WORKDIR /app
-COPY package*.json ./
+COPY ./package.json ./
 COPY tsconfig.json ./
-COPY . .
 
-RUN npm i typescript pm2 -g
+RUN npm i pm2 -g
 RUN npm i
 COPY . .
-RUN tsc
-
+RUN npm run build
 
 CMD ["pm2-runtime", "./dist/app.js"]

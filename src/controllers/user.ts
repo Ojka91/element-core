@@ -1,3 +1,4 @@
+import { Bcrypt } from "../security/bcrypt";
 import { IUser } from "../database/models/user";
 import UserRepository from "../database/repositories/user-repository";
 
@@ -5,11 +6,12 @@ import UserRepository from "../database/repositories/user-repository";
 export class User {
 
     public async getUserData() {
+        const encrypter = new Bcrypt();
         const user: IUser = {
+            username: 'username',
             email: 'fakemail',
-            password: 'pass',
-            createdAt: new Date(),
-            recoverPasswordToken: 'token',
+            password: encrypter.encrypt('pass'),
+            createdAt: new Date()
         }
 
         console.log('Getting user data...')

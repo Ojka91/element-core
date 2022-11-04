@@ -1,7 +1,7 @@
-## Build and run the docker image
+## Build and run the dev docker image
 docker-run:	
-	docker build -t element-backend . && docker run -p 3000:3000 element-backend
+	docker build -t element-backend . && docker run --env-file='.env-dev' -p 3000:3000 element-backend
 
-## Run locally using npm
+## Run locally dev using npm
 run:
-	npm run start:dev
+	npm run start
