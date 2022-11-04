@@ -4,4 +4,4 @@ docker-run:
 
 ## Run locally using npm
 run:
-	npm run start
+	npm run start:dev
