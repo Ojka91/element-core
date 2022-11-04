@@ -4,9 +4,26 @@ import bodyParser from 'body-parser';
 import { routes } from './routes';
 import mongoose from 'mongoose'
 import * as dotenv from 'dotenv' 
-dotenv.config({ path: `.env${process.env.NODE_ENV}` });
-
 const app: Express = express();
+dotenv.config({ path: `.env${process.env.NODE_ENV}` });
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+
+const options = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Element API',
+      version: '1.0.0',
+    },
+  },
+  apis: ['./src/routes/*.ts'],
+};
+
+const openapiSpecification = swaggerJsdoc(options);
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapiSpecification));
+
 app.use(cors({ exposedHeaders: ['*', 'token'] }));
 app.options('*', cors());
 app.use(bodyParser.urlencoded({ extended: true }));
