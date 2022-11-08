@@ -1,7 +1,7 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import { routes } from './routes';
+import { routes } from '@/routes';
 import mongoose from 'mongoose'
 import * as dotenv from 'dotenv' 
 const app: Express = express();

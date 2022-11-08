@@ -1,4 +1,4 @@
-import User, {IUser} from '../models/user'
+import User, {IUser} from '@/database/models/user'
 
 
 class UserRepository {

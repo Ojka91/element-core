@@ -1,6 +1,6 @@
-import { Bcrypt } from "../security/bcrypt";
-import { IUser } from "../database/models/user";
-import UserRepository from "../database/repositories/user-repository";
+import { Bcrypt } from "@/security/bcrypt";
+import { IUser } from "@/database/models/user";
+import UserRepository from "@/database/repositories/user-repository";
 
 
 export class User {
