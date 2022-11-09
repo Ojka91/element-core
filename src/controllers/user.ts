@@ -1,6 +1,7 @@
 import { Bcrypt } from "@/security/bcrypt";
 import { IUser } from "@/database/models/user";
 import UserRepository from "@/database/repositories/user-repository";
+import { logger } from "@/utils/logger";
 
 
 export class User {
@@ -14,7 +15,10 @@ export class User {
             createdAt: new Date()
         }
 
-        console.log('Getting user data...')
-        return UserRepository.create(user)
+        logger.warn({fake: 'obj'}, 'this is warn')
+        logger.info({fake: 'obj'}, 'this is info')
+        logger.error({fake: 'obj'}, 'this is error')
+        //return UserRepository.create(user)
+        return 'User created'
     }
 }

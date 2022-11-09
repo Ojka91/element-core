@@ -21,7 +21,6 @@ const options = {
 };
 
 const openapiSpecification = swaggerJsdoc(options);
-
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapiSpecification));
 
 app.use(cors({ exposedHeaders: ['*', 'token'] }));
@@ -29,7 +28,6 @@ app.options('*', cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use('/', routes)
-
 
 mongoose.connect(process.env.MONGO_URL || '', { dbName: process.env.DATABASE, useNewUrlParser: true, useUnifiedTopology: true }, () => {
   if(mongoose.connection.readyState === 1) {
