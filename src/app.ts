@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import { routes } from '@/routes';
 import mongoose from 'mongoose'
 import * as dotenv from 'dotenv' 
+import Board from './game/models/board';
 const app: Express = express();
 dotenv.config({ path: `.env${process.env.NODE_ENV}` });
 const swaggerJsdoc = require('swagger-jsdoc');
@@ -43,4 +44,12 @@ app.get('/health', async (_req: Request, res: Response) => {
 
 app.listen(process.env.PORT || 3000, () => {
   console.log('Server listening on port 3000')
+});
+
+app.get('/game', async (_req: Request, res: Response) => {
+  let board = new Board();
+  board.placePlayerSage(1);
+  board.placePlayerSage(2);
+  board.displayGrid();
+  return res.send({status: 'ok'});
 });
