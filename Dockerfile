@@ -9,6 +9,7 @@ COPY tsconfig.json ./
 RUN npm i pm2 -g
 RUN npm i
 COPY . .
+RUN npm run test
 RUN npm run build
 
 CMD ["pm2-runtime", "./dist/app.js"]

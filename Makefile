@@ -12,3 +12,6 @@ build:
 # Run locally dev using npm
 run:
 	npm run start
+
+test:
+	npm run test
