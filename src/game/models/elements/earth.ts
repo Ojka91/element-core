@@ -1,6 +1,5 @@
-import Board from "../board";
 import { Piece } from "../pieces";
-import { Element, ElementCreator } from "./elements";
+import { Element } from "./elements";
 import { Water } from "./water";
 
 /**
@@ -36,24 +35,8 @@ import { Water } from "./water";
         return false;
     }
 
-    reaction(board: Board): void {
+    reaction(): void {
         /* TBD */
         console.log("Earth reaction!");
-    }
-}
-
-/**
- * EarthCreator override the factory method in order to change the
- * resulting piece's type.
- */
- export class EarthCreator extends ElementCreator {
-    /**
-     * Note that the signature of the method still uses the abstract pieces
-     * type, even though the empty piece is actually returned from the
-     * method. This way the PieceCreator can stay independent of piece type
-     * classes.
-     */
-    public factoryMethod(): Element {
-        return new Earth();
     }
 }

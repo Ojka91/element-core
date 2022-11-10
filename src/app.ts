@@ -51,5 +51,5 @@ app.get('/game', async (_req: Request, res: Response) => {
   board.placePlayerSage(1);
   board.placePlayerSage(2);
   board.displayGrid();
-  return res.send({status: 'ok'});
+  return res.send(board);
 });
