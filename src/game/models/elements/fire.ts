@@ -1,5 +1,5 @@
 import { Piece } from "../pieces";
-import { Element } from "./elements";
+import { Element, ElementTypes } from "./elements";
 import { Wind } from "./wind";
 
 /**
@@ -17,7 +17,7 @@ import { Wind } from "./wind";
 
     ruleOfReplacement(piece_to_replace: Piece): boolean {
         const piece_name = piece_to_replace.constructor.name;
-        if(piece_name == Wind.constructor.name){
+        if(piece_name == ElementTypes.Wind){
             return true;
         }
         return false;
