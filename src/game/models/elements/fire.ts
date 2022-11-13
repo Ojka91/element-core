@@ -1,6 +1,5 @@
 import { Piece } from "../pieces";
 import { Element, ElementTypes } from "./elements";
-import { Wind } from "./wind";
 
 /**
  * Fire class
@@ -21,10 +20,5 @@ import { Wind } from "./wind";
             return true;
         }
         return false;
-    }
-
-    reaction(): void {
-        /* TBD */
-        console.log("Fire reaction!")
     }
 }

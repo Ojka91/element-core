@@ -1,17 +1,16 @@
 import { Piece } from "./pieces";
 import { EmptyPieceCreator, SagePieceCreator } from "./pieces_factory";
+import { Element, ElementTypes } from "./elements/elements";
 
 const COLUMN_PIECES_WIDTH: number = 11;
 const ROW_PIECES_HEIGHT: number = 11;
 
-const SAGE_1_ROW_2PLAYER: number = 4;
-const SAGE_1_COLUMN_2PLAYER: number = 5;
-const SAGE_2_ROW_2PLAYER: number = SAGE_1_ROW_2PLAYER + 2;
-const SAGE_2_COLUMN_2PLAYER: number = SAGE_1_COLUMN_2PLAYER;
+const NUM_PIECES_PER_ELEMENT: number = 30;
 
 
 class Board {
     grid: Piece[][];
+    //elementPool: Element[];
 
     constructor(){
         let grid = new Array(COLUMN_PIECES_WIDTH);
@@ -47,6 +46,8 @@ class Board {
             }
         }
     }
+
+    
 }
 
 export default Board;

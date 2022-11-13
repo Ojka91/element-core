@@ -1,6 +1,5 @@
 import { Piece } from "../pieces";
-import { Earth } from "./earth";
-import { Element } from "./elements";
+import { Element, ElementTypes } from "./elements";
 
 const MAX_STACKED_WINDS: number = 4;
 
@@ -20,19 +19,14 @@ const MAX_STACKED_WINDS: number = 4;
 
     ruleOfReplacement(piece_to_replace: Piece): boolean {
         const piece_name = piece_to_replace.constructor.name;
-        if(piece_name == Earth.constructor.name){
+        if(piece_name == ElementTypes.Earth){
             return true;
-        } else if (piece_name == Wind.constructor.name){
+        } else if (piece_name == ElementTypes.Wind){
             if(this.stacked_winds <= MAX_STACKED_WINDS){
                 this.stacked_winds++;
                 return true;
             }
         }
         return false;
-    }
-
-    reaction(): void {
-        /* TBD */
-        console.log("Wind reaction! Jump "+this.stacked_winds);
     }
 }

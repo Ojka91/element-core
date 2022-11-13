@@ -1,6 +1,5 @@
 import { Piece } from "../pieces";
-import { Element } from "./elements";
-import { Fire } from "./fire";
+import { Element, ElementTypes } from "./elements";
 
 /**
  * Water class
@@ -21,15 +20,10 @@ import { Fire } from "./fire";
 
     ruleOfReplacement(piece_to_replace: Piece): boolean {
         const piece_name = piece_to_replace.constructor.name;
-        if(piece_name == Fire.constructor.name){
+        if(piece_name == ElementTypes.Fire){
             return true;
         } 
         
         return false;
-    }
-
-    reaction(): void {
-        /* TBD */
-        console.log("Water reaction!");
     }
 }

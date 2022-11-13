@@ -1,7 +1,7 @@
-import { Earth } from "./earth"
-import { Fire } from "./fire"
-import { Water } from "./water"
-import { Wind } from "./wind"
+import { Earth } from "../earth"
+import { Fire } from "../fire"
+import { Water } from "../water"
+import { Wind } from "../wind"
 
 describe('Earth', () => {
     it('Rule of replacement: Should return true if repalces water or earth', async () => {

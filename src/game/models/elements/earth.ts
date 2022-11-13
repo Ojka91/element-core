@@ -33,9 +33,4 @@ import { Element, ElementTypes } from "./elements";
         }
         return false;
     }
-
-    reaction(): void {
-        /* TBD */
-        console.log("Earth reaction!");
-    }
 }
