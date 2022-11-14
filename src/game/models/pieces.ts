@@ -1,13 +1,16 @@
+import { Position } from "./grid";
+
 export abstract class Piece {
-    row: number = 0;
-    column: number = 0;
+    position: Position = {
+        row: 0,
+        column: 0
+    };
 
     // debugging purposes
     string_representation: string = "";
 
-    updatePosition(new_row: number, new_column: number){
-        this.row = new_row;
-        this.column = new_column;
+    updatePosition(new_position: Position){
+        this.position = new_position;
 
     }
 }

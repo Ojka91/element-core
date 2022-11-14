@@ -3,6 +3,7 @@ import { ElementTypes } from "../elements/elements";
 import { Fire } from "../elements/fire";
 import { Water } from "../elements/water";
 import { Wind } from "../elements/wind";
+import { Position } from "../grid";
 import { Empty, Sage } from "../pieces";
 import { ElementPieceCreator, EmptyPieceCreator, SagePieceCreator } from "../pieces_factory"
 
@@ -47,10 +48,11 @@ describe('Pieces', () => {
 
     it('updatePosition: Pieces subclasses can update their position', async () => {
         const sage = new SagePieceCreator().createPiece();
-        sage.updatePosition(1,2);
+        const position: Position = {row: 1, column: 2}
+        sage.updatePosition(position);
 
-        expect(sage.row).toStrictEqual(1);
-        expect(sage.column).toStrictEqual(2);
+        expect(sage.position.row).toStrictEqual(1);
+        expect(sage.position.column).toStrictEqual(2);
     })
 })
   

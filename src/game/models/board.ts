@@ -1,52 +1,45 @@
-import { Piece } from "./pieces";
-import { EmptyPieceCreator, SagePieceCreator } from "./pieces_factory";
-import { Element, ElementTypes } from "./elements/elements";
+import { Grid, Position } from "./grid";
+import { ElementTypes } from "./elements/elements";
+import ElementPoolManager from "./element_pool_manager";
+import Player from "./player";
+import { isSageMoveValid } from "./movement_manager";
 
 const COLUMN_PIECES_WIDTH: number = 11;
 const ROW_PIECES_HEIGHT: number = 11;
 
-const NUM_PIECES_PER_ELEMENT: number = 30;
-
-
 class Board {
-    grid: Piece[][];
-    //elementPool: Element[];
+    private grid: Grid = new Grid(ROW_PIECES_HEIGHT, COLUMN_PIECES_WIDTH);
+    elementPool: ElementPoolManager = new ElementPoolManager();
 
-    constructor(){
-        let grid = new Array(COLUMN_PIECES_WIDTH);
-        for (let row = 0; row < COLUMN_PIECES_WIDTH; row++) {
-            grid[row] = new Array(ROW_PIECES_HEIGHT);
-            for (let col = 0; col < ROW_PIECES_HEIGHT; col++){
-                grid[row][col] = new EmptyPieceCreator().createPiece();
-                grid[row][col].updatePosition(row, col);
-            }
-        }
-        this.grid = grid;
+    public returnElementToPool(element: ElementTypes): void {
+        this.elementPool.addElement(element);
     }
 
-    placePlayerSage(player_number: number){
-        switch(player_number){
-            case 1:
-                this.grid[SAGE_1_ROW_2PLAYER][SAGE_1_COLUMN_2PLAYER] = new SagePieceCreator().createPiece();
-                this.grid[SAGE_1_ROW_2PLAYER][SAGE_1_COLUMN_2PLAYER].updatePosition(SAGE_1_ROW_2PLAYER, SAGE_1_COLUMN_2PLAYER);
-                break;
-            case 2:
-                this.grid[SAGE_2_ROW_2PLAYER][SAGE_2_COLUMN_2PLAYER] = new SagePieceCreator().createPiece();
-                this.grid[SAGE_2_ROW_2PLAYER][SAGE_2_COLUMN_2PLAYER].updatePosition(SAGE_2_ROW_2PLAYER, SAGE_2_COLUMN_2PLAYER);
-                break;
-            default:
-                break;
-        }
+    public getElementFromPool(element: ElementTypes): void {
+        this.elementPool.removeElement(element);
     }
 
-    displayGrid(){
-        for (var row of this.grid){
-            for (var column of row){
-                console.log(column);
-            }
-        }
+    /** Grid getter */
+    public getGrid(): Grid {
+        return this.grid;
     }
 
+    /** Method to place the player sage in the board */
+    public placePlayerSage(player: Player, new_position: Position): void {
+        let sage = player.getSage();
+        if (( new_position.column >= COLUMN_PIECES_WIDTH) || (new_position.row >= ROW_PIECES_HEIGHT)){
+            throw new Error("Incorrect new row or new column dimensions");
+        }
+        if(isSageMoveValid(this.grid, sage.position, new_position) == false){
+            throw new Error("Sage movement is not valid");
+        }
+        sage.updatePosition(new_position);
+        this.grid.updateGridCell(sage);
+    }
+
+    public displayGrid(): void {
+        this.grid.displayGrid();
+    }
     
 }
 
