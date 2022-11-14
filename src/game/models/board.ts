@@ -11,6 +11,11 @@ class Board {
     private grid: Grid = new Grid(ROW_PIECES_HEIGHT, COLUMN_PIECES_WIDTH);
     elementPool: ElementPoolManager = new ElementPoolManager();
 
+    public addPlayer(player: Player){
+        let sage = player.getSage();
+        this.grid.updateGridCell(sage);
+    }
+
     public returnElementToPool(element: ElementTypes): void {
         this.elementPool.addElement(element);
     }

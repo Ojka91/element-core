@@ -5,6 +5,7 @@ import { routes } from '@/routes';
 import mongoose from 'mongoose'
 import * as dotenv from 'dotenv' 
 import Board from './game/models/board';
+import Player, { GameType, PlayerNumber } from './game/models/player';
 const app: Express = express();
 dotenv.config({ path: `.env${process.env.NODE_ENV}` });
 const swaggerJsdoc = require('swagger-jsdoc');
@@ -48,8 +49,11 @@ app.listen(process.env.PORT || 3000, () => {
 
 app.get('/game', async (_req: Request, res: Response) => {
   let board = new Board();
-  board.placePlayerSage(1);
-  board.placePlayerSage(2);
+  let player_1 = new Player(PlayerNumber.player_1, GameType.TwoPlayersGame);
+  let player_2 = new Player(PlayerNumber.player_2, GameType.TwoPlayersGame);
+  // Letting sages in their starting position
+  board.addPlayer(player_1);
+  board.addPlayer(player_2);
   board.displayGrid();
   return res.send(board);
 });
