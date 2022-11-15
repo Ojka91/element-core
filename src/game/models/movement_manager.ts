@@ -2,30 +2,30 @@
 import { Earth } from "./elements/earth";
 import { Wind } from "./elements/wind";
 import { Grid, Position } from "./grid";
-import { Empty, Piece } from "./pieces";
-
+import { Piece } from "./pieces";
+import { isSamePosition, isStrictPosition } from "./position_utils"
 
 /** Performs all checkers for the sage movement */
 export function isSageMoveValid(grid: Grid, current_position: Position, new_position: Position): boolean {
     
     // check if there has been a movement
-    if(hasMoved(current_position, new_position) == false){
+    if(isSamePosition(current_position, new_position)){
         // Hadn't moved so it's not considered a movement
         return false;
     }
     // Check if the new position is valid
-    if (isPositionValid(grid, new_position) == false){
+    if (grid.isPositionValid(new_position) == false){
         return false;
     }
 
     // Check if the movement is to an empty cell
-    if(isPositionEmpty(grid, new_position) == false){
+    if(grid.isPositionEmpty(new_position) == false){
         // illegal move
         return false;
     }
 
     // Check if the move has been strict
-    if(isStrictMove(current_position, new_position) == false){
+    if(isStrictPosition(current_position, new_position) == false){
         // Check if it's a legal wind/whirlwind move
         if(isWindJumpLegal(grid, current_position, new_position) == false){
             // illegal move
@@ -33,84 +33,6 @@ export function isSageMoveValid(grid: Grid, current_position: Position, new_posi
         }
     }    
     return true;
-}
-
-/** Check whether there is movement so current and new positions are different
- * return: true if there is movement, false otherwise
- */
-function hasMoved(current_position: Position, new_position: Position): boolean {
-    return !((current_position.row == new_position.row) && (current_position.column == new_position.column));
-}
-
-/** Check whether the position is inside the grid boundaries */
-function isPositionValid(grid: Grid, new_position: Position){
-    return (grid.getWidth() > new_position.column) && (grid.getHeight() > new_position.row);
-}
-
-/** Check whether the move is strict or not. Strict means moves of only a single cell
- * return: true if is strict, false otherwise
- */
-function isStrictMove(current_position: Position, new_position: Position): boolean {
-    const distance_x: number = Math.abs(current_position.column - new_position.column);
-    const distance_y: number = Math.abs(current_position.row - new_position.row);
-
-    if((distance_x > 1) || (distance_y > 1)){
-        return false;
-    }
-    return true;
-}
-
-/** Check whether the move is orthogonal
- * return: true if orthogonal, false otherwise
- */
-function isOrthogonalMove(current_position: Position, new_position: Position): boolean {
-
-    if(( current_position.row != new_position.row ) && (current_position.column == new_position.column)){
-        /** Horizontally Orthogonal */
-        return true;
-    }
-    
-    if((current_position.column != new_position.column) && (current_position.row == new_position.row)){
-        /** Vertically Orthogonal */
-        return true;
-    }
-    return false;
-}
-
-/** Check whether the move is diagonal
- * return: true if diagonal, false otherwise
- */
-function isDiagonalMove(current_position: Position, new_position: Position): boolean {
-    if((Math.abs(current_position.row - new_position.row) == 1) && (Math.abs(current_position.column - new_position.column) == 1)){
-        /** Diagonal move */
-        return true;
-    }
-    return false;
-}
-
-/** Check whether the position is empty
- * return: true if empty, false otherwise
- */
-function isPositionEmpty(grid: Grid, new_position: Position): boolean {
-    return grid.getGridCellByPosition(new_position) instanceof Empty;
-}
-
-/** Check whether the position is wind
- * return: true if empty, false otherwise
- */
- function isWindCell(grid: Grid, position: Position): boolean {
-    return grid.getGridCellByPosition(position) instanceof Wind;
-}
-
-/** Check whether the position is a mountain
- * return true if mountain, false otherwise
- */
-function isMountain(grid: Grid, position: Position): boolean {
-    const piece: Piece = grid.getGridCellByPosition(position);
-    if ( piece instanceof Earth){
-        return (piece as Earth).isMountain();
-    }
-    return false;
 }
 
 /** Check whether there is a range between the current position and the new position 
@@ -154,7 +76,7 @@ function isWindJumpLegal(grid: Grid, current_position: Position, new_position: P
     
     while (!((next_piece_pos.row == new_position.row) && (next_piece_pos.column == new_position.column))){
         // Check if current cell is wind
-        if(isWindCell(grid, next_piece_pos) == false){
+        if(grid.isWindCell(next_piece_pos) == false){
             // if it's not a wind piece, then the movement it's not allowed
             return false;
         }
@@ -171,7 +93,7 @@ function isWindJumpLegal(grid: Grid, current_position: Position, new_position: P
             }
 
             // Check if it's not a mountain
-            if(isMountain(grid, next_piece_pos)){
+            if(grid.isMountainCell(next_piece_pos)){
                 return false;
             }
 

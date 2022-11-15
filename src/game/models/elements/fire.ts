@@ -1,3 +1,4 @@
+import Grid, { Position } from "../grid";
 import { Piece } from "../pieces";
 import { Element } from "./elements";
 import { Wind } from "./wind";
@@ -20,5 +21,13 @@ import { Wind } from "./wind";
             return true;
         }
         return false;
+    }
+
+    reaction(grid: Grid, cell: Position): void {
+        this.propagate(grid, cell);
+    }
+
+    private propagate(grid: Grid, cell: Position): void {
+        console.log("propagate!")
     }
 }

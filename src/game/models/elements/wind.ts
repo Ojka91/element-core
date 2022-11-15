@@ -1,3 +1,4 @@
+import Grid, { Position } from "../grid";
 import { Piece } from "../pieces";
 import { Earth } from "./earth";
 import { Element } from "./elements";
@@ -32,5 +33,9 @@ const MAX_STACKED_WINDS: number = 4;
             }
         }
         return false;
+    }
+
+    public reaction(grid: Grid, cell: Position): void {
+        console.log("react!")
     }
 }

@@ -1,3 +1,4 @@
+import Grid, { Position } from "../grid";
 import { Piece } from "../pieces";
 import { Element } from "./elements";
 import { Water } from "./water";
@@ -40,5 +41,9 @@ import { Water } from "./water";
             }
         }
         return false;
+    }
+
+    public reaction(grid: Grid, cell: Position): void {
+        console.log("react!")
     }
 }

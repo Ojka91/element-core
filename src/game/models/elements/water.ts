@@ -1,3 +1,4 @@
+import Grid, { Position } from "../grid";
 import { Piece } from "../pieces";
 import { Element } from "./elements";
 import { Fire } from "./fire";
@@ -25,5 +26,9 @@ import { Fire } from "./fire";
         } 
         
         return false;
+    }
+
+    public reaction(grid: Grid, cell: Position): void {
+        console.log("react!")
     }
 }
