@@ -20,8 +20,7 @@ describe('Bcrypt', () => {
       const isValid = await encrypter.isValid('password', 'hashedPassword');
       expect(bcrypt.compareSync).toBeCalledTimes(1);
       expect(isValid).toBe(true)
-    })
-  
+    })  
 
-  })
+})
   
