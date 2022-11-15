@@ -1,5 +1,6 @@
 import { Piece } from "../pieces";
-import { Element, ElementTypes } from "./elements";
+import { Element } from "./elements";
+import { Water } from "./water";
 
 /**
  * Earth class
@@ -20,11 +21,10 @@ import { Element, ElementTypes } from "./elements";
     }
 
     ruleOfReplacement(piece_to_replace: Piece): boolean {
-        const piece_name = piece_to_replace.constructor.name;
-        if(piece_name == ElementTypes.Water){
+        if(piece_to_replace instanceof Water){
             return true;
         } 
-        if (piece_name == ElementTypes.Earth){
+        if (piece_to_replace instanceof Earth){
             if (this.is_mountain == false){
                 this.is_mountain = true;
                 this.is_range = true;

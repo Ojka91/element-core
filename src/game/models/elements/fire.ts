@@ -1,5 +1,6 @@
 import { Piece } from "../pieces";
-import { Element, ElementTypes } from "./elements";
+import { Element } from "./elements";
+import { Wind } from "./wind";
 
 /**
  * Fire class
@@ -15,8 +16,7 @@ import { Element, ElementTypes } from "./elements";
     }
 
     ruleOfReplacement(piece_to_replace: Piece): boolean {
-        const piece_name = piece_to_replace.constructor.name;
-        if(piece_name == ElementTypes.Wind){
+        if(piece_to_replace instanceof Wind){
             return true;
         }
         return false;

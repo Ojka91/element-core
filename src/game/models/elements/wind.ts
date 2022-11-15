@@ -1,5 +1,6 @@
 import { Piece } from "../pieces";
-import { Element, ElementTypes } from "./elements";
+import { Earth } from "./earth";
+import { Element } from "./elements";
 
 const MAX_STACKED_WINDS: number = 4;
 
@@ -18,10 +19,9 @@ const MAX_STACKED_WINDS: number = 4;
     }
 
     ruleOfReplacement(piece_to_replace: Piece): boolean {
-        const piece_name = piece_to_replace.constructor.name;
-        if(piece_name == ElementTypes.Earth){
+        if(piece_to_replace instanceof Earth){
             return true;
-        } else if (piece_name == ElementTypes.Wind){
+        } else if (piece_to_replace instanceof Wind){
             if(this.stacked_winds <= MAX_STACKED_WINDS){
                 this.stacked_winds++;
                 return true;
