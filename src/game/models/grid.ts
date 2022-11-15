@@ -1,4 +1,5 @@
 import { Earth } from "./elements/earth";
+import { Fire } from "./elements/fire";
 import { Wind } from "./elements/wind";
 import { Empty, Piece } from "./pieces";
 import { EmptyPieceCreator } from "./pieces_factory";
@@ -61,7 +62,10 @@ export class Grid {
 
     /** Check whether the position is inside the grid boundaries */
     public isPositionValid(new_position: Position){
-        return (this.getWidth() > new_position.column) && (this.getHeight() > new_position.row);
+        return (this.getWidth() > new_position.column) &&
+        (0 <= new_position.column) &&
+        (0 <= new_position.row) &&
+        (this.getHeight() > new_position.row);
     }
 
     /** Check whether the position is empty
@@ -71,11 +75,30 @@ export class Grid {
         return this.getGridCellByPosition(new_position) instanceof Empty;
     }
 
+    
+    /** Check whether the position is fire
+     * return: true if empty, false otherwise
+     */
+     public isFireCell(position: Position): boolean {
+        return this.getGridCellByPosition(position) instanceof Fire;
+    }
+    
     /** Check whether the position is wind
      * return: true if empty, false otherwise
      */
     public isWindCell(position: Position): boolean {
         return this.getGridCellByPosition(position) instanceof Wind;
+    }
+
+    /** Check whether the position is whirlwind
+     * return: true if empty, false otherwise
+     */
+     public isWhirlwindCell(position: Position): boolean {
+        const piece: Piece = this.getGridCellByPosition(position);
+        if (piece instanceof Wind){
+            return (piece as Wind).getNumberOfStackedWinds() > 1;
+        }
+        return false;
     }
 
     /** Check whether the position is a mountain
