@@ -20,6 +20,14 @@ import { Water } from "./water";
         super();
     }
 
+    public isMountain(): boolean {
+        return this.is_mountain;
+    }
+
+    public isRange(): boolean {
+        return this.is_range;
+    }
+
     ruleOfReplacement(piece_to_replace: Piece): boolean {
         if(piece_to_replace instanceof Water){
             return true;

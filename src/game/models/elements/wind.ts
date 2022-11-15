@@ -18,6 +18,10 @@ const MAX_STACKED_WINDS: number = 4;
         super();
     }
 
+    public getNumberOfStackedWinds(): number {
+        return this.stacked_winds;
+    }
+
     ruleOfReplacement(piece_to_replace: Piece): boolean {
         if(piece_to_replace instanceof Earth){
             return true;

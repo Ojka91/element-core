@@ -54,7 +54,7 @@ class ElementPoolManager {
     }
 
     public removeElement(element: ElementTypes): void {
-        const pool_element = this.mapper.get(element);
+        const pool_element: ElementPool = this.mapper.get(element);
         pool_element.decrease();
     }
 
