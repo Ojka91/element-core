@@ -61,6 +61,15 @@ export class Grid {
         return cells;
     }
 
+    /** Clears the cell by placing an empty piece */
+    public clearCell(cell: Position): void {
+        if(this.isPositionValid(cell)){
+            const piece: Empty = new Empty();
+            piece.updatePosition(cell)
+            this.updateGridCell(piece);
+        }
+    }
+
     /** Check whether the position is inside the grid boundaries */
     public isPositionValid(new_position: Position){
         return (this.getWidth() > new_position.column) &&

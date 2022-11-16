@@ -86,6 +86,13 @@ export function isOrthogonalPosition(current_position: Position, new_position: P
     return false;
 }
 
+/** Check whether is strict orthogonal
+ * return: true if strict orthogonal, false otherwise
+ */
+export function isStrictOrthogonalPosition(current_position: Position, new_position: Position): boolean {
+    return isOrthogonalPosition(current_position, new_position) && isStrictPosition(current_position, new_position);
+}
+
 /** Check whether the move is diagonal
  * return: true if diagonal, false otherwise
  */
