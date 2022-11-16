@@ -19,23 +19,45 @@ const MAX_STACKED_WINDS: number = 4;
         super();
     }
 
+    public isMaxWhirlwind(): boolean {
+        return this.stacked_winds == MAX_STACKED_WINDS;
+    }
+
+    public increaseStackedWinds(): void {
+        if(this.stacked_winds < MAX_STACKED_WINDS){
+            this.stacked_winds++;
+        }
+    }
+
     public getNumberOfStackedWinds(): number {
         return this.stacked_winds;
     }
 
-    ruleOfReplacement(piece_to_replace: Piece): boolean {
+    public ruleOfReplacement(piece_to_replace: Piece): boolean {
         if(piece_to_replace instanceof Earth){
+            if(piece_to_replace.isMountain() || piece_to_replace.isRange()){
+                return false;
+            }
             return true;
         } else if (piece_to_replace instanceof Wind){
-            if(this.stacked_winds <= MAX_STACKED_WINDS){
-                this.stacked_winds++;
-                return true;
-            }
+            return !this.isMaxWhirlwind()
         }
         return false;
     }
 
     public reaction(grid: Grid, cell: Position): void {
-        console.log("react!")
+        const piece: Piece = grid.getGridCellByPosition(cell);
+        if(grid.isWindCell(cell)){
+            if(this.ruleOfReplacement(piece as Wind)){
+                (piece as Wind).increaseStackedWinds();
+                grid.updateGridCell(piece)
+            }
+        } else if (grid.isEarthCell(cell)){
+            if(this.ruleOfReplacement(piece as Earth)){
+                const wind: Wind = new Wind();
+                wind.updatePosition(cell);
+                grid.updateGridCell(wind);
+            }
+        }
     }
 }

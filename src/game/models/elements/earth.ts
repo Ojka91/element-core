@@ -1,7 +1,11 @@
 import Grid, { Position } from "../grid";
 import { Piece } from "../pieces";
+import { all_direction_increment_map, AxisIncrement } from "../position_utils";
 import { Element } from "./elements";
 import { Water } from "./water";
+
+
+const all_direction_map: Map<string, AxisIncrement> = all_direction_increment_map;
 
 /**
  * Earth class
@@ -29,14 +33,21 @@ import { Water } from "./water";
         return this.is_range;
     }
 
-    ruleOfReplacement(piece_to_replace: Piece): boolean {
+    public promoteToRange(): void {
+        this.is_range = true;
+    }
+
+    public promoteToMountain(): void {
+        this.is_mountain = true;
+        this.promoteToRange();
+    }
+
+    public ruleOfReplacement(piece_to_replace: Piece): boolean {
         if(piece_to_replace instanceof Water){
             return true;
         } 
         if (piece_to_replace instanceof Earth){
             if (this.is_mountain == false){
-                this.is_mountain = true;
-                this.is_range = true;
                 return true;
             }
         }
@@ -44,6 +55,54 @@ import { Water } from "./water";
     }
 
     public reaction(grid: Grid, cell: Position): void {
-        console.log("react!")
+        const piece: Piece = grid.getGridCellByPosition(cell);
+        if(this.ruleOfReplacement(piece)){
+            if(grid.isWaterCell(cell)){
+                const earth: Earth = new Earth();
+                earth.updatePosition(cell);
+                grid.updateGridCell(earth);
+            } else if ( (grid.isEarthCell(cell)) && (grid.isMountainCell(cell)==false)){
+                (piece as Earth).promoteToMountain();
+                this.formRange(grid, cell);
+            }
+            
+        }
+    }
+
+    private formRange(grid: Grid, cell: Position){
+
+        // In this array are stored all the surrounding Earths of the evaluated earth position
+        let surrounding_earths: Array<Position> = this.getSurroundingEarths(grid, cell);
+
+        // Until there are surrounding earths to evaluate
+        while(surrounding_earths.length != 0){
+            let next_surrounding_earths: Array<Position> = [];
+            surrounding_earths.forEach((earth_pos: Position) => {
+                const earth: Earth = grid.getGridCellByPosition(earth_pos) as Earth;
+                earth.promoteToRange();
+                
+                next_surrounding_earths = next_surrounding_earths.concat(earth.getSurroundingEarths(grid, earth_pos));
+
+            });
+            surrounding_earths = next_surrounding_earths;
+        }
+        
+    }
+    
+    private getSurroundingEarths(grid: Grid, cell: Position): Array<Position> {
+        let surrounding_earths: Array<Position> = [];
+        let evaluation_cell: Position;
+
+        all_direction_map.forEach((value: AxisIncrement, key: string) => {
+            evaluation_cell = {
+                row: cell.row + value.y,
+                column: cell.column + value.x
+            };
+            if(grid.isPositionValid(evaluation_cell) && grid.isEarthCell(evaluation_cell) && (grid.isRangeCell(evaluation_cell) == false)){
+                surrounding_earths.push(evaluation_cell);
+            }
+        })
+
+        return surrounding_earths;
     }
 }

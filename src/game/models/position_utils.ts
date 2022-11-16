@@ -1,5 +1,54 @@
 import { Position } from "./grid";
 
+export type AxisIncrement = {
+    x: number,
+    y: number
+}
+
+export const orthogonal_increment_map: Map<string, AxisIncrement> = new Map([
+    ["Up", {
+        x: 0,
+        y: 1
+    }],
+    ["Left", {
+        x: -1,
+        y: 0
+    }],
+    ["Down", {
+        x: 0,
+        y: -1
+    }],
+    ["Right", {
+        x: 1,
+        y: 0
+    }]
+]);
+
+export const diagonal_increment_map: Map<string, AxisIncrement> = new Map([
+    ["Up-Left", {
+        x: -1,
+        y: 1
+    }],
+    ["Left-Down", {
+        x: -1,
+        y: -1
+    }],
+    ["Down-Right", {
+        x: 1,
+        y: -1
+    }],
+    ["Up-Right", {
+        x: 1,
+        y: 1
+    }]
+]);
+
+export const all_direction_increment_map: Map<string, AxisIncrement> = new Map([
+    ...orthogonal_increment_map.entries(), 
+    ...diagonal_increment_map.entries()
+]);
+
+
 /** Check whether positions are different or not
  * return: true if are the same, false otherwise
  */

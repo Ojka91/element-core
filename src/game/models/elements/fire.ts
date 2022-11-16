@@ -1,33 +1,10 @@
 import Grid, { Position } from "../grid";
 import { Piece } from "../pieces";
+import { AxisIncrement, orthogonal_increment_map } from "../position_utils";
 import { Element } from "./elements";
 import { Wind } from "./wind";
 
-enum PropagationDirection {
-    Up = "Up",
-    Down = "Down",
-    Left = "Left",
-    Right = "Right"
-}
-
-const propagation_map = {
-    "Up": {
-        inc_x: 0,
-        inc_y: 1
-    },
-    "Down": {
-        inc_x: 0,
-        inc_y: -1
-    },
-    "Left": {
-        inc_x: -1,
-        inc_y: 0
-    },
-    "Right": {
-        inc_x: 1,
-        inc_y: 0
-    }
-}
+const propagation_map: Map<string, AxisIncrement> = orthogonal_increment_map;
 
 /**
  * Fire class
@@ -44,25 +21,26 @@ const propagation_map = {
 
     ruleOfReplacement(piece_to_replace: Piece): boolean {
         if(piece_to_replace instanceof Wind){
-            return true;
+            if(piece_to_replace.getNumberOfStackedWinds() == 1){
+                return true;
+            }
         }
         return false;
     }
 
     reaction(grid: Grid, cell: Position): void {
 
-        this.propagate(grid, cell, PropagationDirection.Up);
-        this.propagate(grid, cell, PropagationDirection.Down);
-        this.propagate(grid, cell, PropagationDirection.Left);
-        this.propagate(grid, cell, PropagationDirection.Right);
+        propagation_map.forEach((value: AxisIncrement, key: string) => {
+            this.propagate(grid, cell, value);
+        })
     }
 
     /** Propagation shall be done by looking for Orthogonal lines of fire and adding one extra fire in the opposite side of the placed cell */
-    private propagate(grid: Grid, cell: Position, direction: PropagationDirection): void {
+    private propagate(grid: Grid, cell: Position, direction: AxisIncrement): void {
         
         const evaluation_cell: Position = {
-            row: cell.row + propagation_map[direction].inc_y,
-            column: cell.column + propagation_map[direction].inc_x
+            row: cell.row + direction.y,
+            column: cell.column + direction.x
         }
         if(grid.isPositionValid(evaluation_cell)){
             if (grid.isFireCell(evaluation_cell)){
@@ -73,7 +51,7 @@ const propagation_map = {
                 
                 if(grid.isPositionEmpty(evaluation_cell)){
                     grid.updateGridCell(free_fire);
-                } else if(grid.isWindCell(evaluation_cell) && !(grid.isWhirlwindCell(evaluation_cell))){
+                } else if(this.ruleOfReplacement(grid.getGridCellByPosition(evaluation_cell))){
                     grid.updateGridCell(free_fire);
                 }
             }
