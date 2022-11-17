@@ -27,6 +27,8 @@
     "pino": "^8.7.0",
     "pino-http": "^8.2.1",
     "redis": "4.0.1",
+    "socket.io": "^4.5.3",
+    "socket.io-client": "^4.5.3",
     "swagger-jsdoc": "^6.2.5",
     "swagger-ui-express": "^4.5.0"
   },
