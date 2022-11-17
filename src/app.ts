@@ -6,6 +6,7 @@ import mongoose from 'mongoose'
 import * as dotenv from 'dotenv' 
 import Board from './game/models/board';
 import Player, { GameType, PlayerNumber } from './game/models/player';
+import { Redis } from './redis';
 const app: Express = express();
 dotenv.config({ path: `.env${process.env.NODE_ENV}` });
 const swaggerJsdoc = require('swagger-jsdoc');
@@ -57,3 +58,6 @@ app.get('/game', async (_req: Request, res: Response) => {
   board.displayGrid();
   return res.send(board);
 });
+
+const redis = new Redis()
+redis.connect()
