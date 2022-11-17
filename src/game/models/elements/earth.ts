@@ -1,11 +1,11 @@
 import Grid, { Position } from "../grid";
 import { Piece } from "../pieces";
-import { all_direction_increment_map, AxisIncrement } from "../position_utils";
+import { PositionUtils, AxisIncrement } from "../position_utils";
 import { Element } from "./elements";
 import { Water } from "./water";
 
 
-const all_direction_map: Map<string, AxisIncrement> = all_direction_increment_map;
+const all_direction_map: Map<string, AxisIncrement> = PositionUtils.all_direction_increment_map;
 
 /**
  * Earth class

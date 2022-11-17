@@ -1,6 +1,6 @@
 import Grid, { Position } from "../grid";
 import { Piece } from "../pieces";
-import { AxisIncrement, isSamePosition, isStrictOrthogonalPosition, orthogonal_increment_map } from "../position_utils";
+import { AxisIncrement, PositionUtils } from "../position_utils";
 import { Element } from "./elements";
 import { Fire } from "./fire";
 
@@ -99,7 +99,7 @@ import { Fire } from "./fire";
         let previous_pos: Position | null = null;
         for (let pos of river_pos_list){
             if(previous_pos != null){
-                if(isStrictOrthogonalPosition(previous_pos, pos) == false){
+                if(PositionUtils.isStrictOrthogonalPosition(previous_pos, pos) == false){
                     return false;
                 }
             }
@@ -131,12 +131,12 @@ import { Fire } from "./fire";
 
     private getSurroundingWaters(grid: Grid, cell: Position): Array<Position> {
         let surr_waters_position: Array<Position> = [];
-        orthogonal_increment_map.forEach((value: AxisIncrement, key: string) => {
+        PositionUtils.orthogonal_increment_map.forEach((value: AxisIncrement, key: string) => {
             const evaluate_pos: Position = {
                 row: cell.row + value.y,
                 column: cell.column + value.x
             };
-            if(grid.isWaterCell(evaluate_pos)){
+            if(grid.isPositionValid(evaluate_pos) && grid.isWaterCell(evaluate_pos)){
                 surr_waters_position.push(evaluate_pos);
             }
         });
@@ -148,11 +148,11 @@ import { Fire } from "./fire";
         const river_head: Position = river[0];
         const new_river_head: Position = new_river[0];
         
-        /*if(isSamePosition(river_head, new_river_head)){
+        /*if(PositionUtils.isSamePosition(river_head, new_river_head)){
             return false;
         }*/
         // Check if heads are strictly orthogonal to the cell
-        if(isStrictOrthogonalPosition(cell, river_head) && isStrictOrthogonalPosition(cell, new_river_head)){
+        if(PositionUtils.isStrictOrthogonalPosition(cell, river_head) && PositionUtils.isStrictOrthogonalPosition(cell, new_river_head)){
             return true;
         }
         return false;

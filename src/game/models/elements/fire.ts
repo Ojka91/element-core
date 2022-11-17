@@ -1,10 +1,10 @@
 import Grid, { Position } from "../grid";
 import { Piece } from "../pieces";
-import { AxisIncrement, orthogonal_increment_map } from "../position_utils";
+import { AxisIncrement, PositionUtils } from "../position_utils";
 import { Element } from "./elements";
 import { Wind } from "./wind";
 
-const propagation_map: Map<string, AxisIncrement> = orthogonal_increment_map;
+const propagation_map: Map<string, AxisIncrement> = PositionUtils.orthogonal_increment_map;
 
 /**
  * Fire class
