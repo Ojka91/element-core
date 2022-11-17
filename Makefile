@@ -4,7 +4,8 @@ local-up:
 	docker-compose up --build
 
 # Build and run redis
-docker build -t redis -f Dockerfile-redis . && docker run -p 6379:6379 redis
+redis:
+	docker build -t redis -f Dockerfile-redis . && docker run -p 6379:6379 redis
 
 # Build and run the dev docker image
 docker-run:	
