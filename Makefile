@@ -1,4 +1,8 @@
 ## CONTAINER COMMANDS
+# Build and run backend service and redis locally
+local-up:
+	docker-compose up --build
+
 # Build and run the dev docker image
 docker-run:	
 	docker build -t element-backend . && docker run --env-file='.env-dev' -p 3000:3000 element-backend

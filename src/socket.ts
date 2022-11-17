@@ -1,4 +1,8 @@
 import { Server } from "socket.io";
+
+/**
+ * This class is reponsible to mantain socket connection and logic between players and server when game begins
+ */
 class Socket {
     private io: any;
 
@@ -50,8 +54,6 @@ class Socket {
        })
 
     })
-
-
 
   }
 
