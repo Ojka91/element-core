@@ -1,6 +1,6 @@
 import Grid, { Position } from "../grid";
 import { Piece } from "../pieces";
-import { AxisIncrement, isStrictOrthogonalPosition, orthogonal_increment_map } from "../position_utils";
+import { AxisIncrement, isSamePosition, isStrictOrthogonalPosition, orthogonal_increment_map } from "../position_utils";
 import { Element } from "./elements";
 import { Fire } from "./fire";
 
@@ -28,34 +28,62 @@ import { Fire } from "./fire";
         return false;
     }
 
+    /** Water reaction
+     * Both selected river and new river are optionals since not always a river is formed.
+     * Rivers must be sorted and have their head as the first element in the array.
+     * 
+     * NOTE:    A river head is the nearest position to the cell. Therefore rivers are always formed as head-to-tail
+     *          where the head is the nearest position to the water placed and the tail is the further water.
+     */
     public reaction(
         grid: Grid,
         cell: Position,
-        selected_river_pos_list?: Array<Position>,
-        new_river_pos_list?: Array<Position>
+        curr_river?: Array<Position>,  // must be sorted and head must be the first element
+        new_river?: Array<Position>        // must be sorted and head must be the first element
         ): void {
 
+            const surr_waters: Array<Position> = this.getSurroundingWaters(grid, cell);
             // Check if new water creates a River or is alone
-            if(this.isWaterOrthogonallySurrounded(grid, cell) == false){
+            if( surr_waters.length == 0){
                 // water standalone, do nothing
                 return;
             }
 
             // It forms a river, is river data provided?
-            if((new_river_pos_list == undefined) || (new_river_pos_list.length == 0)){
+            if((new_river == undefined) || (new_river.length == 0)){
                 throw new Error("Water reaction requires a new river array with at least 1 position. Got undefined or 0")
             }
-            if((selected_river_pos_list == undefined) || (selected_river_pos_list.length == 0)){
-                throw new Error("Water reaction requires a new river array with at least 1 position. Got undefined or 0")
+            if((curr_river == undefined) || (curr_river.length == 0)){
+                throw new Error("Water reaction requires an old river array with at least 1 position. Got undefined or 0")
+            }
+
+            const selected_river_pos_list: Array<Position> = JSON.parse(JSON.stringify(curr_river));
+            const new_river_pos_list: Array<Position> = JSON.parse(JSON.stringify(new_river));
+
+            if(new_river_pos_list.length - 1 != selected_river_pos_list.length){
+                throw new Error("New river must have the old river length + 1")
+            }
+
+            // River data are a legal move?
+            if(this.isRiverLegal(cell, selected_river_pos_list, new_river_pos_list)== false){
+                throw new Error("River is illegal. Heads of the rivers must be opposite to the new water piece position")
+            }
+
+            // Add placed water to the old river list
+            selected_river_pos_list.unshift(cell);
+
+            // New river data is provided, is it valid?
+            if(this.isNewRiverValid(grid, new_river_pos_list!) == false){
+                throw new Error("New river data provided is invalid");
             }
             // River data is provided, is it valid?
-            if(this.isNewRiverValid(grid, new_river_pos_list!) && this.isValidRiver(grid, selected_river_pos_list!)){
+            if(this.isValidRiver(grid, selected_river_pos_list!) == false){
                 throw new Error("River data provided is invalid");
             }
 
-            // River data provided is valid, is it a legal move?
-            if(this.isRiverLegal(cell, selected_river_pos_list, new_river_pos_list)== false){
-                throw new Error("River is illegal. Head or tail of the river must be opposite to the new water piece position")
+            // Clear old river
+            for (let pos of selected_river_pos_list!){
+                grid.clearCell(pos);
             }
 
             // Add new river
@@ -64,46 +92,33 @@ import { Fire } from "./fire";
                 water.updatePosition(pos);
                 grid.updateGridCell(water);
             }
-
-            // Clear old river
-            for (let pos of selected_river_pos_list!){
-                grid.clearCell(pos);
-            }
             
     }
 
-    public isRiverOrthogonal(river_pos_list: Array<Position>): boolean {
-        if(river_pos_list.length == 0){
-            return false;
-        }
-        let temp_river: Array<Position> = river_pos_list.reverse();
-        let previous_pos: Position = temp_river.pop()!;
-        for (let pos of temp_river){
-            if(isStrictOrthogonalPosition(previous_pos, pos) == false){
-                return false;
+    private isRiverOrthogonal(river_pos_list: Array<Position>): boolean {
+        let previous_pos: Position | null = null;
+        for (let pos of river_pos_list){
+            if(previous_pos != null){
+                if(isStrictOrthogonalPosition(previous_pos, pos) == false){
+                    return false;
+                }
             }
             previous_pos = pos;
         }
         return true;
+
     }
 
-    public isValidRiver(grid: Grid, river_pos_list: Array<Position>): boolean {
-        if(river_pos_list.length == 0){
-            return false;
-        }
+    private isValidRiver(grid: Grid, river_pos_list: Array<Position>): boolean {
         for(let water_pos of river_pos_list){
             if(grid.isWaterCell(water_pos) == false){
                 return false;
             }
         }
-        
         return this.isRiverOrthogonal(river_pos_list);
     }
 
-    private isNewRiverValid(grid: Grid, river_pos_list: Array<Position>) {
-        if(river_pos_list.length == 0){
-            return false;
-        }
+    private isNewRiverValid(grid: Grid, river_pos_list: Array<Position>) : boolean {
         for(let pos of river_pos_list){
             if(grid.isPositionEmpty(pos) == false){
                 if (this.ruleOfReplacement(grid.getGridCellByPosition(pos)) == false){
@@ -114,23 +129,32 @@ import { Fire } from "./fire";
         return this.isRiverOrthogonal(river_pos_list);
     }
 
-    private isWaterOrthogonallySurrounded(grid: Grid, cell: Position): boolean {
+    private getSurroundingWaters(grid: Grid, cell: Position): Array<Position> {
+        let surr_waters_position: Array<Position> = [];
         orthogonal_increment_map.forEach((value: AxisIncrement, key: string) => {
             const evaluate_pos: Position = {
                 row: cell.row + value.y,
                 column: cell.column + value.x
             };
             if(grid.isWaterCell(evaluate_pos)){
-                return true;
+                surr_waters_position.push(evaluate_pos);
             }
         });
-        return false;
+        return surr_waters_position;
     }
 
+    /** Check whether the head of both river and new river are orthogonal to cell position */
     private isRiverLegal(cell: Position, river: Array<Position>, new_river: Array<Position>): boolean {
-        if((isStrictOrthogonalPosition(cell, river[0]) == false) && (isStrictOrthogonalPosition(cell, river[river.length - 1]) == false)){
+        const river_head: Position = river[0];
+        const new_river_head: Position = new_river[0];
+        
+        /*if(isSamePosition(river_head, new_river_head)){
             return false;
+        }*/
+        // Check if heads are strictly orthogonal to the cell
+        if(isStrictOrthogonalPosition(cell, river_head) && isStrictOrthogonalPosition(cell, new_river_head)){
+            return true;
         }
-        return true
+        return false;
     }
 }
