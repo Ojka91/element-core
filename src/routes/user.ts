@@ -1,3 +1,4 @@
+import { socket } from '@/app';
 import { User } from '@/controllers/user';
 import express, { Request, Response, Router } from 'express';
 
@@ -33,5 +34,11 @@ export const user: Router = express.Router();
 user.get('/user', async (req: Request, res: Response) => {
     const userController = new User();
     return res.send(await userController.getUserData());
+})
+
+user.get('/room', async (req: Request, res: Response) => {
+    // Testing porpouses TODO DELETE!!
+   socket.emmitRoom()
+   return res.send('emmited to room 1')
 })
 
