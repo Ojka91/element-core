@@ -9,6 +9,7 @@ import Socket from './socket';
 export const app: Express = express();
 import Board from './game/models/board';
 import Player, { GameType, PlayerNumber } from './game/models/player';
+import { RedisSingleton } from './redis';
 dotenv.config({ path: `.env${process.env.NODE_ENV}` });
 
 app.use(cors());
@@ -37,6 +38,29 @@ app.get('/game', async (_req: Request, res: Response) => {
   board.displayGrid();
   return res.send(board);
 });
+
+app.get('/add', async (_req: Request, res: Response) => {
+  let redis = RedisSingleton.getInstance();
+  let response = await redis.set('1234', {
+    id: '1234',
+    players: [
+      {
+        name: "oscar"
+      },
+      {
+        name: "marc"
+      }
+    ]
+  })
+  return res.send(response);
+});
+
+app.get('/get', async (_req: Request, res: Response) => {
+  let redis = RedisSingleton.getInstance();
+  return res.send(await redis.get('1234'));
+});
+
+if (process.env.ENV != 'development') RedisSingleton.getInstance().connect()
 
 export const socket = new Socket(server);
 socket.init()
