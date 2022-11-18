@@ -4,7 +4,7 @@ import { Fire } from "../elements/fire";
 import { Water } from "../elements/water";
 import { Wind } from "../elements/wind";
 import { Position } from "../grid";
-import { Empty, Sage } from "../pieces";
+import { Empty, Piece, Sage } from "../pieces";
 import { ElementPieceCreator, EmptyPieceCreator, SagePieceCreator } from "../pieces_factory"
 
 
@@ -25,7 +25,7 @@ describe('Pieces', () => {
 
     it('Pieces factory: Can create all Element pieces', async () => {
         let element_factory = new ElementPieceCreator(ElementTypes.Fire).createPiece();
-        let element = new Fire();
+        let element: Piece = new Fire();
 
         expect(element_factory).toStrictEqual(element);
 
