@@ -2,7 +2,7 @@ import { Grid, Position } from "./grid";
 import { ElementTypes } from "./elements/elements";
 import ElementPoolManager from "./element_pool_manager";
 import Player from "./player";
-import { isSageMoveValid } from "./movement_manager";
+import { MovementManager } from "./movement_manager";
 
 const COLUMN_PIECES_WIDTH: number = 11;
 const ROW_PIECES_HEIGHT: number = 11;
@@ -35,7 +35,7 @@ class Board {
         if (( new_position.column >= COLUMN_PIECES_WIDTH) || (new_position.row >= ROW_PIECES_HEIGHT)){
             throw new Error("Incorrect new row or new column dimensions");
         }
-        if(isSageMoveValid(this.grid, sage.position, new_position) == false){
+        if(MovementManager.isSageMoveValid(this.grid, sage.position, new_position) == false){
             throw new Error("Sage movement is not valid");
         }
         sage.updatePosition(new_position);
