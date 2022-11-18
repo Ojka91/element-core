@@ -3,11 +3,11 @@
 local-up:
 	docker-compose up --build
 
-# Build and run redis
+# Build and run redis separately !! Not possible to connect if built separately for now
 redis:
 	docker build -t redis -f Dockerfile-redis . && docker run -p 6379:6379 redis
 
-# Build and run the dev docker image
+# Build and run the dev docker image !! Wont connect to redis. Development only
 docker-run:	
 	docker build -t element-backend . && docker run --env-file='.env-dev' -p 3000:3000 element-backend
 

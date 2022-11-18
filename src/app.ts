@@ -60,7 +60,7 @@ app.get('/get', async (_req: Request, res: Response) => {
   return res.send(await redis.get('1234'));
 });
 
-const redis = RedisSingleton.getInstance()
-redis.connect()
+if (process.env.ENV != 'development') RedisSingleton.getInstance().connect()
+
 export const socket = new Socket(server);
 socket.init()
