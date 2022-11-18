@@ -1,32 +1,21 @@
-
 import { Sage } from "../pieces";
-import Player, { GameType, PlayerNumber } from "../player";
+import Player from "../player";
 
 
 describe('Player', () => {
-    it('getSage: sage is returned upon new player is created ', async () => {
-        let player_1 = new Player(PlayerNumber.player_1, GameType.TwoPlayersGame);
-        let sage = player_1.getSage();
-        let result = sage instanceof Sage;
+    it('getSage: sage should be returned or throw an error ', async () => {
+        let player_1 = new Player(0);
         
-        expect(result).toBe(true);
+        expect(() => {player_1.getSage();}).toThrow("Player has no assigned sage")
+        
+        const sage: Sage = new Sage();
+        player_1.setSage(sage);
 
-        player_1 = new Player(PlayerNumber.player_1, GameType.FourPlayersGame);
-        sage = player_1.getSage();
-        result = sage instanceof Sage;
-
-        expect(result).toBe(true);
+        expect(player_1.getSage()).toStrictEqual(sage);
     });
 
-    it('getSage: should throw an error if game type is two players and player number is greater than 2 ', async () => {
-        expect(() => {
-            new Player(PlayerNumber.player_3, GameType.TwoPlayersGame);
-        }).toThrow('Player number cannot be greater than allowed players in a Game');
-                
-    })
-
     it('getUuid: should return an uuid', async () => {
-        const player_1 = new Player(PlayerNumber.player_1, GameType.TwoPlayersGame);
+        const player_1 = new Player(0);
         const uuid = player_1.getUuid();
         const result = uuid == "";
 
