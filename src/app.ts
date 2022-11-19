@@ -48,8 +48,8 @@ app.get('/game', async (_req: Request, res: Response) => {
   return res.send(room);
 });
 
-/** Debugging purposes: Display the game board */
-app.get('/display_board', async (_req: Request, res: Response) => {
+/** Debugging purposes: Display the entire room */
+app.get('/display_room', async (_req: Request, res: Response) => {
   
   const game: GameController = new GameController();
   const room: Room = await game.loadRoom(room_id);
