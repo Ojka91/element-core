@@ -43,7 +43,7 @@ app.get('/game', async (_req: Request, res: Response) => {
   room.addUser(user_1);
   room.addUser(user_2);
 
-  game.gameStart(room);
+  await game.gameStart(room);
 
   return res.send(room);
 });
@@ -52,7 +52,7 @@ app.get('/game', async (_req: Request, res: Response) => {
 app.get('/display_board', async (_req: Request, res: Response) => {
   
   const game: GameController = new GameController();
-  const room: Room = game.loadRoom(room_id);
+  const room: Room = await game.loadRoom(room_id);
 
   return res.send(room);
 });
@@ -61,7 +61,7 @@ app.get('/add', async (_req: Request, res: Response) => {
   let redis = RedisSingleton.getInstance();
   let response = await redis.set('1234', {
     id: '1234',
-    players: [
+    players: [        
       {
         name: "oscar"
       },

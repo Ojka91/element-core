@@ -6,7 +6,7 @@ import { createClient } from '@node-redis/client';
  * We use it to store, retreive and update live game statuses
  * We only keep data in memory for 1 day
  */
-export class Redis {
+class Redis {
     
     private client;
 
