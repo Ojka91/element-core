@@ -9,8 +9,7 @@ export class GameCache {
     }
 
     public static async loadRoom(room_id: string): Promise<Room> {
-        let cacher = RedisSingleton.getInstance();
-        return await cacher.get(room_id);
+       await RedisSingleton.getInstance().get(room_id);
     }
     
 }
