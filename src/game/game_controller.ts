@@ -11,4 +11,8 @@ export class GameController {
     public async loadRoom(room_id: string): Promise<Room> {
         return await GameCache.loadRoom(room_id);
     }
+
+    public async saveRoom(room: Room): Promise<void> {
+        await GameCache,this.saveRoom(room);
+    }
 }
