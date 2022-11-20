@@ -7,9 +7,11 @@ import Database from './database';
 import Swagger from './utils/swagger';
 import Socket from './socket';
 export const app: Express = express();
-import Board from './game/models/board';
-import Player, { GameType, PlayerNumber } from './game/models/player';
 import { RedisSingleton } from './redis';
+import Room from './game/models/room';
+import { User } from './game/user';
+import { GameController } from './game/game_controller';
+//import { User } from './controllers/user';
 dotenv.config({ path: `.env${process.env.NODE_ENV}` });
 
 app.use(cors());
@@ -28,22 +30,38 @@ var server = app.listen(process.env.PORT || 3000, () => {
   console.log('Server listening on port 3000')
 });
 
+/* Game debugging endpoints */
+let room_id: string;
 app.get('/game', async (_req: Request, res: Response) => {
-  let board = new Board();
-  let player_1 = new Player(PlayerNumber.player_1, GameType.TwoPlayersGame);
-  let player_2 = new Player(PlayerNumber.player_2, GameType.TwoPlayersGame);
-  // Letting sages in their starting position
-  board.addPlayer(player_1);
-  board.addPlayer(player_2);
-  board.displayGrid();
-  return res.send(board);
+  let room = new Room();
+  const game: GameController = new GameController();
+  room_id = room.getUuid()
+
+  const user_1: User = new User("Arkk92");
+  const user_2: User = new User("Ojka");
+
+  room.addUser(user_1);
+  room.addUser(user_2);
+
+  await game.gameStart(room);
+
+  return res.send(room);
+});
+
+/** Debugging purposes: Display the entire room */
+app.get('/display_room', async (_req: Request, res: Response) => {
+  
+  const game: GameController = new GameController();
+  const room: Room = await game.loadRoom(room_id);
+
+  return res.send(room);
 });
 
 app.get('/add', async (_req: Request, res: Response) => {
   let redis = RedisSingleton.getInstance();
   let response = await redis.set('1234', {
     id: '1234',
-    players: [
+    players: [        
       {
         name: "oscar"
       },
