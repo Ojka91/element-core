@@ -13,6 +13,6 @@ export class GameController {
     }
 
     public async saveRoom(room: Room): Promise<void> {
-        await GameCache,this.saveRoom(room);
+        await GameCache.saveRoom(room);
     }
 }
