@@ -109,6 +109,16 @@ class Socket {
         console.log(data)
       })
 
+      socket.on("forceGameUpdate", async (data: any) => {
+        /**
+         * Testing porpouses
+         * When client triggers this event, an event is sent to the room1 under boardMovement event
+         */
+        const room = await this.gameController.loadRoom("room1");
+        this.io.to("room1").emit('gameUpdate', {room: room});
+        console.log(room)
+      })
+
       socket.on("disconnect", (socket: any) => {
         console.log("client disconnected")
   
