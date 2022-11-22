@@ -2,7 +2,7 @@ import { Server } from "socket.io";
 import { GameController } from "./game/game_controller";
 import Room from "./game/models/room";
 import { QueueController } from "./game/queue_controller";
-import { User } from "./game/user";
+import { PublicServerResponse } from "./schemas/server_response";
 
 export enum queue {
   queue2 = 'queue2',
@@ -22,14 +22,14 @@ export type JoinGame = {
  */
 class Socket {
     private io: any;
-    private gameController: GameController;
 
     constructor(server: any) {
       this.io = new Server(server)
-      this.gameController = new GameController();
     }
   public init() {
-    
+
+    const gameController = new GameController();
+
     const queueController = new QueueController();
 
     this.io.on("connection", (socket: any) => {
@@ -51,10 +51,9 @@ class Socket {
         // 2. Checking if that queue have enough players
         if(queueController.isQueueFull(data)) {
           // 2.1 Creating and saving new room
-          let room = new Room();
-          await this.gameController.saveRoom(room);
+          let roomId: string = await gameController.createRoom();
           // 2.1 Sending roomId to client for them to join
-          this.io.to(data.queue).emit('gameFound', {roomId: room.getUuid});
+          this.io.to(data.queue).emit('gameFound', {roomId: roomId});
           // 2.1 Cleaning queue room from those players that found the game !! This system may fail if we have a lot of concurrency, we may change it in the future
           this.io.socketsLeave(data.queue);
         }
@@ -73,17 +72,19 @@ class Socket {
         // 1. Join game/roomId socket
         socket.join(data.roomId)
         // 1. Join user into the game room
-        let room: Room = await this.gameController.loadRoom(data.roomId);
-        room.addUser(new User(socket.id)); // Username is socketid
+        let room: Room = await gameController.loadRoom(data.roomId);
+        gameController.addUser(room, socket.id)
+        
 
         // 2. Checking if room is full so game can start
-        if(room.isRoomFull()) { // TBD TODO !!! we have no way to check if the room is created for 2, 3 or 4 players yet! should we implement it??!
+        if(gameController.isRoomFull(room)) { // TBD TODO !!! we have no way to check if the room is created for 2, 3 or 4 players yet! should we implement it??!
           // 2.1 Starting game
-          await this.gameController.gameStart(room); // TODO Which one????
-          room.gameStart(); // TODO Which one????
-
+          await gameController.gameStart(room);
+          
+          const response: PublicServerResponse = gameController.preparePublicResponse(room);
+          
           // 2.1 We emit a game update for the clients to start playing
-          this.io.to(data.roomId).emit('gameUpdate', room); // TODO TBD My proposal is to use the event "gameUpdate" each time a player does something. So client...
+          this.io.to(data.roomId).emit('gameUpdate', response); // TODO TBD My proposal is to use the event "gameUpdate" each time a player does something. So client...
           //... will have to listen to 'gameUpdate' and react accordingly
         } 
 
@@ -107,16 +108,6 @@ class Socket {
          */
         this.io.to("room1").emit('boardMovement', {board: 'new'});
         console.log(data)
-      })
-
-      socket.on("forceGameUpdate", async (data: any) => {
-        /**
-         * Testing porpouses
-         * When client triggers this event, an event is sent to the room1 under boardMovement event
-         */
-        const room = await this.gameController.loadRoom("room1");
-        this.io.to("room1").emit('gameUpdate', {room: room});
-        console.log(room)
       })
 
       socket.on("disconnect", (socket: any) => {
