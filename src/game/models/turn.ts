@@ -1,8 +1,11 @@
-import { Element } from "./elements/elements";
+import { ElementTypes } from "./elements/elements";
 
 export class Turn {
 
-    //private chosen_elements: Array<Element>;
-    //private available_sage_moves: number;
+    static MAX_ALLOWED_ELEMENTS: number = 3;
+    static MIN_SAGE_MOVEMENTS: number = 2;
+
+    chosen_elements: Array<ElementTypes> = [];
+    available_sage_moves: number = 2;
 
 }

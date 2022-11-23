@@ -1,5 +1,6 @@
 import { User } from "../user";
 import { Game } from "./game";
+import { GameType } from "./game_utils";
 import Player from "./player"
 
 const MAX_PLAYERS_PER_ROOM = 4;
@@ -62,15 +63,30 @@ class Room {
     }
 
     /** Starts the game */
-    public gameStart(): void {
-        if(this.user_map_list.size < 2){
-            throw new Error("To start a game it's required at least 2 players");
+    public gameStart(): boolean {
+        let game_type: GameType
+        switch(this.user_map_list.size){
+            case 2:
+                game_type = GameType.TwoPlayersGame
+                break;
+            case 3:
+                game_type = GameType.ThreePlayersGame
+                break;
+            case 4:
+                game_type = GameType.TwoPlayersGame
+                break;
+            default:
+                return false;
+                break;
         }
+
         this.user_map_list.forEach((player, user)=> {
             this.game.addPlayer(player);
         })
 
-        this.game.startGame();
+        this.game.startGame(game_type);
+
+        return true;
         
         
     }

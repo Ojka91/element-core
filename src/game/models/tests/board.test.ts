@@ -1,5 +1,6 @@
 import Board from "../board";
 import { ElementTypes } from "../elements/elements";
+import { GameType } from "../game_utils";
 import Grid, { Position } from "../grid";
 import { Empty } from "../pieces";
 import Player from "../player";
@@ -16,9 +17,8 @@ describe('Board', () => {
         expect(num_rows == 11).toBe(true);
         expect(num_columns == 11).toBe(true);
     })
-})
 
-    /*it('generateInitialGrid: ensure the Board is initialized with empty pieces ', async () => {
+    it('generateInitialGrid: ensure the Board is initialized with empty pieces ', async () => {
         let board = new Board();
         let grid = board.getGrid();
         
@@ -34,8 +34,9 @@ describe('Board', () => {
         let board = new Board();
         let player = new Player(0);
         let grid = board.getGrid();
+        board.createSageByPlayerAndGameType(player, GameType.FourPlayersGame);
 
-        const new_position: Position = {row: 5, column: 4}; // Orthogonally move to left
+        const new_position: Position = {row: 2, column: 1}; // Orthogonally move to left
         board.placePlayerSage(player, new_position);
 
         expect(player.getSage()).toStrictEqual(grid.getGridCellByPosition(new_position));
@@ -44,14 +45,16 @@ describe('Board', () => {
     it('placePlayerSage: an illegal player sage is placed in the grid', async () => {
         let board = new Board();
         let player = new Player(0);
+        board.createSageByPlayerAndGameType(player, GameType.FourPlayersGame);
 
-        const new_position: Position = {row: 1, column: 4}; // Orthogonally move to left
+        const new_position: Position = {row: 1, column: 4};
         expect(() => {board.placePlayerSage(player, new_position);}).toThrow("Sage movement is not valid");
     })
 
     it('placePlayerSage: player sage is placed outside the grid boundaries', async () => {
         let board = new Board();
         let player = new Player(0);
+        board.createSageByPlayerAndGameType(player, GameType.FourPlayersGame);
 
         const new_position: Position = {row: 100, column: 4}; // Orthogonally move to left
         expect(() => {board.placePlayerSage(player, new_position);}).toThrow("Incorrect new row or new column dimensions");
@@ -68,4 +71,5 @@ describe('Board', () => {
         expect(board.elementPool.fire.amount == 29).toBe(true);
         board.returnElementToPool(ElementTypes.Fire);
         expect(board.elementPool.fire.amount == 30).toBe(true);
-    })*/
+    })
+})

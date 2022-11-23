@@ -24,12 +24,12 @@ type Position = {
     column: number;
 }
 
-type WaterReaction = {
+export type WaterReaction = {
     initial_river: Array<Position>;
     new_river: Array<Position>;
 }
 
-type Reactions = {
+export type Reactions = {
     water: WaterReaction;
     fire: null;
     earth: null;
