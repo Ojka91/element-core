@@ -3,6 +3,24 @@ import { GameController } from "./game/game_controller";
 import Room from "./game/models/room";
 import { QueueController } from "./game/queue_controller";
 import { PublicServerResponse } from "./schemas/server_response";
+interface ServerToClientEvents {
+  noArg: () => void;
+  basicEmit: (a: number, b: string, c: Buffer) => void;
+  withAck: (d: string, callback: (e: number) => void) => void;
+}
+
+interface ClientToServerEvents {
+  hello: () => void;
+}
+
+interface InterServerEvents {
+  ping: () => void;
+}
+
+interface SocketData {
+  name: string;
+  age: number;
+}
 
 export enum queue {
   queue2 = 'queue2',
@@ -21,11 +39,16 @@ export type JoinGame = {
  * This class is reponsible to mantain socket connection and logic between players and server when game begins
  */
 class Socket {
-    private io: any;
+  private io: any;
 
-    constructor(server: any) {
-      this.io = new Server(server)
-    }
+  constructor(server: any) {
+      this.io = new Server<
+        ClientToServerEvents,
+        ServerToClientEvents,
+        InterServerEvents,
+        SocketData
+      >(server)
+  }
   public init() {
 
     const gameController = new GameController();
@@ -116,6 +139,7 @@ class Socket {
          * When client triggers this event, an event is sent to the room1 under boardMovement event
          */
         const room: Room = await new GameController().loadRoom("room1")
+        console.log(room)
         this.io.to("room1").emit('gameUpdate', {room: room});
       })
 
