@@ -36,8 +36,7 @@ describe('Water: reaction', () => {
 
         // Place water
         const placed_water: Water = new Water();
-        placed_water.updatePosition(placed_water_pos);
-        grid.updateGridCell(placed_water);
+        placed_water.place(grid, placed_water_pos);
 
         // Perform water reaction
         const result = placed_water.reaction(grid, placed_water_pos);
@@ -61,14 +60,12 @@ describe('Water: reaction', () => {
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
             const water: Water = new Water();
-            water.updatePosition(water_pos);
-            grid.updateGridCell(water);
+            water.place(grid, water_pos);
         })
 
         // Place water
         const placed_water: Water = new Water();
-        placed_water.updatePosition(placed_water_pos);
-        grid.updateGridCell(placed_water);
+        placed_water.place(grid, placed_water_pos);
 
         // Perform water reaction tests
         expect(() => {
@@ -105,14 +102,12 @@ describe('Water: reaction', () => {
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
             const water: Water = new Water();
-            water.updatePosition(water_pos);
-            grid.updateGridCell(water);
+            water.place(grid, water_pos);
         })
 
         // Place water
         const placed_water: Water = new Water();
-        placed_water.updatePosition(placed_water_pos);
-        grid.updateGridCell(placed_water);
+        placed_water.place(grid, placed_water_pos);
 
         // Perform water reaction tests
         expect(() => {
@@ -139,14 +134,12 @@ describe('Water: reaction', () => {
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
             const water: Water = new Water();
-            water.updatePosition(water_pos);
-            grid.updateGridCell(water);
+            water.place(grid, water_pos);
         })
 
         // Place water
         const placed_water: Water = new Water();
-        placed_water.updatePosition(placed_water_pos);
-        grid.updateGridCell(placed_water);
+        placed_water.place(grid, placed_water_pos);
 
         // Perform water reaction tests
         expect(() => {
@@ -202,18 +195,18 @@ describe('Water: reaction', () => {
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
             const water: Water = new Water();
-            water.updatePosition(water_pos);
-            grid.updateGridCell(water);
+            water.place(grid, water_pos);
+            
         })
 
         const earth: Earth = new Earth();
-        earth.updatePosition(water_pos_list[1]);
-        grid.updateGridCell(earth);
+        earth.place(grid, water_pos_list[1]);
+        
 
         // Place water
         const placed_water: Water = new Water();
-        placed_water.updatePosition(placed_water_pos);
-        grid.updateGridCell(placed_water);
+        placed_water.place(grid, placed_water_pos);
+        
 
         // Perform water reaction
         expect(() => {
@@ -263,14 +256,14 @@ describe('Water: reaction', () => {
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
             const water: Water = new Water();
-            water.updatePosition(water_pos);
-            grid.updateGridCell(water);
+            water.place(grid, water_pos);
+            
         })
 
         // Place water
         const placed_water: Water = new Water();
-        placed_water.updatePosition(placed_water_pos);
-        grid.updateGridCell(placed_water);
+        placed_water.place(grid, placed_water_pos);
+        
 
         // Perform water reaction
         placed_water.reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
@@ -329,14 +322,14 @@ describe('Water: reaction', () => {
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
             const water: Water = new Water();
-            water.updatePosition(water_pos);
-            grid.updateGridCell(water);
+            water.place(grid, water_pos);
+            
         })
 
         // Place water
         const placed_water: Water = new Water();
-        placed_water.updatePosition(placed_water_pos);
-        grid.updateGridCell(placed_water);
+        placed_water.place(grid, placed_water_pos);
+        
 
         // Perform water reaction
         placed_water.reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
@@ -403,14 +396,14 @@ describe('Water: reaction', () => {
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
             const water: Water = new Water();
-            water.updatePosition(water_pos);
-            grid.updateGridCell(water);
+            water.place(grid, water_pos);
+            
         })
 
         // Place water
         const placed_water: Water = new Water();
-        placed_water.updatePosition(placed_water_pos);
-        grid.updateGridCell(placed_water);
+        placed_water.place(grid, placed_water_pos);
+        
 
         // Perform water reaction
         placed_water.reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
@@ -485,20 +478,19 @@ describe('Water: reaction', () => {
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
             const water: Water = new Water();
-            water.updatePosition(water_pos);
-            grid.updateGridCell(water);
+            water.place(grid, water_pos);
+            
         })
 
         fire_pos_list.forEach((fire_pos) => {
             const fire: Fire = new Fire();
-            fire.updatePosition(fire_pos);
-            grid.updateGridCell(fire);
+            fire.place(grid, fire_pos);
         })
 
         // Place water
         const placed_water: Water = new Water();
-        placed_water.updatePosition(placed_water_pos);
-        grid.updateGridCell(placed_water);
+        placed_water.place(grid, placed_water_pos);
+        
 
         // Perform water reaction
         placed_water.reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
@@ -570,21 +562,21 @@ describe('Water: reaction', () => {
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
             const water: Water = new Water();
-            water.updatePosition(water_pos);
-            grid.updateGridCell(water);
+            water.place(grid, water_pos);
+            
         })
 
         // Place water
         const placed_water: Water = new Water();
-        placed_water.updatePosition(placed_water_pos);
-        grid.updateGridCell(placed_water);
+        placed_water.place(grid, placed_water_pos);
+        
 
         /* 
         TEST WITH other element: Earth
         */
         const earth: Earth = new Earth();
-        earth.updatePosition(other_element_pos);
-        grid.updateGridCell(earth); 
+        earth.place(grid, other_element_pos);
+         
 
         expect(() => {
             placed_water.reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
@@ -594,8 +586,8 @@ describe('Water: reaction', () => {
         TEST WITH other element: Water
         */
         const water: Water = new Water();
-        water.updatePosition(other_element_pos);
-        grid.updateGridCell(water); 
+        water.place(grid, other_element_pos);
+         
 
         expect(() => {
             placed_water.reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
@@ -605,8 +597,8 @@ describe('Water: reaction', () => {
         TEST WITH other element: Wind
         */
         const wind: Wind = new Wind();
-        wind.updatePosition(other_element_pos);
-        grid.updateGridCell(water); 
+        wind.place(grid, other_element_pos);
+         
 
         expect(() => {
             placed_water.reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
@@ -617,7 +609,8 @@ describe('Water: reaction', () => {
         */
         const sage: Sage = new Sage();
         sage.updatePosition(other_element_pos);
-        grid.updateGridCell(water); 
+        grid.updateGridCell(sage);
+         
 
         expect(() => {
             placed_water.reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
@@ -670,14 +663,14 @@ describe('Water: reaction', () => {
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
             const water: Water = new Water();
-            water.updatePosition(water_pos);
-            grid.updateGridCell(water);
+            water.place(grid, water_pos);
+            
         })
 
         // Place water
         const placed_water: Water = new Water();
-        placed_water.updatePosition(placed_water_pos);
-        grid.updateGridCell(placed_water);
+        placed_water.place(grid, placed_water_pos);
+        
 
         // Perform water reaction
         expect( () => {
@@ -729,14 +722,14 @@ describe('Water: reaction', () => {
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
             const water: Water = new Water();
-            water.updatePosition(water_pos);
-            grid.updateGridCell(water);
+            water.place(grid, water_pos);
+            
         })
 
         // Place water
         const placed_water: Water = new Water();
-        placed_water.updatePosition(placed_water_pos);
-        grid.updateGridCell(placed_water);
+        placed_water.place(grid, placed_water_pos);
+        
 
         // Perform water reaction
         expect( () => {

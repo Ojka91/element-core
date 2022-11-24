@@ -84,7 +84,7 @@ class Room {
             this.game.addPlayer(player);
         })
 
-        this.game.startGame(game_type);
+        this.game.setupGame(game_type);
 
         return true;
         

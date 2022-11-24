@@ -28,9 +28,11 @@ const all_direction_map: Map<string, AxisIncrement> = PositionUtils.all_directio
     // Override parent method
     public place(grid: Grid, cell: Position): boolean {
         const piece: Piece = grid.getGridCellByPosition(cell);
+        this.position = cell;
         if(piece instanceof Earth){
             if (piece.isMountain() == false){
                 this.promoteToMountain();
+                grid.updateGridCell(this)
                 this.formRange(grid, cell);
                 return true;
             } else {
@@ -38,7 +40,6 @@ const all_direction_map: Map<string, AxisIncrement> = PositionUtils.all_directio
             }
         }
         if(grid.isPositionEmpty(cell) || (this.ruleOfReplacement(piece))){
-            this.position = cell;
             grid.updateGridCell(this)
     
             return true;

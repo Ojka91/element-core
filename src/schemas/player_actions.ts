@@ -53,7 +53,7 @@ type MessageHeader = {
 
 type PlacePieceBody = {
     piece: Piece;
-    reaction: Reactions
+    reaction: Reaction
 }
 
 export type PlacePieceSchema = MessageHeader & {

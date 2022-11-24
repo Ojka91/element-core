@@ -1,3 +1,4 @@
+import ElementPoolManager from "../../element_pool_manager";
 import Grid, { Position } from "../../grid";
 import { Earth } from "../earth";
 import { ElementTypes } from "../elements"
@@ -68,6 +69,7 @@ describe('Fire: reaction', () => {
            -----------------------------------------
         */
        const grid: Grid = new Grid(10, 8);
+       const element_pool_manager: ElementPoolManager = new ElementPoolManager();
        const pf_pos: Position = {
         row: 3,
         column: 4
@@ -88,13 +90,10 @@ describe('Fire: reaction', () => {
        const placed_fire: Fire = new Fire();
        const fire: Fire = new Fire();
 
-       placed_fire.updatePosition(pf_pos);
-       fire.updatePosition(f_pos);
+       placed_fire.place(grid, pf_pos);
+       fire.place(grid, f_pos);
 
-       grid.updateGridCell(placed_fire);
-       grid.updateGridCell(fire);
-       
-       placed_fire.reaction(grid, pf_pos);
+       placed_fire.reaction(grid, pf_pos, element_pool_manager);
 
        expect(grid.isFireCell(ff_pos)).toBe(true);
 
@@ -127,6 +126,7 @@ describe('Fire: reaction', () => {
            -----------------------------------------
         */
        const grid: Grid = new Grid(10, 8);
+       const element_pool_manager: ElementPoolManager = new ElementPoolManager();
        const pf_pos: Position = {
         row: 3,
         column: 2
@@ -148,15 +148,11 @@ describe('Fire: reaction', () => {
        const fire_1: Fire = new Fire();
        const fire_2: Fire = new Fire();
 
-       placed_fire.updatePosition(pf_pos);
-       fire_1.updatePosition(f_pos_1);
-       fire_2.updatePosition(f_pos_2);
-
-       grid.updateGridCell(placed_fire);
-       grid.updateGridCell(fire_1);
-       grid.updateGridCell(fire_2);
+       placed_fire.place(grid, pf_pos);
+       fire_1.place(grid, f_pos_1);
+       fire_2.place(grid, f_pos_2);
        
-       placed_fire.reaction(grid, pf_pos);
+       placed_fire.reaction(grid, pf_pos, element_pool_manager);
 
        expect(grid.isFireCell(ff_pos)).toBe(true);
     
@@ -187,6 +183,7 @@ describe('Fire: reaction', () => {
            -----------------------------------------
         */
        const grid: Grid = new Grid(10, 8);
+       const element_pool_manager: ElementPoolManager = new ElementPoolManager();
        const pf_pos: Position = {
         row: 4,
         column: 3
@@ -208,15 +205,11 @@ describe('Fire: reaction', () => {
        const fire_1: Fire = new Fire();
        const fire_2: Fire = new Fire();
 
-       placed_fire.updatePosition(pf_pos);
-       fire_1.updatePosition(f_pos_1);
-       fire_2.updatePosition(f_pos_2);
-
-       grid.updateGridCell(placed_fire);
-       grid.updateGridCell(fire_1);
-       grid.updateGridCell(fire_2);
+       placed_fire.place(grid, pf_pos);
+       fire_1.place(grid, f_pos_1);
+       fire_2.place(grid, f_pos_2);
        
-       placed_fire.reaction(grid, pf_pos);
+       placed_fire.reaction(grid, pf_pos, element_pool_manager);
 
        expect(grid.isFireCell(ff_pos)).toBe(true);
     
@@ -247,6 +240,7 @@ describe('Fire: reaction', () => {
            -----------------------------------------
         */
        const grid: Grid = new Grid(10, 8);
+       const element_pool_manager: ElementPoolManager = new ElementPoolManager();
        const pf_pos: Position = {
         row: 1,
         column: 3
@@ -268,15 +262,11 @@ describe('Fire: reaction', () => {
        const fire_1: Fire = new Fire();
        const fire_2: Fire = new Fire();
 
-       placed_fire.updatePosition(pf_pos);
-       fire_1.updatePosition(f_pos_1);
-       fire_2.updatePosition(f_pos_2);
-
-       grid.updateGridCell(placed_fire);
-       grid.updateGridCell(fire_1);
-       grid.updateGridCell(fire_2);
+       placed_fire.place(grid, pf_pos);
+       fire_1.place(grid, f_pos_1);
+       fire_2.place(grid, f_pos_2);
        
-       placed_fire.reaction(grid, pf_pos);
+       placed_fire.reaction(grid, pf_pos, element_pool_manager);
 
        expect(grid.isFireCell(ff_pos)).toBe(true);
     })
@@ -306,6 +296,7 @@ describe('Fire: reaction', () => {
            -----------------------------------------
         */
        const grid: Grid = new Grid(10, 8);
+       const element_pool_manager: ElementPoolManager = new ElementPoolManager();
        const pf_pos: Position = {
         row: 1,
         column: 3
@@ -327,15 +318,12 @@ describe('Fire: reaction', () => {
        const fire_1: Fire = new Fire();
        const fire_2: Fire = new Fire();
 
-       placed_fire.updatePosition(pf_pos);
-       fire_1.updatePosition(f_pos_1);
-       fire_2.updatePosition(f_pos_2);
+       placed_fire.place(grid, pf_pos);
+       fire_1.place(grid, f_pos_1);
+       fire_2.place(grid, f_pos_2);
 
-       grid.updateGridCell(placed_fire);
-       grid.updateGridCell(fire_1);
-       grid.updateGridCell(fire_2);
        
-       placed_fire.reaction(grid, pf_pos);
+       placed_fire.reaction(grid, pf_pos, element_pool_manager);
 
        expect(grid.isFireCell(ff_pos)).toBe(false);
     })
@@ -365,6 +353,7 @@ describe('Fire: reaction', () => {
            -----------------------------------------
         */
        const grid: Grid = new Grid(10, 8);
+       const element_pool_manager: ElementPoolManager = new ElementPoolManager();
        const pf_pos: Position = {
         row: 3,
         column: 7
@@ -386,15 +375,12 @@ describe('Fire: reaction', () => {
        const fire_1: Fire = new Fire();
        const fire_2: Fire = new Fire();
 
-       placed_fire.updatePosition(pf_pos);
-       fire_1.updatePosition(f_pos_1);
-       fire_2.updatePosition(f_pos_2);
+       placed_fire.place(grid, pf_pos);
+       fire_1.place(grid, f_pos_1);
+       fire_2.place(grid, f_pos_2);
 
-       grid.updateGridCell(placed_fire);
-       grid.updateGridCell(fire_1);
-       grid.updateGridCell(fire_2);
        
-       placed_fire.reaction(grid, pf_pos);
+       placed_fire.reaction(grid, pf_pos, element_pool_manager);
 
        expect(grid.isFireCell(ff_pos)).toBe(false);
     
@@ -425,6 +411,7 @@ describe('Fire: reaction', () => {
            -----------------------------------------
         */
        const grid: Grid = new Grid(10, 8);
+       const element_pool_manager: ElementPoolManager = new ElementPoolManager();
        const pf_pos: Position = {
         row: 3,
         column: 3
@@ -473,21 +460,15 @@ describe('Fire: reaction', () => {
        const fire_4: Fire = new Fire();
        const fire_5: Fire = new Fire();
 
-       placed_fire.updatePosition(pf_pos);
-       fire_1.updatePosition(f_pos_1);
-       fire_2.updatePosition(f_pos_2);
-       fire_3.updatePosition(f_pos_3);
-       fire_4.updatePosition(f_pos_4);
-       fire_5.updatePosition(f_pos_5);
+       placed_fire.place(grid, pf_pos);
+       fire_1.place(grid, f_pos_1);
+       fire_2.place(grid, f_pos_2);
+       fire_3.place(grid, f_pos_3);
+       fire_4.place(grid, f_pos_4);
+       fire_5.place(grid, f_pos_5);
 
-       grid.updateGridCell(placed_fire);
-       grid.updateGridCell(fire_1);
-       grid.updateGridCell(fire_2);
-       grid.updateGridCell(fire_3);
-       grid.updateGridCell(fire_4);
-       grid.updateGridCell(fire_5);
        
-       placed_fire.reaction(grid, pf_pos);
+       placed_fire.reaction(grid, pf_pos, element_pool_manager);
 
        expect(grid.isFireCell(ff_pos_1)).toBe(true);
        expect(grid.isFireCell(ff_pos_2)).toBe(true);
@@ -522,6 +503,7 @@ describe('Fire: reaction', () => {
            -----------------------------------------
         */
        const grid: Grid = new Grid(10, 8);
+       const element_pool_manager: ElementPoolManager = new ElementPoolManager();
        const pf_pos: Position = {
         row: 4,
         column: 3
@@ -540,15 +522,15 @@ describe('Fire: reaction', () => {
        const fire: Fire = new Fire();
        const wind: Wind = new Wind();
 
-       placed_fire.updatePosition(pf_pos);
-       fire.updatePosition(f_pos);
-       wind.updatePosition(w_pos);
+       placed_fire.place(grid, pf_pos);
+       fire.place(grid, f_pos);
+       wind.place(grid, w_pos);
 
-       grid.updateGridCell(placed_fire);
-       grid.updateGridCell(fire);
-       grid.updateGridCell(wind);
+      
+      
+      
        
-       placed_fire.reaction(grid, pf_pos);
+       placed_fire.reaction(grid, pf_pos, element_pool_manager);
 
        expect(grid.isFireCell(ff_pos)).toBe(true);
     
@@ -580,6 +562,7 @@ describe('Fire: reaction', () => {
            -----------------------------------------
         */
        const grid: Grid = new Grid(10, 8);
+       const element_pool_manager: ElementPoolManager = new ElementPoolManager();
        const pf_pos: Position = {
         row: 4,
         column: 3
@@ -599,18 +582,73 @@ describe('Fire: reaction', () => {
        const wind: Wind = new Wind();
        wind.increaseStackedWinds();
 
-       placed_fire.updatePosition(pf_pos);
-       fire.updatePosition(f_pos);
-       wind.updatePosition(w_pos);
+       placed_fire.place(grid, pf_pos);
+       fire.place(grid, f_pos);
+       wind.place(grid, w_pos);
 
-       grid.updateGridCell(placed_fire);
-       grid.updateGridCell(fire);
-       grid.updateGridCell(wind);
        
-       placed_fire.reaction(grid, pf_pos);
+       placed_fire.reaction(grid, pf_pos, element_pool_manager);
 
        expect(grid.isFireCell(ff_pos)).toBe(false);
     
     })
+
+    it('Reaction: Should not propagate free fire if element pool is empty', async () => {
+      /* Orthogonally up propagation 
+          PF: Place fire
+          F: Fire
+          FF: Free fire
+          W: Wind
+           0   1   2   3   4   5   6   7   8   9 
+         -----------------------------------------
+      0  |   |   |   |   |   |   |   |   |   |   |
+         -----------------------------------------
+      1  |   |   |   |   |   |   |   |   |   |   |
+         -----------------------------------------
+      2  |   |   |   |   |   |   |   |   |   |   | <-- Should NOT be replaced!
+         -----------------------------------------
+      3  |   |   |   | F |   |   |   |   |   |   |
+         -----------------------------------------
+      4  |   |   |   | PF|   |   |   |   |   |   |
+         -----------------------------------------
+      5  |   |   |   |   |   |   |   |   |   |   |
+         -----------------------------------------
+      6  |   |   |   |   |   |   |   |   |   |   |
+         -----------------------------------------
+      7  |   |   |   |   |   |   |   |   |   |   |
+         -----------------------------------------
+      */
+     const grid: Grid = new Grid(10, 8);
+     const element_pool_manager: ElementPoolManager = new ElementPoolManager();
+     const pf_pos: Position = {
+      row: 4,
+      column: 3
+     }
+     const f_pos: Position = {
+      row: 3,
+      column: 3
+     }
+     const w_pos: Position = {
+      row: 2,
+      column: 3
+     }
+     const ff_pos: Position = w_pos;
+
+     const placed_fire: Fire = new Fire();
+     const fire: Fire = new Fire();
+     const wind: Wind = new Wind();
+     wind.increaseStackedWinds();
+
+     placed_fire.place(grid, pf_pos);
+     fire.place(grid, f_pos);
+     wind.place(grid, w_pos);
+
+     element_pool_manager.fire.amount = 0;
+     
+     placed_fire.reaction(grid, pf_pos, element_pool_manager);
+
+     expect(grid.isFireCell(ff_pos)).toBe(false);
+  
+  })
 })
   

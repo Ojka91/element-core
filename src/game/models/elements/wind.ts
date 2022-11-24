@@ -22,18 +22,18 @@ const MAX_STACKED_WINDS: number = 4;
     // Override parent method
     public place(grid: Grid, cell: Position): boolean {
         const piece: Piece = grid.getGridCellByPosition(cell);
-        
+        this.position = cell;
         if(piece instanceof Wind){
             if(piece.isMaxWhirlwind() == false){
-                piece.increaseStackedWinds();
+                this.stacked_winds = (piece as Wind).getNumberOfStackedWinds() + 1;
+                grid.updateGridCell(this);
                 return true;
             } else {
                 return false;
             }
         }
         if(grid.isPositionEmpty(cell) || (this.ruleOfReplacement(piece))){
-            this.position = cell;
-            grid.updateGridCell(this)
+            grid.updateGridCell(this);
             return true;
         }
         return false;
