@@ -39,4 +39,14 @@ export class GameController {
             player_turn_uuid: 'room.getGame().getTurnPlayer().getTurn()' // TODO !!! to be implemented
         }
     }
+
+    public endTurn(loadedRoom: Room, room: Room): PublicServerResponse {
+        // TODO !!! To implement
+
+        return {
+            room_uuid: room.getUuid(),
+            board: room.getGame().getBoard(),
+            player_turn_uuid: 'room.getGame().getTurnPlayer().getTurn()' // TODO !!! to be implemented
+        }
+    }
 }

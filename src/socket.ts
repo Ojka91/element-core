@@ -34,6 +34,10 @@ export type JoinQueue = {
 export type JoinGame = {
   roomId: string
 }
+export type EndTurn = {
+  roomId: string,
+  room: Room
+}
 
 /**
  * This class is reponsible to mantain socket connection and logic between players and server when game begins
@@ -113,6 +117,21 @@ class Socket {
 
       })
 
+      /**
+       * endTurn: Client which turn is playing should emit to this event with all the changes in the board
+       */
+      socket.on("endTurn", async (data: EndTurn) => {
+        console.log(data.roomId)
+
+        let loadedRoom: Room = await gameController.loadRoom(data.roomId);
+        const response = await gameController.endTurn(loadedRoom, data.room);
+  
+        this.io.to(data.roomId).emit('gameUpdate', response)
+
+      })
+
+
+      
 
       // From here below, testing only
       socket.on("joinRoom", (data: any) => {
