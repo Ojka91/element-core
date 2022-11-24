@@ -11,6 +11,7 @@ import { RedisSingleton } from './redis';
 import Room from './game/models/room';
 import { User } from './game/user';
 import { GameController } from './game/game_controller';
+import { GameType } from './game/models/game_utils';
 //import { User } from './controllers/user';
 dotenv.config({ path: `.env${process.env.NODE_ENV}` });
 
@@ -33,8 +34,8 @@ var server = app.listen(process.env.PORT || 3000, () => {
 /* Game debugging endpoints */
 let room_id: string;
 app.get('/game', async (_req: Request, res: Response) => {
-  let room = new Room();
-  const game: GameController = new GameController();
+  let room = new Room(GameType.TwoPlayersGame);
+  const game: GameController = new GameController(room);
   room_id = room.getUuid()
 
   const user_1: User = new User("Arkk92");
@@ -43,7 +44,7 @@ app.get('/game', async (_req: Request, res: Response) => {
   room.addUser(user_1);
   room.addUser(user_2);
 
-  await game.gameStart(room);
+  await game.gameStart();
 
   return res.send(room);
 });
@@ -51,8 +52,9 @@ app.get('/game', async (_req: Request, res: Response) => {
 /** Debugging purposes: Display the entire room */
 app.get('/display_room', async (_req: Request, res: Response) => {
   
-  const game: GameController = new GameController();
-  const room: Room = await game.loadRoom(room_id);
+  const room: Room = new Room(GameType.TwoPlayersGame); // Overrided since a Room is going to be loaded
+  const game: GameController = new GameController(room);
+  await game.loadRoom(room_id);
 
   return res.send(room);
 });
