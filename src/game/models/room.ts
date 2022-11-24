@@ -63,21 +63,9 @@ class Room {
     }
 
     /** Starts the game */
-    public gameStart(): boolean {
-        let game_type: GameType
-        switch(this.user_map_list.size){
-            case 2:
-                game_type = GameType.TwoPlayersGame
-                break;
-            case 3:
-                game_type = GameType.ThreePlayersGame
-                break;
-            case 4:
-                game_type = GameType.TwoPlayersGame
-                break;
-            default:
-                return false;
-                break;
+    public gameStart(game_type: GameType): boolean {
+        if(this.user_map_list.size != game_type){
+            return false;
         }
 
         this.user_map_list.forEach((player, user)=> {

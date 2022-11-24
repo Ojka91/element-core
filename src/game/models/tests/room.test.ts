@@ -1,4 +1,5 @@
 import { User } from "@/game/user";
+import { GameType } from "../game_utils";
 import Player from "../player";
 import Room from "../room";
 
@@ -78,17 +79,20 @@ describe('Room', () => {
     });
 
     it('gameStart: should throw error if there is less than 2 users in the room ', async () => {
+        const game_type: GameType = GameType.TwoPlayersGame;
         const room: Room = new Room();
         const user4: User = new User("Ark4");
         const user1: User = new User("Ark1");
         const user2: User = new User("Ark2");
         const user3: User = new User("Ark3");
         
-        expect(()=>{room.gameStart()}).toThrow("To start a game it's required at least 2 players")
+        expect(room.gameStart(game_type)).toBe(false)
         room.addUser(user1);
-        expect(()=>{room.gameStart()}).toThrow("To start a game it's required at least 2 players")
+        expect(room.gameStart(game_type)).toBe(false)
         room.addUser(user2);
-        expect(room.gameStart() == null).toBe(true);
+        expect(room.gameStart(game_type)).toBe(true);
+        room.addUser(user3);
+        expect(room.gameStart(game_type)).toBe(false);
     });
 })
   
