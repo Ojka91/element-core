@@ -20,7 +20,7 @@ const propagation_map: Map<string, AxisIncrement> = PositionUtils.orthogonal_inc
         super();
     }
 
-    ruleOfReplacement(piece_to_replace: Piece): boolean {
+    public ruleOfReplacement(piece_to_replace: Piece): boolean {
         if(piece_to_replace instanceof Wind){
             if(piece_to_replace.getNumberOfStackedWinds() == 1){
                 return true;
@@ -29,7 +29,7 @@ const propagation_map: Map<string, AxisIncrement> = PositionUtils.orthogonal_inc
         return false;
     }
 
-    reaction(grid: Grid, cell: Position, element_pool_manager?: ElementPoolManager): void {
+    public reaction(grid: Grid, cell: Position, element_pool_manager?: ElementPoolManager): void {
 
         if(element_pool_manager === undefined){
             throw new Error("Element pool is required for Fire reaction")

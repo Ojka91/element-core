@@ -1,8 +1,7 @@
 export enum GameStates {
     NewGame,
-    StartTurn,
-    PlayerTurn,
-    EndTurn
+    GameRunning,
+    EndGame
 }
 
 export enum GameType {

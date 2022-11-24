@@ -25,6 +25,27 @@ const all_direction_map: Map<string, AxisIncrement> = PositionUtils.all_directio
         super();
     }
 
+    // Override parent method
+    public place(grid: Grid, cell: Position): boolean {
+        const piece: Piece = grid.getGridCellByPosition(cell);
+        if(piece instanceof Earth){
+            if (piece.isMountain() == false){
+                this.promoteToMountain();
+                this.formRange(grid, cell);
+                return true;
+            } else {
+                return false;
+            }
+        }
+        if(grid.isPositionEmpty(cell) || (this.ruleOfReplacement(piece))){
+            this.position = cell;
+            grid.updateGridCell(this)
+    
+            return true;
+        }
+        return false;
+    }
+
     public isMountain(): boolean {
         return this.is_mountain;
     }
@@ -55,7 +76,7 @@ const all_direction_map: Map<string, AxisIncrement> = PositionUtils.all_directio
     }
 
     public reaction(grid: Grid, cell: Position): void {
-        const piece: Piece = grid.getGridCellByPosition(cell);
+        /*const piece: Piece = grid.getGridCellByPosition(cell);
         if(this.ruleOfReplacement(piece)){
             if(grid.isWaterCell(cell)){
                 const earth: Earth = new Earth();
@@ -67,6 +88,7 @@ const all_direction_map: Map<string, AxisIncrement> = PositionUtils.all_directio
             }
             
         }
+        */
     }
 
     private formRange(grid: Grid, cell: Position){

@@ -8,7 +8,7 @@ import { ElementPieceCreator, SagePieceCreator } from "./pieces_factory";
 import { GameType } from "./game_utils";
 import { Water } from "./elements/water";
 import { Fire } from "./elements/fire";
-import { Reactions } from "@/schemas/player_actions";
+import { Reaction, WaterReaction } from "@/schemas/player_actions";
 import { PositionUtils } from "./position_utils";
 import { Wind } from "./elements/wind";
 
@@ -32,7 +32,7 @@ class Board {
 
     /** Method to check whether the requested elements can be taken or not */
     public checkElementPoolAvailability(elements: Array<ElementTypes>): boolean {
-        return this.elementPool.checkElementsAvailability(elements);
+        return this.elementPool.checkElementListAvailability(elements);
     }
 
     /** Grid getter */
@@ -63,25 +63,32 @@ class Board {
     }
 
     /** Method to place an element in the board */
-    public placeElement(element_type: ElementTypes, position: Position, reactions?: Reactions): void {
-        const cell_piece: Piece = this.grid.getGridCellByPosition(position);
+    public placeElement(element_type: ElementTypes, position: Position): void {
+        
         const element: Element = new ElementPieceCreator(element_type).createPiece() as Element
-        element.updatePosition(position);
 
         if (this.grid.isPositionValid(position) == false){
             throw new Error("Invalid position, outside grid boundaries");
         }
         
-        if(this.grid.isPositionEmpty(position) == false){
-            if(element.ruleOfReplacement(cell_piece) == false){
-                throw new Error("Cannot replace the cell due to a rule of replacement")
-            }
-        }
-        this.grid.updateGridCell(element);
 
+        element.updatePosition(position);
+        
+        if(element.place(this.grid, position) == false){
+            throw new Error("Cannot replace the cell due to a rule of replacement")
+        }
+    }
+
+    public performElementReaction(element_type: ElementTypes, position: Position, reaction?: Reaction): void {
+        const element: Element = new ElementPieceCreator(element_type).createPiece() as Element
         switch(element_type){
             case ElementTypes.Water:
-                (element as Water).reaction(this.grid, position, reactions?.water.initial_river, reactions?.water.new_river);    
+                if(reaction instanceof WaterReaction){
+                    const water_reaction: WaterReaction = reaction as WaterReaction
+                    (element as Water).reaction(this.grid, position, water_reaction.initial_river, water_reaction.new_river);
+                }else{
+                    (element as Water).reaction(this.grid, position);    
+                }
                 break;
             case ElementTypes.Fire:
                 (element as Fire).reaction(this.grid, position, this.elementPool);
@@ -92,7 +99,7 @@ class Board {
         }
     }
 
-    public winningCondition(position: Position): string {
+    public winningCondition(position: Position): string | null {
         for(let sage of this.sage_list){
             if(PositionUtils.isStrictPosition(sage.position, position)){
                 if(this.isSageCaptured(sage)){
@@ -100,7 +107,7 @@ class Board {
                 }
             }
         }
-        return "";
+        return null;
     }
 
     private isSageCaptured(sage: Sage): boolean {

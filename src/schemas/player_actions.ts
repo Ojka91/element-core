@@ -24,16 +24,21 @@ type Position = {
     column: number;
 }
 
-export type WaterReaction = {
-    initial_river: Array<Position>;
-    new_river: Array<Position>;
+type River = Array<Position>
+
+export abstract class Reaction {
 }
 
-export type Reactions = {
-    water: WaterReaction;
-    fire: null;
-    earth: null;
-    wind: null;
+export class WaterReaction extends Reaction {
+    
+    initial_river: River;;
+    new_river: River;
+
+    constructor(initial_river: River, new_river: River){
+        super();
+        this.initial_river = initial_river;
+        this.new_river = new_river;
+    }
 }
 
 type Piece = {
@@ -48,7 +53,7 @@ type MessageHeader = {
 
 type PlacePieceBody = {
     piece: Piece;
-    reaction: Reactions | null
+    reaction: Reactions
 }
 
 export type PlacePieceSchema = MessageHeader & {
