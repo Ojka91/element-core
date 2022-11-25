@@ -1,5 +1,4 @@
-import { Position } from "../grid";
-import { PositionUtils } from "../position_utils";
+import { PositionUtils, Position } from "../../utils/position_utils";
 
 
 

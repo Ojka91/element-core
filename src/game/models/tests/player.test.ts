@@ -1,4 +1,4 @@
-import { Sage } from "../pieces";
+import { Sage } from "../pieces/pieces";
 import Player from "../player";
 
 

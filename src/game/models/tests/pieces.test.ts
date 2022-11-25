@@ -4,7 +4,7 @@ import { Fire } from "../elements/fire";
 import { Water } from "../elements/water";
 import { Wind } from "../elements/wind";
 import { Position } from "../grid";
-import { Empty, Piece, Sage } from "../pieces";
+import { Empty, Piece, Sage } from "../pieces/pieces";
 import { ElementPieceCreator, EmptyPieceCreator, SagePieceCreator } from "../pieces_factory"
 
 

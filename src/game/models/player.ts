@@ -1,10 +1,10 @@
-import { Sage } from "./pieces";
+import { ISageModel } from "./pieces/sage";
 
 
 class Player {
     private uuid: string;
     private player_number: number;
-    private sage?: Sage;
+    private sage?: ISageModel;
 
     constructor(player_number: number){
         
@@ -12,11 +12,11 @@ class Player {
         this.uuid = "Player "+player_number;
     }
 
-    public setSage(sage: Sage): void {
+    public setSage(sage: ISageModel): void {
         this.sage = sage;
     }
 
-    public getSage(): Sage{
+    public getSage(): ISageModel{
         if(this.sage === undefined){
             throw new Error("Player has no assigned sage")
         }

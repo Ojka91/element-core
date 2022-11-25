@@ -1,4 +1,4 @@
-import { User } from "@/game/user";
+import { User } from "@/game/models/user";
 import { GameType } from "../game_utils";
 import Player from "../player";
 import Room from "../room";
@@ -13,8 +13,6 @@ describe('Room', () => {
         expect(result).toBe(true);
 
         expect(room.getUserList().length==0).toBe(false)
-
-        expect(room.getPlayerByUser(user) instanceof Player).toBe(true);
     });
 
     it('addUser: there cannot be identical users in same room ', async () => {

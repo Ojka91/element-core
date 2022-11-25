@@ -3,7 +3,7 @@ import Board from "../board";
 import { ElementTypes } from "../elements/elements";
 import { GameType } from "../game_utils";
 import Grid, { Position } from "../grid";
-import { Empty } from "../pieces";
+import { Empty } from "../pieces/pieces";
 import Player from "../player";
 
 

@@ -33,7 +33,7 @@ class Redis {
      */
     async set(id: string, data: any): Promise<any> { // TODO data type to define?
         try {
-            return await this.client.setEx(id, 86400, JSON.stringify(data));
+            return await this.client.setEx(id, 86400, data);
         } catch (error) {
             logger.error(error, `Failed storing to redis game id: ${id}`)
         }

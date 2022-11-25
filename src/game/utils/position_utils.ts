@@ -1,9 +1,13 @@
-import { Position } from "./grid";
 
 export type AxisIncrement = {
     x: number,
     y: number
 }
+
+export type Position = {
+    row: number,
+    column: number
+};
 
 export class PositionUtils {
 

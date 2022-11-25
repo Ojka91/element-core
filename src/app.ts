@@ -10,7 +10,7 @@ export const app: Express = express();
 import { RedisSingleton } from './redis';
 import Room from './game/models/room';
 import { User } from './game/user';
-import { GameController } from './game/game_controller';
+import { GameController } from './game/controllers/game_controller';
 import { GameType } from './game/models/game_utils';
 //import { User } from './controllers/user';
 dotenv.config({ path: `.env${process.env.NODE_ENV}` });

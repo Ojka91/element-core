@@ -1,5 +1,5 @@
 import Grid, { Position } from "../../grid"
-import { Sage } from "../../pieces"
+import { Sage } from "../../pieces/pieces"
 import { Earth } from "../earth"
 import { Fire } from "../fire"
 import { Water } from "../water"

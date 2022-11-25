@@ -1,168 +1,44 @@
-import { Earth } from "./elements/earth";
-import { Fire } from "./elements/fire";
-import { Water } from "./elements/water";
-import { Wind } from "./elements/wind";
-import { Empty, Piece, Sage } from "./pieces";
-import { EmptyPieceCreator } from "./pieces_factory";
-import { PositionUtils } from "./position_utils";
+import { PieceModel, PieceTypes } from "./pieces/pieces";
+import { Mapper } from '../utils/mapper';
+import { EmptyModelMap } from './pieces/empty';
+import { SageModelMap } from './pieces/sage';
 
-export type Position = {
-    row: number,
-    column: number
-};
-
-export class Grid {
-
-    private cells: Piece[][] = [];
-    private width: number = 0;
-    private height: number = 0;
-
-    constructor(width: number, height: number) {
-        this.cells = this.generateInitialGrid(width, height)
-        this.width = width
-        this.height = height
-    }
-
-    public getWidth(): number {
-        return this.width
-    }
-
-    public getHeight(): number {
-        return this.height
-    }
-
-    public updateGridCell(piece: Piece): void {
-        this.cells[piece.position.row][piece.position.column] = piece;
-    }
-
-    public getGridCellByPosition(position: Position): Piece {
-        return this.cells[position.row][position.column];
-    }
-
-    public displayGrid(): void {
-        for (var row of this.cells){
-            for (var column of row){
-                console.log(column);
-            }
-        }
-    }
-
-    private generateInitialGrid(width: number, height: number): Piece[][] {
-        let cells: Piece[][] = new Array(height);
-        for (let row = 0; row < height; row++) {
-            cells[row] = new Array(width);
-            for (let col = 0; col < width; col++){
-                const new_position: Position = {row: row, column: col};
-                
-                let new_piece = new EmptyPieceCreator().createPiece();
-                new_piece.updatePosition(new_position);
-                cells[row][col] = new_piece;
-            }
-        }
-        return cells;
-    }
-
-    /** Clears the cell by placing an empty piece */
-    public clearCell(cell: Position): void {
-        if(this.isPositionValid(cell)){
-            const piece: Empty = new Empty();
-            piece.updatePosition(cell)
-            this.updateGridCell(piece);
-        }
-    }
-
-    /** Check whether the position is inside the grid boundaries */
-    public isPositionValid(new_position: Position){
-        return (this.getWidth() > new_position.column) &&
-        (0 <= new_position.column) &&
-        (0 <= new_position.row) &&
-        (this.getHeight() > new_position.row);
-    }
-
-    /** Check whether the position is empty
-     * return: true if empty, false otherwise
-     */
-    public isPositionEmpty(new_position: Position): boolean {
-        return this.getGridCellByPosition(new_position) instanceof Empty;
-    }
-
-    
-    /** Check whether the position is fire
-     * return: true if empty, false otherwise
-     */
-     public isFireCell(position: Position): boolean {
-        return this.getGridCellByPosition(position) instanceof Fire;
-    }
-
-    /** Check whether the position is earth
-     * return: true if empty, false otherwise
-     */
-     public isEarthCell(position: Position): boolean {
-        return this.getGridCellByPosition(position) instanceof Earth;
-    }
-
-    /** Check whether the position is water
-     * return: true if empty, false otherwise
-     */
-     public isWaterCell(position: Position): boolean {
-        return this.getGridCellByPosition(position) instanceof Water;
-    }
-
-    
-    /** Check whether the position is wind
-     * return: true if empty, false otherwise
-     */
-    public isWindCell(position: Position): boolean {
-        return this.getGridCellByPosition(position) instanceof Wind;
-    }
-
-    /** Check whether the position is whirlwind
-     * return: true if empty, false otherwise
-     */
-     public isWhirlwindCell(position: Position): boolean {
-        const piece: Piece = this.getGridCellByPosition(position);
-        if (piece instanceof Wind){
-            return (piece as Wind).getNumberOfStackedWinds() > 1;
-        }
-        return false;
-    }
-
-    /** Check whether the position is a mountain
-     * return true if mountain, false otherwise
-     */
-    public isMountainCell(position: Position): boolean {
-        const piece: Piece = this.getGridCellByPosition(position);
-        if ( piece instanceof Earth){
-            return (piece as Earth).isMountain();
-        }
-        return false;
-    }
-
-    /** Check whether the position is a range
-     * return true if mountain, false otherwise
-     */
-     public isRangeCell(position: Position): boolean {
-        const piece: Piece = this.getGridCellByPosition(position);
-        if ( piece instanceof Earth){
-            return (piece as Earth).isRange();
-        }
-        return false;
-    }
-
-    /** Get surrounding pieces of the provided position 
-     * return Piece list
-    */
-    public getSurroundingPieces(position: Position): Array<Piece> {
-        let piece_list: Array<Piece> = []
-        for(let axis_inc of PositionUtils.all_direction_increment_map.values()){
-            const piece_pos: Position = {
-                row: position.row + axis_inc.y,
-                column: position.column + axis_inc.x,
-            }
-            piece_list.push(this.getGridCellByPosition(piece_pos));
-        }
-        return piece_list;
-    }
+export interface IGridModel {
+    cells: Array<Array<PieceModel>>;
+    width: number;
+    height: number;
 }
 
-export default Grid;
+export class GridModel {
+
+    cells: PieceModel[][] = [];
+    width: number = 0;
+    height: number = 0;
+}
+
+export class GridModelMap extends Mapper{
+    public toDomain(raw: any): IGridModel {
+        const grid: IGridModel = new GridModel();
+        grid.width = raw.width;
+        grid.height = raw.height;
+        for (let row of raw.cells){
+            for (let piece of row){
+                let mapper: SageModelMap | SageModelMap | ElementModelMap;
+                switch(piece.type){
+                    case PieceTypes.Element:
+                        mapper = ElementModelMap;
+                        break;
+                    case PieceTypes.Sage:
+                        mapper = SageModelMap;
+                        break;
+                    case PieceTypes.Empty:
+                    default:
+                        mapper = EmptyModelMap;
+                        break;
+                }
+                grid.cells.push(new mapper().toDomain(piece))
+            }
+        }
+        return grid;
+    }
+}
