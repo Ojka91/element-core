@@ -19,7 +19,7 @@ export class Empty extends Piece {
     /** Empty piece class */
     constructor(){
         super();
-        this.string_representation = " "
+        this.string_representation = "."
     }
 }
 

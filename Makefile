@@ -1,6 +1,9 @@
 ## CONTAINER COMMANDS
 # Build and run backend service and redis locally. !! keep in mind --build flag will build re-build the images each time
 local-up:
+	docker-compose up
+
+local-up-build:
 	docker-compose up --build
 
 # Build and run redis separately !! Not possible to connect if built separately for now

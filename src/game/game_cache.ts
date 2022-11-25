@@ -8,7 +8,7 @@ export class GameCache {
     }
 
     public static async loadRoom(room_id: string): Promise<Room> {
-       await RedisSingleton.getInstance().get(room_id);
+       return await RedisSingleton.getInstance().get(room_id);
     }
     
 }

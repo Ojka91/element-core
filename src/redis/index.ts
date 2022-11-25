@@ -1,3 +1,4 @@
+import Room from '@/game/models/room';
 import { logger } from '@/utils/logger';
 import { createClient } from '@node-redis/client';
 
@@ -43,12 +44,13 @@ class Redis {
      * Retreive game data from redis
      * @param id game room/id
      */
-    async get(id: string): Promise<any> {  // TODO define data type?
+    async get(id: string): Promise<Room> {  // TODO define data type?
         try {
-            const data: any = await this.client.get(id);
-            return JSON.parse(data);
+            const data: string | null = await this.client.get(id);
+            return JSON.parse(data as string);
         } catch (error) {
             logger.error(error, `Failed retreiving data from redis game id: ${id}`)
+            throw new Error(`Failed retreiving data from redis game id: ${id}`)
         }
     }
 

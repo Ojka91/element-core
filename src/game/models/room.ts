@@ -5,7 +5,7 @@ import Player from "./player"
 const MAX_PLAYERS_PER_ROOM = 4;
 
 class Room {
-    private uuid: string = "room_id_1123213"
+    private uuid: string = "room1"
     private user_map_list: Map<User, Player> = new Map();
     private game: Game = new Game();
 
