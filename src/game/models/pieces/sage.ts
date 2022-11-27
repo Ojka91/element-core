@@ -1,7 +1,7 @@
 import {v4 as uuidv4} from 'uuid';
-import { PieceModel, PieceModelMap, PieceTypes } from "./pieces";
+import { IPieceModel, PieceModel, PieceModelMap, PieceTypes } from "./pieces";
 
-export interface ISageModel {
+export interface ISageModel extends IPieceModel {
     uuid: string;
 }
 

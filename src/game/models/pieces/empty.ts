@@ -1,6 +1,6 @@
-import { PieceModel, PieceModelMap, PieceTypes } from "./pieces";
+import { IPieceModel, PieceModel, PieceModelMap, PieceTypes } from "./pieces";
 
-export interface IEmptyModel {
+export interface IEmptyModel extends IPieceModel {
 
 }
 

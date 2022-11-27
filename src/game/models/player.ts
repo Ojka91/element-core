@@ -1,35 +1,31 @@
-import { ISageModel } from "./pieces/sage";
+import { v4 as uuidv4 } from 'uuid';
+import { Mapper } from '../utils/mapper';
+import { ISageModel, SageModelMap } from "./pieces/sage";
 
+export interface IPlayerModel {
+    uuid: string;
+    player_number: number;
+    sage: ISageModel;
+}
 
-class Player {
-    private uuid: string;
-    private player_number: number;
-    private sage?: ISageModel;
+export class PlayerModel {
+    uuid: string;
+    player_number: number;
+    sage?: ISageModel;
 
-    constructor(player_number: number){
-        
+    constructor(player_number: number) {
+
         this.player_number = player_number;
-        this.uuid = "Player "+player_number;
-    }
-
-    public setSage(sage: ISageModel): void {
-        this.sage = sage;
-    }
-
-    public getSage(): ISageModel{
-        if(this.sage === undefined){
-            throw new Error("Player has no assigned sage")
-        }
-        return this.sage;
-    }
-
-    public getUuid(): string{
-        return this.uuid;
-    }
-
-    public getPlayerNumber(): number {
-        return this.player_number;
+        this.uuid = uuidv4();
     }
 }
 
-export default Player;
+export class PlayerModelMap extends Mapper{
+    public toDomain(raw: any): PlayerModel {
+        const player: PlayerModel = new PlayerModel(0);
+        player.player_number = raw.player_number;
+        player.sage = new SageModelMap().toDomain(raw.sage);
+        player.uuid = raw.uuid;
+        return player;
+    }
+}

@@ -3,6 +3,7 @@ import { IGridModel } from "../../models/grid";
 import { PieceModel } from "../../models/pieces/pieces";
 import { Position } from '../../utils/position_utils'
 import GridController from '../grid_controller';
+import { IElementModel } from '@/game/models/elements/elements';
 
 export interface IElementController {
 
@@ -12,7 +13,7 @@ export interface IElementController {
 }
 
 /** Abstract class for all elements */
-export abstract class ElementController extends PieceController {
+export abstract class ElementController extends PieceController implements IElementController{
 
     /** All Elements has their own rule of replacement, this function return if it's allowed to be replace the piece with the element */
     public abstract ruleOfReplacement(piece_to_replace: PieceModel): boolean

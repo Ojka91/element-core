@@ -1,4 +1,4 @@
-import { Position } from "../../models/grid";
+import { Position } from "@/game/utils/position_utils";
 import { IPieceModel } from "@/game/models/pieces/pieces";
 
 export interface IPieceController {

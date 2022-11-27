@@ -1,5 +1,5 @@
 import { ElementTypes } from "../elements/elements";
-import ElementPoolManager, { NUM_PIECES_PER_ELEMENT } from "../element_pool_manager";
+import ElementPoolManager, { NUM_PIECES_PER_ELEMENT } from "../element_pool";
 
 describe('ElementPoolManager', () => {
     it('addElement: adding an element updates the pool ', async () => {

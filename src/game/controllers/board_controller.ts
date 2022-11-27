@@ -1,106 +1,141 @@
-import { Grid, Position } from "./grid";
-import { Element, ElementTypes } from "./elements/elements";
-import ElementPoolManager from "./element_pool_manager";
-import Player from "./player";
-import { MovementManager } from "./movement_manager";
-import { Piece, Sage } from "./pieces/pieces";
-import { ElementPieceCreator, SagePieceCreator } from "./pieces_factory";
-import { GameType } from "./game_utils";
-import { Water } from "./elements/water";
-import { Fire } from "./elements/fire";
+import { ElementPieceCreator, SagePieceCreator } from "@/game/models/pieces_factory";
 import { Reaction, WaterReaction } from "@/schemas/player_actions";
-import { PositionUtils } from "../utils/position_utils";
-import { Wind } from "./elements/wind";
+import { PositionUtils, Position } from "@/game/utils/position_utils";
+import { BoardModel } from "../models/board";
+import { IGridModel } from "../models/grid";
+import { ISageModel, SageModel } from "../models/pieces/sage";
+import { SageController } from "./pieces/sage_controller";
+import ElementPoolManager from "./element_pool_controller";
+import { ElementModel, ElementTypes } from "../models/elements/elements";
+import { GameType } from "../models/game";
+import GridController from "./grid_controller";
+import { MovementManager } from "../models/movement_manager";
+import { ElementController } from "./elements/elements_controller";
+import { IPieceModel } from "../models/pieces/pieces";
+import { IPlayerModel } from "../models/player";
+import PlayerController from "./player_controller";
+import { EarthController } from "./elements/earth_controller";
+import { WaterController } from "./elements/water_controller";
+import { FireController } from "./elements/fire_controller";
+import { WindController } from "./elements/wind_controller";
+import { EarthModel } from "../models/elements/earth";
+import { WaterModel } from "../models/elements/water";
+import { FireModel } from "../models/elements/fire";
+import { WindModel } from "../models/elements/wind";
 
-const COLUMN_PIECES_WIDTH: number = 11;
-const ROW_PIECES_HEIGHT: number = 11;
+class BoardController {
 
-class Board {
+    private model: BoardModel;
+    private element_pool_manager = ElementPoolManager
 
-    private grid: Grid = new Grid(ROW_PIECES_HEIGHT, COLUMN_PIECES_WIDTH);
-    private sage_list: Array<Sage> = [];
-    public elementPool: ElementPoolManager = new ElementPoolManager();
-
+    constructor(model: BoardModel){
+        this.model = model;
+    }
 
     public returnElementToPool(element: ElementTypes): void {
-        this.elementPool.addElement(element);
+        new this.element_pool_manager(this.model.elementPool).addElement(element);
     }
 
     public getElementFromPool(element: ElementTypes): void {
-        this.elementPool.removeElement(element);
+        new this.element_pool_manager(this.model.elementPool).removeElement(element);
     }
 
     /** Method to check whether the requested elements can be taken or not */
     public checkElementPoolAvailability(elements: Array<ElementTypes>): boolean {
-        return this.elementPool.checkElementListAvailability(elements);
+        return new this.element_pool_manager(this.model.elementPool).checkElementListAvailability(elements);
     }
 
     /** Grid getter */
-    public getGrid(): Grid {
-        return this.grid;
+    public getGrid(): IGridModel {
+        return this.model.grid;
     }
 
     /** Method to create the sages for the players */
-    public createSageByPlayerAndGameType(player: Player, game_type: GameType): void {
-        const sage: Sage = new SagePieceCreator().createPiece() as Sage;
-        sage.updatePosition(Sage.initial_position_map.get(game_type)!.get(player.getPlayerNumber())!)
-        player.setSage(sage);
-        this.grid.updateGridCell(player.getSage());
-        this.sage_list.push(sage);
+    public createSageByPlayerAndGameType(player: IPlayerModel, game_type: GameType): void {
+        const sage: SageModel = new SagePieceCreator().createPieceModel() as SageModel;
+        const sage_controller: SageController = new SageController(sage);
+        const player_controller: PlayerController = new PlayerController(player);
+        
+        sage_controller.updatePosition(sage_controller.getSageInitialPosition(game_type as number, player_controller.getPlayerNumber()));
+        player_controller.setSage(sage);
+        new GridController(this.model.grid).updateGridCell(player_controller.getSage());
+        this.model.sage_list.push(sage);
     }
 
     /** Method to place the player sage in the board */
-    public placePlayerSage(player: Player, new_position: Position): void {
-        let sage = player.getSage();
-        if (this.grid.isPositionValid(new_position) == false){
+    public placePlayerSage(player: IPlayerModel, new_position: Position): void {
+        let sage = new PlayerController(player).getSage();
+        const grid_controller: GridController = new GridController(this.model.grid);
+        if (grid_controller.isPositionValid(new_position) == false){
             throw new Error("Incorrect new row or new column dimensions");
         }
-        if(MovementManager.isSageMoveValid(this.grid, sage.position, new_position) == false){
+        if(MovementManager.isSageMoveValid(this.model.grid, sage.position, new_position) == false){
             throw new Error("Sage movement is not valid");
         }
-        sage.updatePosition(new_position);
-        this.grid.updateGridCell(sage);
+        new SageController(sage).updatePosition(new_position);
+        grid_controller.updateGridCell(sage);
     }
 
     /** Method to place an element in the board */
     public placeElement(element_type: ElementTypes, position: Position): void {
         
-        const element: Element = new ElementPieceCreator(element_type).createPiece() as Element
-
-        if (this.grid.isPositionValid(position) == false){
+        const element: ElementModel = new ElementPieceCreator(element_type).createPieceModel() as ElementModel
+        if (new GridController(this.model.grid).isPositionValid(position) == false){
             throw new Error("Invalid position, outside grid boundaries");
         }
-        
+        let element_controller: ElementController;
+        switch(element_type){
+            case ElementTypes.Earth:
+                element_controller = new EarthController(element as EarthModel);
+                break;
+            case ElementTypes.Water:
+                element_controller = new WaterController(element as WaterModel);
+                break;
+            case ElementTypes.Fire:
+                element_controller = new FireController(element as FireModel);
+                break;
+            case ElementTypes.Wind:
+                element_controller = new WindController(element as WindModel);
+                break;
+        }
 
-        element.updatePosition(position);
+        element_controller.updatePosition(position);
         
-        if(element.place(this.grid, position) == false){
+        if(element_controller.place(this.model.grid, position) == false){
             throw new Error("Cannot replace the cell due to a rule of replacement")
         }
     }
 
     public performElementReaction(element_type: ElementTypes, position: Position, reaction?: Reaction): void {
-        const element: Element = new ElementPieceCreator(element_type).createPiece() as Element
+        const element: ElementModel = new ElementPieceCreator(element_type).createPieceModel() as ElementModel
+        let element_controller: ElementController;
         switch(element_type){
             case ElementTypes.Water:
+                element_controller = new WaterController(element);
                 if(reaction instanceof WaterReaction){
                     const water_reaction: WaterReaction = reaction as WaterReaction
-                    (element as Water).reaction(this.grid, position, water_reaction.initial_river, water_reaction.new_river);
+                    element_controller.reaction(this.model.grid, position, water_reaction.initial_river, water_reaction.new_river);
                 }else{
-                    (element as Water).reaction(this.grid, position);    
+                    element_controller.reaction(this.model.grid, position);    
                 }
                 break;
             case ElementTypes.Fire:
-                (element as Fire).reaction(this.grid, position, this.elementPool);
+                element_controller = new FireController(element);
+                element_controller.reaction(this.model.grid, position, new this.element_pool_manager(this.model.elementPool));
                 break;
-            default:
-                element.reaction(this.grid, position);
+            case ElementTypes.Earth:
+                element_controller = new EarthController(element);
+                element_controller.reaction(this.model.grid, position);
+                break;
+            case ElementTypes.Wind:
+                element_controller = new WindController(element);
+                element_controller.reaction(this.model.grid, position);
                 break;
         }
     }
 
     public winningCondition(position: Position): string | null {
-        for(let sage of this.sage_list){
+        for(let sage of this.model.sage_list){
             if(PositionUtils.isStrictPosition(sage.position, position)){
                 if(this.isSageCaptured(sage)){
                     return sage.uuid;
@@ -110,13 +145,14 @@ class Board {
         return null;
     }
 
-    private isSageCaptured(sage: Sage): boolean {
-        const piece_list: Array<Piece> = this.grid.getSurroundingPieces(sage.position);
+    private isSageCaptured(sage: ISageModel): boolean {
+        const grid_controller: GridController = new GridController(this.model.grid);
+        const piece_list: Array<IPieceModel> = grid_controller.getSurroundingPieces(sage.position);
         for(let piece of piece_list){
-            if(this.grid.isWindCell(piece.position)){
-                return MovementManager.isWindBlocked(this.grid, piece.position, piece as Wind);
+            if(grid_controller.isWindCell(piece.position)){
+                return MovementManager.isWindBlocked(this.model.grid, piece.position, piece as WindModel);
             }
-            if(MovementManager.isSageMoveValid(this.grid, sage.position, piece.position)){
+            if(MovementManager.isSageMoveValid(this.model.grid, sage.position, piece.position)){
                 return false;
             }
         }
@@ -124,9 +160,9 @@ class Board {
     }
 
     public displayGrid(): void {
-        this.grid.displayGrid();
+        new GridController(this.model.grid).displayGrid();
     }
     
 }
 
-export default Board;
+export default BoardController;

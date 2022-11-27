@@ -1,4 +1,4 @@
-import { PieceModel, PieceModelMap } from "../pieces/pieces";
+import { IPieceModel, PieceModel, PieceModelMap } from "../pieces/pieces";
 
 /** mapping of the element to the corresponding class */
 export enum ElementTypes {
@@ -8,6 +8,9 @@ export enum ElementTypes {
     Wind = "Wind"
 };
 
+export interface IElementModel extends IPieceModel {
+    
+}
 
 /** Abstract class for all elements */
 export abstract class ElementModel extends PieceModel {

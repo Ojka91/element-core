@@ -1,4 +1,4 @@
-import ElementPoolManager from "../../element_pool_manager";
+import ElementPoolManager from "../../element_pool";
 import Grid, { Position } from "../../grid";
 import { Earth } from "../earth";
 import { ElementTypes } from "../elements"

@@ -1,11 +1,14 @@
 
-import { Wind } from "./elements/wind";
-import { Grid, Position } from "./grid";
-import { PositionUtils } from "./position_utils"
+import { WindModel } from "./elements/wind";
+import { PositionUtils, Position } from "../utils/position_utils"
+import { IGridModel } from "./grid";
+import GridController from "../controllers/grid_controller";
 
 export class MovementManager {
 
-    public static isWindBlocked(grid: Grid, origin: Position, wind: Wind) : boolean{
+    public static isWindBlocked(grid: IGridModel, origin: Position, wind: WindModel) : boolean{
+        
+        const grid_controller: GridController = new GridController(grid);
         // Distance of each axis
         const x_dist: number = wind.position.column - origin.column;
         const y_dist: number = wind.position.row - origin.row;
@@ -20,30 +23,31 @@ export class MovementManager {
             row: wind.position.row + jump_distance * y_dir,
             column: wind.position.column + jump_distance * x_dir,
         }
-        if(grid.isPositionEmpty(landing_position)){
+        if(grid_controller.isPositionEmpty(landing_position)){
             return false;
-        } else if(grid.isWindCell(landing_position)){
-            return this.isWindBlocked(grid, landing_position, grid.getGridCellByPosition(landing_position) as Wind);
+        } else if(grid_controller.isWindCell(landing_position)){
+            return this.isWindBlocked(grid, landing_position, grid_controller.getGridCellByPosition(landing_position) as WindModel);
         }
         return true
 
     }
 
     /** Performs all checkers for the sage movement */
-    public static isSageMoveValid(grid: Grid, current_position: Position, new_position: Position): boolean {
+    public static isSageMoveValid(grid: IGridModel, current_position: Position, new_position: Position): boolean {
         
+        const grid_controller: GridController = new GridController(grid);
         // check if there has been a movement
         if(PositionUtils.isSamePosition(current_position, new_position)){
             // Hadn't moved so it's not considered a movement
             return false;
         }
         // Check if the new position is valid
-        if (grid.isPositionValid(new_position) == false){
+        if (grid_controller.isPositionValid(new_position) == false){
             return false;
         }
 
         // Check if the movement is to an empty cell
-        if(grid.isPositionEmpty(new_position) == false){
+        if(grid_controller.isPositionEmpty(new_position) == false){
             // illegal move
             return false;
         }
@@ -62,7 +66,8 @@ export class MovementManager {
     /** Check whether there is a wind or a whirlwind in the sage move direction and it's legal
      * return: true if wind or whirlwind and jump is legal, otherwise false
      */
-    private static isWindJumpLegal(grid: Grid, current_position: Position, new_position: Position): boolean {
+    private static isWindJumpLegal(grid: IGridModel, current_position: Position, new_position: Position): boolean {
+        const grid_controller: GridController = new GridController(grid);
         // Distance of each axis
         const x_dist: number = new_position.column - current_position.column;
         const y_dist: number = new_position.row - current_position.row;
@@ -80,13 +85,13 @@ export class MovementManager {
         
         while (PositionUtils.isSamePosition(next_piece_pos, new_position) == false ){
             // Check if current cell is wind
-            if(grid.isWindCell(next_piece_pos) == false){
+            if(grid_controller.isWindCell(next_piece_pos) == false){
                 // if it's not a wind piece, then the movement it's not allowed
                 return false;
             }
 
             // Get cell piece
-            const jump_distance: number = (grid.getGridCellByPosition(next_piece_pos) as Wind).getNumberOfStackedWinds();
+            const jump_distance: number = (grid_controller.getGridCellByPosition(next_piece_pos) as WindModel).getNumberOfStackedWinds();
 
             for (let cell: number = 1; cell <= jump_distance; cell++){
                 // Get cell piece
@@ -99,12 +104,12 @@ export class MovementManager {
                 // Check if it's not a mountain 
                 // NOTE:    It's not necessary since all Mountains are ranges, so 
                 //          it's left like this in case other functionalities are added for mountains
-                if(grid.isMountainCell(next_piece_pos)){
+                if(grid_controller.isMountainCell(next_piece_pos)){
                     return false;
                 }
 
                 // Check there are no ranges in the middle of the jump
-                if(grid.isRangeCell(next_piece_pos)){
+                if(grid_controller.isRangeCell(next_piece_pos)){
                     return false;
                 }
             }
