@@ -4,7 +4,7 @@ import GridController from "../grid_controller";
 import { IPieceModel, PieceModel } from "@/game/models/pieces/pieces";
 import { IGridModel } from "@/game/models/grid";
 import { WaterModel } from "@/game/models/elements/water";
-import { ElementController } from "./elements_controller";
+import { ElementController, IElementController } from "./elements_controller";
 
 
 const all_direction_map: Map<string, AxisIncrement> = PositionUtils.all_direction_increment_map;
@@ -19,10 +19,20 @@ const all_direction_map: Map<string, AxisIncrement> = PositionUtils.all_directio
  *          become a Range and share the same properties as a Mountain.
  *          A Range blocks the Sage to move diagonally.
  */
- export class EarthController extends ElementController{
+export interface IEarthController extends IElementController {
+    place(grid: IGridModel, cell: Position): boolean;
+    isMountain(): boolean;
+    isRange(): boolean;
+    promoteToRange(): void;
+    promoteToMountain(): void;
+    ruleOfReplacement(piece_to_replace: IPieceModel): boolean;
+    reaction(grid: IGridModel, cell: Position): void;
+}
+
+export class EarthController extends ElementController implements IEarthController {
     protected model: EarthModel;
 
-    constructor(model: IEarthModel){
+    constructor(model: IEarthModel) {
         super(model);
         this.model = model;
     }
@@ -32,8 +42,8 @@ const all_direction_map: Map<string, AxisIncrement> = PositionUtils.all_directio
         const grid_controller: GridController = new GridController(grid);
         const piece: PieceModel = grid_controller.getGridCellByPosition(cell);
         this.model.position = cell;
-        if(piece instanceof EarthModel){
-            if (new EarthController(piece).isMountain() == false){
+        if (piece instanceof EarthModel) {
+            if (new EarthController(piece).isMountain() == false) {
                 this.promoteToMountain();
                 grid_controller.updateGridCell(this.model)
                 this.formRange(grid, cell);
@@ -42,9 +52,9 @@ const all_direction_map: Map<string, AxisIncrement> = PositionUtils.all_directio
                 return false;
             }
         }
-        if(grid_controller.isPositionEmpty(cell) || (this.ruleOfReplacement(piece))){
+        if (grid_controller.isPositionEmpty(cell) || (this.ruleOfReplacement(piece))) {
             grid_controller.updateGridCell(this.model)
-    
+
             return true;
         }
         return false;
@@ -68,11 +78,11 @@ const all_direction_map: Map<string, AxisIncrement> = PositionUtils.all_directio
     }
 
     public ruleOfReplacement(piece_to_replace: IPieceModel): boolean {
-        if(piece_to_replace instanceof WaterModel){
+        if (piece_to_replace instanceof WaterModel) {
             return true;
-        } 
-        if (piece_to_replace instanceof EarthModel){
-            if (this.model.is_mountain == false){
+        }
+        if (piece_to_replace instanceof EarthModel) {
+            if (this.model.is_mountain == false) {
                 return true;
             }
         }
@@ -80,10 +90,10 @@ const all_direction_map: Map<string, AxisIncrement> = PositionUtils.all_directio
     }
 
     public reaction(grid: IGridModel, cell: Position): void {
-        
+
     }
 
-    private formRange(grid: IGridModel, cell: Position){
+    private formRange(grid: IGridModel, cell: Position) {
 
         const grid_controller: GridController = new GridController(grid);
 
@@ -91,20 +101,20 @@ const all_direction_map: Map<string, AxisIncrement> = PositionUtils.all_directio
         let surrounding_earths: Array<Position> = this.getSurroundingEarths(grid, cell);
 
         // Until there are surrounding earths to evaluate
-        while(surrounding_earths.length != 0){
+        while (surrounding_earths.length != 0) {
             let next_surrounding_earths: Array<Position> = [];
             surrounding_earths.forEach((earth_pos: Position) => {
                 const earth: EarthModel = grid_controller.getGridCellByPosition(earth_pos) as EarthModel;
                 new EarthController(earth).promoteToRange();
-                
+
                 next_surrounding_earths = next_surrounding_earths.concat(new EarthController(earth).getSurroundingEarths(grid, earth_pos));
 
             });
             surrounding_earths = next_surrounding_earths;
         }
-        
+
     }
-    
+
     private getSurroundingEarths(grid: IGridModel, cell: Position): Array<Position> {
         let surrounding_earths: Array<Position> = [];
         let evaluation_cell: Position;
@@ -116,7 +126,7 @@ const all_direction_map: Map<string, AxisIncrement> = PositionUtils.all_directio
                 row: cell.row + value.y,
                 column: cell.column + value.x
             };
-            if(grid_controller.isPositionValid(evaluation_cell) && grid_controller.isEarthCell(evaluation_cell) && (grid_controller.isRangeCell(evaluation_cell) == false)){
+            if (grid_controller.isPositionValid(evaluation_cell) && grid_controller.isEarthCell(evaluation_cell) && (grid_controller.isRangeCell(evaluation_cell) == false)) {
                 surrounding_earths.push(evaluation_cell);
             }
         })

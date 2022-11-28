@@ -1,13 +1,15 @@
 import { IGridModel } from "../models/grid";
-import { Earth } from  '../models/elements/earth';
-import { Fire } from '../models/elements/fire';
-import { Water } from '../models/elements/water';
-import { Wind } from '../models/elements/wind';
 import { IPieceModel } from '../models/pieces/pieces';
 import { EmptyModel } from '../models/pieces/empty';
 import { EmptyPieceCreator } from '../models/pieces_factory';
 import { PositionUtils, Position } from '../utils/position_utils';
 import { EmptyController } from "./pieces/empty_controller";
+import { FireModel } from "../models/elements/fire";
+import { EarthModel } from "../models/elements/earth";
+import { WaterModel } from "../models/elements/water";
+import { WindModel } from "../models/elements/wind";
+import { WindController } from "./elements/wind_controller";
+import { EarthController } from "./elements/earth_controller";
 
 export interface IGridController {
     getWidth(): number
@@ -104,21 +106,21 @@ export class GridController implements IGridController {
      * return: true if empty, false otherwise
      */
     public isFireCell(position: Position): boolean {
-        return this.getGridCellByPosition(position) instanceof Fire;
+        return this.getGridCellByPosition(position) instanceof FireModel;
     }
 
     /** Check whether the position is earth
      * return: true if empty, false otherwise
      */
     public isEarthCell(position: Position): boolean {
-        return this.getGridCellByPosition(position) instanceof Earth;
+        return this.getGridCellByPosition(position) instanceof EarthModel;
     }
 
     /** Check whether the position is water
      * return: true if empty, false otherwise
      */
     public isWaterCell(position: Position): boolean {
-        return this.getGridCellByPosition(position) instanceof Water;
+        return this.getGridCellByPosition(position) instanceof WaterModel;
     }
 
 
@@ -126,7 +128,7 @@ export class GridController implements IGridController {
      * return: true if empty, false otherwise
      */
     public isWindCell(position: Position): boolean {
-        return this.getGridCellByPosition(position) instanceof Wind;
+        return this.getGridCellByPosition(position) instanceof WindModel;
     }
 
     /** Check whether the position is whirlwind
@@ -134,8 +136,9 @@ export class GridController implements IGridController {
      */
     public isWhirlwindCell(position: Position): boolean {
         const piece: IPieceModel = this.getGridCellByPosition(position);
-        if (piece instanceof Wind) {
-            return (piece as Wind).getNumberOfStackedWinds() > 1;
+        if (piece instanceof WindModel) {
+            const wind_controller: WindController = new WindController(piece);
+            return wind_controller.getNumberOfStackedWinds() > 1;
         }
         return false;
     }
@@ -145,8 +148,9 @@ export class GridController implements IGridController {
      */
     public isMountainCell(position: Position): boolean {
         const piece: IPieceModel = this.getGridCellByPosition(position);
-        if (piece instanceof Earth) {
-            return (piece as Earth).isMountain();
+        if (piece instanceof EarthModel) {
+            const earth_controller: EarthController = new EarthController(piece);
+            return earth_controller.isMountain();
         }
         return false;
     }
@@ -156,8 +160,9 @@ export class GridController implements IGridController {
      */
     public isRangeCell(position: Position): boolean {
         const piece: IPieceModel = this.getGridCellByPosition(position);
-        if (piece instanceof Earth) {
-            return (piece as Earth).isRange();
+        if (piece instanceof EarthModel) {
+            const earth_controller: EarthController = new EarthController(piece);
+            return earth_controller.isRange();
         }
         return false;
     }

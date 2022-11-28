@@ -9,6 +9,7 @@ export interface ITurnController {
     isDrawingElementsAllowed(): boolean ;
     isMovingSageAllowed(): boolean ;
     isPlaceElementAllowed(): boolean ;
+    isNumberOfDrawnElementsAllowed(num_draw_elements: number): boolean ;
     setDrawnElements(elements: Array<ElementTypes>): void ;
     getRemainingElements(): Array<ElementTypes> ;
     removeElementFromList(element: ElementTypes): boolean ;
@@ -37,6 +38,10 @@ export class TurnController implements ITurnController{
 
     public isPlaceElementAllowed(): boolean {
         return this.model.state == TurnStates.MovesAvailables && this.model.chosen_elements.length > 0;
+    }
+
+    public isNumberOfDrawnElementsAllowed(num_draw_elements: number): boolean {
+        return num_draw_elements <= MAX_ALLOWED_ELEMENTS;
     }
 
     public setDrawnElements(elements: Array<ElementTypes>): void {

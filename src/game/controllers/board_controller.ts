@@ -6,7 +6,7 @@ import { IGridModel } from "../models/grid";
 import { ISageModel, SageModel } from "../models/pieces/sage";
 import { SageController } from "./pieces/sage_controller";
 import ElementPoolManager from "./element_pool_controller";
-import { ElementModel, ElementTypes } from "../models/elements/elements";
+import { ElementModel, ElementTypes, IElementModel } from "../models/elements/elements";
 import { GameType } from "../models/game";
 import GridController from "./grid_controller";
 import { MovementManager } from "../models/movement_manager";
@@ -18,10 +18,10 @@ import { EarthController } from "./elements/earth_controller";
 import { WaterController } from "./elements/water_controller";
 import { FireController } from "./elements/fire_controller";
 import { WindController } from "./elements/wind_controller";
-import { EarthModel } from "../models/elements/earth";
-import { WaterModel } from "../models/elements/water";
-import { FireModel } from "../models/elements/fire";
-import { WindModel } from "../models/elements/wind";
+import { EarthModel, IEarthModel } from "../models/elements/earth";
+import { WaterModel, IWaterModel } from "../models/elements/water";
+import { FireModel, IFireModel } from "../models/elements/fire";
+import { IWindModel, WindModel } from "../models/elements/wind";
 
 class BoardController {
 
@@ -107,11 +107,11 @@ class BoardController {
     }
 
     public performElementReaction(element_type: ElementTypes, position: Position, reaction?: Reaction): void {
-        const element: ElementModel = new ElementPieceCreator(element_type).createPieceModel() as ElementModel
-        let element_controller: ElementController;
+        const element: IElementModel = new ElementPieceCreator(element_type).createPieceModel() as ElementModel
+        let element_controller;
         switch(element_type){
             case ElementTypes.Water:
-                element_controller = new WaterController(element);
+                element_controller = new WaterController(element as IWaterModel);
                 if(reaction instanceof WaterReaction){
                     const water_reaction: WaterReaction = reaction as WaterReaction
                     element_controller.reaction(this.model.grid, position, water_reaction.initial_river, water_reaction.new_river);
@@ -120,15 +120,15 @@ class BoardController {
                 }
                 break;
             case ElementTypes.Fire:
-                element_controller = new FireController(element);
+                element_controller = new FireController(element as IFireModel);
                 element_controller.reaction(this.model.grid, position, new this.element_pool_manager(this.model.elementPool));
                 break;
             case ElementTypes.Earth:
-                element_controller = new EarthController(element);
+                element_controller = new EarthController(element as IEarthModel);
                 element_controller.reaction(this.model.grid, position);
                 break;
             case ElementTypes.Wind:
-                element_controller = new WindController(element);
+                element_controller = new WindController(element as IWindModel);
                 element_controller.reaction(this.model.grid, position);
                 break;
         }

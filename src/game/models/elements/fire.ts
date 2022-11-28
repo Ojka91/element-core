@@ -1,14 +1,14 @@
 import { Mapper } from "@/game/utils/mapper";
-import { ElementModel, IElementModel } from "./elements";
+import { ElementModel, ElementTypes, IElementModel } from "./elements";
 
 export interface IFireModel extends IElementModel {
-
 }
 
 export class FireModel extends ElementModel implements IFireModel{
 
     constructor() {
         super();
+        this.element_type = ElementTypes.Fire
     }
 }
 

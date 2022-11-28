@@ -1,6 +1,6 @@
-import Board from "./board";
+import Board, { BoardModelMap } from "./board";
 import { Mapper } from "@/game/utils/mapper";
-import Player from "./player";
+import Player, { PlayerModelMap } from "./player";
 import { TurnModel, TurnModelMap } from "./turn";
 
 export enum GameStates {

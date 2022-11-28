@@ -1,5 +1,5 @@
 import { Mapper } from "@/game/utils/mapper";
-import { ElementModel, IElementModel } from "./elements";
+import { ElementModel, ElementTypes, IElementModel } from "./elements";
 
 export interface IWindModel extends IElementModel {
     stacked_winds: number;
@@ -10,6 +10,7 @@ export class WindModel extends ElementModel implements IWindModel {
 
     constructor() {
         super();
+        this.element_type = ElementTypes.Wind;
     }
 }
 

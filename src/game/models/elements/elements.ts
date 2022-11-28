@@ -9,11 +9,13 @@ export enum ElementTypes {
 };
 
 export interface IElementModel extends IPieceModel {
-    
+    element_type: ElementTypes;
 }
 
 /** Abstract class for all elements */
 export abstract class ElementModel extends PieceModel {
+    
+    element_type: ElementTypes = ElementTypes.Fire;
 
     constructor() {
         super();

@@ -1,4 +1,4 @@
-import { ElementModel, ElementModelMap, IElementModel } from "./elements";
+import { ElementModel, ElementModelMap, ElementTypes, IElementModel } from "./elements";
 
 
 export interface IEarthModel extends IElementModel {
@@ -6,9 +6,14 @@ export interface IEarthModel extends IElementModel {
     is_range: boolean
 }
 
-export class EarthModel extends ElementModel {
+export class EarthModel extends ElementModel implements IEarthModel {
     is_mountain: boolean = false;
     is_range: boolean = false;
+
+    constructor(){
+        super();
+        this.element_type = ElementTypes.Earth;
+    }
 }
 
 export class EarthModelMap extends ElementModelMap {

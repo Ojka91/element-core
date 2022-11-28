@@ -5,10 +5,10 @@ import { ISageModel, SageModelMap } from "./pieces/sage";
 export interface IPlayerModel {
     uuid: string;
     player_number: number;
-    sage: ISageModel;
+    sage?: ISageModel;
 }
 
-export class PlayerModel {
+export class PlayerModel implements IPlayerModel {
     uuid: string;
     player_number: number;
     sage?: ISageModel;

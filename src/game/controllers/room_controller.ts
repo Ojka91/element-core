@@ -5,7 +5,8 @@ import { UserController } from './user_controller'
 import { UserModel } from '../models/user'
 import { IGameModel } from '../models/game'
 import { IRoomModel } from '../models/room'
-import Player from "../models/player"
+import { PlayerModel } from '../models/player'
+import PlayerController from './player_controller'
 
 interface IRoomController {
     getUuid(): string;
@@ -41,9 +42,9 @@ class RoomController implements IRoomController {
             if (this.model.user_list.includes(user)) {
                 throw new Error("The same user cannot be in the Room twice")
             }
-            const player: Player = new Player(this.model.user_list.length)
+            const player: PlayerModel = new PlayerModel(this.model.user_list.length)
             this.game_controller.addPlayer(player);
-            this.model.user_to_player_map.set(new UserController(user).getUuid(), player.getUuid());
+            this.model.user_to_player_map.set(new UserController(user).getUuid(), new PlayerController(player).getUuid());
             user_added = true;
         }
         return user_added;

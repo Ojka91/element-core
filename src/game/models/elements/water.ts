@@ -1,5 +1,5 @@
 import { Mapper } from "@/game/utils/mapper";
-import { ElementModel, IElementModel } from "./elements";
+import { ElementModel, ElementTypes, IElementModel } from "./elements";
 
 export interface IWaterModel extends IElementModel {
 
@@ -9,6 +9,7 @@ export class WaterModel extends ElementModel implements IWaterModel{
 
     constructor() {
         super();
+        this.element_type = ElementTypes.Water;
     }
 }
 

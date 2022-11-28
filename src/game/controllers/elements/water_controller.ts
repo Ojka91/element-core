@@ -4,7 +4,7 @@ import { IGridModel } from "@/game/models/grid";
 import { IPieceModel } from "@/game/models/pieces/pieces";
 import { AxisIncrement, Position, PositionUtils } from "@/game/utils/position_utils";
 import GridController from "../grid_controller";
-import { ElementController } from "./elements_controller";
+import { ElementController, IElementController } from "./elements_controller";
 
 /**
  * Water class
@@ -16,20 +16,25 @@ import { ElementController } from "./elements_controller";
  *          Wind, Water, Sage and Edges of the board block the River movement.
  *          Rivers can pass through Fire.
  */
- export class WaterController extends ElementController{
+export interface IWaterController extends IElementController {
+    ruleOfReplacement(piece_to_replace: IPieceModel): boolean
+    reaction(grid: IGridModel, cell: Position, curr_river?: Array<Position>, new_river?: Array<Position>): void;
+}
+
+export class WaterController extends ElementController implements IWaterController {
 
     protected model: WaterModel;
 
-    constructor(model: WaterModel){
+    constructor(model: WaterModel) {
         super(model);
         this.model = model
     }
 
     public ruleOfReplacement(piece_to_replace: IPieceModel): boolean {
-        if(piece_to_replace instanceof FireModel){
+        if (piece_to_replace instanceof FireModel) {
             return true;
-        } 
-        
+        }
+
         return false;
     }
 
@@ -45,67 +50,67 @@ import { ElementController } from "./elements_controller";
         cell: Position,
         curr_river?: Array<Position>,  // must be sorted and head must be the first element
         new_river?: Array<Position>        // must be sorted and head must be the first element
-        ): void {
+    ): void {
 
-            const surr_waters: Array<Position> = this.getSurroundingWaters(grid, cell);
-            // Check if new water creates a River or is alone
-            if( surr_waters.length == 0){
-                // water standalone, do nothing
-                return;
-            }
+        const surr_waters: Array<Position> = this.getSurroundingWaters(grid, cell);
+        // Check if new water creates a River or is alone
+        if (surr_waters.length == 0) {
+            // water standalone, do nothing
+            return;
+        }
 
-            // It forms a river, is river data provided?
-            if((new_river == undefined) || (new_river.length == 0)){
-                throw new Error("Water reaction requires a new river array with at least 1 position. Got undefined or 0")
-            }
-            if((curr_river == undefined) || (curr_river.length == 0)){
-                throw new Error("Water reaction requires an old river array with at least 1 position. Got undefined or 0")
-            }
+        // It forms a river, is river data provided?
+        if ((new_river == undefined) || (new_river.length == 0)) {
+            throw new Error("Water reaction requires a new river array with at least 1 position. Got undefined or 0")
+        }
+        if ((curr_river == undefined) || (curr_river.length == 0)) {
+            throw new Error("Water reaction requires an old river array with at least 1 position. Got undefined or 0")
+        }
 
-            const selected_river_pos_list: Array<Position> = JSON.parse(JSON.stringify(curr_river));
-            const new_river_pos_list: Array<Position> = JSON.parse(JSON.stringify(new_river));
+        const selected_river_pos_list: Array<Position> = JSON.parse(JSON.stringify(curr_river));
+        const new_river_pos_list: Array<Position> = JSON.parse(JSON.stringify(new_river));
 
-            if(new_river_pos_list.length - 1 != selected_river_pos_list.length){
-                throw new Error("New river must have the old river length + 1")
-            }
+        if (new_river_pos_list.length - 1 != selected_river_pos_list.length) {
+            throw new Error("New river must have the old river length + 1")
+        }
 
-            // River data are a legal move?
-            if(this.isRiverLegal(cell, selected_river_pos_list, new_river_pos_list)== false){
-                throw new Error("River is illegal. Heads of the rivers must be opposite to the new water piece position")
-            }
+        // River data are a legal move?
+        if (this.isRiverLegal(cell, selected_river_pos_list, new_river_pos_list) == false) {
+            throw new Error("River is illegal. Heads of the rivers must be opposite to the new water piece position")
+        }
 
-            // Add placed water to the old river list
-            selected_river_pos_list.unshift(cell);
+        // Add placed water to the old river list
+        selected_river_pos_list.unshift(cell);
 
-            // New river data is provided, is it valid?
-            if(this.isNewRiverValid(grid, new_river_pos_list!) == false){
-                throw new Error("New river data provided is invalid");
-            }
-            // River data is provided, is it valid?
-            if(this.isValidRiver(grid, selected_river_pos_list!) == false){
-                throw new Error("River data provided is invalid");
-            }
+        // New river data is provided, is it valid?
+        if (this.isNewRiverValid(grid, new_river_pos_list!) == false) {
+            throw new Error("New river data provided is invalid");
+        }
+        // River data is provided, is it valid?
+        if (this.isValidRiver(grid, selected_river_pos_list!) == false) {
+            throw new Error("River data provided is invalid");
+        }
 
-            const grid_controller: GridController = new GridController(grid);
-            // Clear old river
-            for (let pos of selected_river_pos_list!){
-                grid_controller.clearCell(pos);
-            }
+        const grid_controller: GridController = new GridController(grid);
+        // Clear old river
+        for (let pos of selected_river_pos_list!) {
+            grid_controller.clearCell(pos);
+        }
 
-            // Add new river
-            for (let pos of new_river_pos_list!){
-                const water: WaterModel = new WaterModel();
-                new WaterController(water).updatePosition(pos);
-                grid_controller.updateGridCell(water);
-            }
-            
+        // Add new river
+        for (let pos of new_river_pos_list!) {
+            const water: WaterModel = new WaterModel();
+            new WaterController(water).updatePosition(pos);
+            grid_controller.updateGridCell(water);
+        }
+
     }
 
     private isRiverOrthogonal(river_pos_list: Array<Position>): boolean {
         let previous_pos: Position | null = null;
-        for (let pos of river_pos_list){
-            if(previous_pos != null){
-                if(PositionUtils.isStrictOrthogonalPosition(previous_pos, pos) == false){
+        for (let pos of river_pos_list) {
+            if (previous_pos != null) {
+                if (PositionUtils.isStrictOrthogonalPosition(previous_pos, pos) == false) {
                     return false;
                 }
             }
@@ -117,19 +122,19 @@ import { ElementController } from "./elements_controller";
 
     private isValidRiver(grid: IGridModel, river_pos_list: Array<Position>): boolean {
         const grid_controller: GridController = new GridController(grid);
-        for(let water_pos of river_pos_list){
-            if(grid_controller.isWaterCell(water_pos) == false){
+        for (let water_pos of river_pos_list) {
+            if (grid_controller.isWaterCell(water_pos) == false) {
                 return false;
             }
         }
         return this.isRiverOrthogonal(river_pos_list);
     }
 
-    private isNewRiverValid(grid: IGridModel, river_pos_list: Array<Position>) : boolean {
+    private isNewRiverValid(grid: IGridModel, river_pos_list: Array<Position>): boolean {
         const grid_controller: GridController = new GridController(grid);
-        for(let pos of river_pos_list){
-            if(grid_controller.isPositionEmpty(pos) == false){
-                if (this.ruleOfReplacement(grid_controller.getGridCellByPosition(pos)) == false){
+        for (let pos of river_pos_list) {
+            if (grid_controller.isPositionEmpty(pos) == false) {
+                if (this.ruleOfReplacement(grid_controller.getGridCellByPosition(pos)) == false) {
                     return false;
                 }
             }
@@ -145,7 +150,7 @@ import { ElementController } from "./elements_controller";
                 row: cell.row + value.y,
                 column: cell.column + value.x
             };
-            if(grid_controller.isPositionValid(evaluate_pos) && grid_controller.isWaterCell(evaluate_pos)){
+            if (grid_controller.isPositionValid(evaluate_pos) && grid_controller.isWaterCell(evaluate_pos)) {
                 surr_waters_position.push(evaluate_pos);
             }
         });
@@ -156,12 +161,12 @@ import { ElementController } from "./elements_controller";
     private isRiverLegal(cell: Position, river: Array<Position>, new_river: Array<Position>): boolean {
         const river_head: Position = river[0];
         const new_river_head: Position = new_river[0];
-        
+
         /*if(PositionUtils.isSamePosition(river_head, new_river_head)){
             return false;
         }*/
         // Check if heads are strictly orthogonal to the cell
-        if(PositionUtils.isStrictOrthogonalPosition(cell, river_head) && PositionUtils.isStrictOrthogonalPosition(cell, new_river_head)){
+        if (PositionUtils.isStrictOrthogonalPosition(cell, river_head) && PositionUtils.isStrictOrthogonalPosition(cell, new_river_head)) {
             return true;
         }
         return false;

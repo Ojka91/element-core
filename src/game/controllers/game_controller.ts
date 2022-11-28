@@ -1,20 +1,24 @@
-import { GameModel, GameStates } from "../models/game";
-import Player from "../models/player";
-import { ElementTypes } from "../models/elements/elements";
 import { Reaction } from "@/schemas/player_actions";
-import { Position } from "../models/grid";
-import Board from "../models/board";
-import { Turn } from "../models/turn";
+import { BoardModel, IBoardModel } from "../models/board";
+import { ElementTypes } from "../models/elements/elements";
+import { GameModel, GameStates, IGameModel } from "../models/game";
+import { IPlayerModel } from "../models/player";
+import { TurnModel } from "../models/turn";
+import { Position } from "../utils/position_utils";
+import BoardController from "./board_controller";
+import PlayerController from "./player_controller";
+import { TurnController } from "./turn_controller";
+
 
 export interface IGameController {
-    addPlayer(player: Player): void;
+    addPlayer(player: IPlayerModel): void;
     setupGame(game_type: number): void;
     drawingElements(elements: Array<ElementTypes>): void;
     placeElement(element: ElementTypes, position: Position, reaction?: Reaction): void;
-    movePlayerSage(player: Player, position: Position): void;
+    movePlayerSage(player: IPlayerModel, position: Position): void;
     endOfPlayerTurn(): void;
-    getBoard(): Board;
-    getTurnPlayer(): Player;
+    getBoard(): IBoardModel;
+    getTurnPlayer(): IPlayerModel;
     getGameState(): GameStates;
     getWinner(): number | null;
 }
@@ -23,17 +27,17 @@ export class GameController implements IGameController {
 
     private model: GameModel;
 
-    constructor(model: GameModel) {
+    constructor(model: IGameModel) {
         this.model = model;
     }
 
-    public addPlayer(player: Player): void {
+    public addPlayer(player: IPlayerModel): void {
         this.model.player_list.push(player);
     }
 
     public setupGame(game_type: number): void {
         // Resets the board
-        this.model.board = new Board();
+        this.model.board = new BoardModel();
         this.model.player_list.forEach((player) => {
             this.model.board.createSageByPlayerAndGameType(player, game_type);
         })
@@ -42,74 +46,85 @@ export class GameController implements IGameController {
     }
 
     public drawingElements(elements: Array<ElementTypes>): void {
+        const turn_controller: TurnController = new TurnController(this.model.turn);
+        const board_controller: BoardController = new BoardController(this.model.board);
+
         if (this.model.state != GameStates.GameRunning) {
             throw new Error("Cannot draw elements if the game hadn't started or has ended");
         }
-        if (this.model.turn.isDrawingElementsAllowed() == false) {
+        if (turn_controller.isDrawingElementsAllowed() == false) {
             throw new Error("Drawing elements is only allowed at the start of the turn")
         }
-        if (elements.length > Turn.MAX_ALLOWED_ELEMENTS) {
-            throw new Error("Maximum number of allowed elements to be requested is " + Turn.MAX_ALLOWED_ELEMENTS + ", " + elements.length + " given")
+        if (turn_controller.isNumberOfDrawnElementsAllowed(elements.length) == false) {
+            throw new Error("Maximum number of allowed elements to be requested have been exceded")
         }
-        if (this.model.board.checkElementPoolAvailability(elements) == false) {
+        if (board_controller.checkElementPoolAvailability(elements) == false) {
             throw new Error("Requested elements cannot be taken from the pool");
         }
         for (let element of elements) {
-            this.model.board.getElementFromPool(element);
+            board_controller.getElementFromPool(element);
         }
-        this.model.turn.setDrawnElements(elements);
+        turn_controller.setDrawnElements(elements);
     }
 
     public placeElement(element: ElementTypes, position: Position, reaction?: Reaction): void {
+        const turn_controller: TurnController = new TurnController(this.model.turn);
+        const board_controller: BoardController = new BoardController(this.model.board);
+
         if (this.model.state != GameStates.GameRunning) {
             throw new Error("Placing element is not allowed in the current game state: " + this.model.state)
         }
 
-        if (this.model.turn.isPlaceElementAllowed() == false) {
+        if (turn_controller.isPlaceElementAllowed() == false) {
             throw new Error("No more available elements to be placed");
         }
 
-        if (this.model.turn.removeElementFromList(element) == false) {
+        if (turn_controller.removeElementFromList(element) == false) {
             throw new Error("The element is not from the Drawn elements");
         }
-        this.model.board.placeElement(element, position);
-        this.model.board.performElementReaction(element, position, reaction);
+        board_controller.placeElement(element, position);
+        board_controller.performElementReaction(element, position, reaction);
 
-        const loser: string | null = this.model.board.winningCondition(position);
+        const loser: string | null = board_controller.winningCondition(position);
 
         if (loser != null) {
             this.model.loser_uuid = loser;
         }
 
-        if (this.model.turn.isEndOfTurn()) {
+        if (turn_controller.isEndOfTurn()) {
             this.nextPlayerTurn();
         }
     }
 
     private nextPlayerTurn(): void {
-        let player_number: number = this.model.turn.getPlayer() + 1
+        const turn_controller: TurnController = new TurnController(this.model.turn);
+
+        let player_number: number = turn_controller.getPlayer() + 1
         if (player_number == this.model.game_type) {
             player_number = 0;
         }
-        this.model.turn = new Turn(player_number);
+        this.model.turn = new TurnModel(player_number);
     }
 
-    public movePlayerSage(player: Player, position: Position): void {
+    public movePlayerSage(player: IPlayerModel, position: Position): void {
+        const turn_controller: TurnController = new TurnController(this.model.turn);
+
         if (this.model.state != GameStates.GameRunning) {
             throw new Error("Moving sage is not allowed in the current game state: " + this.model.state)
         }
-        if (this.model.turn.isMovingSageAllowed() == false) {
+        if (turn_controller.isMovingSageAllowed() == false) {
             throw new Error("Cannot move sage, not available moves to spend");
         }
         this.model.board.placePlayerSage(player, position);
 
-        if (this.model.turn.isEndOfTurn()) {
+        if (turn_controller.isEndOfTurn()) {
             this.nextPlayerTurn();
         }
     }
 
     public endOfPlayerTurn(): void {
-        const remaining_elements: Array<ElementTypes> = this.model.turn.getRemainingElements();
+        const turn_controller: TurnController = new TurnController(this.model.turn);
+        const remaining_elements: Array<ElementTypes> = turn_controller.getRemainingElements();
 
         for (let element of remaining_elements) {
             this.model.board.returnElementToPool(element);
@@ -117,12 +132,13 @@ export class GameController implements IGameController {
         this.nextPlayerTurn();
     }
 
-    public getBoard(): Board {
+    public getBoard(): IBoardModel {
         return this.model.board;
     }
 
-    public getTurnPlayer(): Player {
-        return this.model.player_list[this.model.turn.getPlayer()];
+    public getTurnPlayer(): IPlayerModel {
+        const turn_controller: TurnController = new TurnController(this.model.turn);
+        return this.model.player_list[turn_controller.getPlayer()];
     }
 
     public getGameState(): GameStates {
@@ -132,8 +148,9 @@ export class GameController implements IGameController {
     public getWinner(): number | null {
         if (this.model.loser_uuid != null) {
             for (let player of this.model.player_list) {
-                if (player.getSage().uuid === this.model.loser_uuid) {
-                    return player.getPlayerNumber();
+                const player_controller: PlayerController = new PlayerController(player)
+                if (player_controller.getSage().uuid === this.model.loser_uuid) {
+                    return player_controller.getPlayerNumber();
                 }
             }
         }

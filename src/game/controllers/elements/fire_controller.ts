@@ -1,4 +1,4 @@
-import { ElementController } from "./elements_controller";
+import { ElementController, IElementController } from "./elements_controller";
 import { FireModel, IFireModel } from "@/game/models/elements/fire";
 import { IPieceModel } from "@/game/models/pieces/pieces";
 import { AxisIncrement, Position, PositionUtils } from "@/game/utils/position_utils";
@@ -7,6 +7,7 @@ import { IGridModel } from "@/game/models/grid";
 import ElementPoolManager from "../element_pool_controller";
 import GridController from "../grid_controller";
 import { ElementTypes } from "@/game/models/elements/elements";
+import { WindController } from "./wind_controller";
 
 const propagation_map: Map<string, AxisIncrement> = PositionUtils.orthogonal_increment_map;
 
@@ -17,18 +18,23 @@ const propagation_map: Map<string, AxisIncrement> = PositionUtils.orthogonal_inc
  *          Extra Fire elements can only be placed orthogonally, NEVER diagonally.
  *          Extra Fire elements do not generate extra Fire elements.
  */
- export class FireController extends ElementController{
+export interface IFireController extends IElementController {
+    ruleOfReplacement(piece_to_replace: IPieceModel): boolean;
+    reaction(grid: IGridModel, cell: Position, element_pool_manager?: ElementPoolManager): void;
+}
+
+export class FireController extends ElementController implements IFireController {
 
     protected model: FireModel;
 
-    constructor(model: IFireModel ){
+    constructor(model: IFireModel) {
         super(model);
         this.model = model
     }
 
     public ruleOfReplacement(piece_to_replace: IPieceModel): boolean {
-        if(piece_to_replace instanceof WindModel){
-            if(new WindController(piece_to_replace).getNumberOfStackedWinds() == 1){
+        if (piece_to_replace instanceof WindModel) {
+            if (new WindController(piece_to_replace).getNumberOfStackedWinds() == 1) {
                 return true;
             }
         }
@@ -37,7 +43,7 @@ const propagation_map: Map<string, AxisIncrement> = PositionUtils.orthogonal_inc
 
     public reaction(grid: IGridModel, cell: Position, element_pool_manager?: ElementPoolManager): void {
 
-        if(element_pool_manager === undefined){
+        if (element_pool_manager === undefined) {
             throw new Error("Element pool is required for Fire reaction")
         }
         propagation_map.forEach((value: AxisIncrement, key: string) => {
@@ -47,30 +53,30 @@ const propagation_map: Map<string, AxisIncrement> = PositionUtils.orthogonal_inc
 
     /** Propagation shall be done by looking for Orthogonal lines of fire and adding one extra fire in the opposite side of the placed cell */
     private propagate(grid: IGridModel, cell: Position, direction: AxisIncrement, element_pool_manager: ElementPoolManager): void {
-        
+
         const grid_controller: GridController = new GridController(grid);
 
         const evaluation_cell: Position = {
             row: cell.row + direction.y,
             column: cell.column + direction.x
         }
-        if(grid_controller.isPositionValid(evaluation_cell)){
-            if (grid_controller.isFireCell(evaluation_cell)){
+        if (grid_controller.isPositionValid(evaluation_cell)) {
+            if (grid_controller.isFireCell(evaluation_cell)) {
                 this.propagate(grid, evaluation_cell, direction, element_pool_manager);
             } else {
                 const free_fire = new FireModel();
                 new FireController(free_fire).updatePosition(evaluation_cell);
-                
+
                 try {
                     element_pool_manager.removeElement(ElementTypes.Fire);
                 } catch {
                     /** Cannot propagate anymore since there are no fire elements to draw */
                     return;
                 }
-                
-                if(grid_controller.isPositionEmpty(evaluation_cell)){
+
+                if (grid_controller.isPositionEmpty(evaluation_cell)) {
                     grid_controller.updateGridCell(free_fire);
-                } else if(this.ruleOfReplacement(grid_controller.getGridCellByPosition(evaluation_cell))){
+                } else if (this.ruleOfReplacement(grid_controller.getGridCellByPosition(evaluation_cell))) {
                     grid_controller.updateGridCell(free_fire);
                 }
             }
