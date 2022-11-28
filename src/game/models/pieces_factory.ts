@@ -1,8 +1,8 @@
 import { ElementTypes } from "./elements/elements";
-import { ElementFactoryMap } from "./elements/elements_factory";
 import { PieceModel } from "./pieces/pieces";
 import {SageModel} from './pieces/sage';
 import {EmptyModel} from './pieces/empty';
+import { ElementModelFactoryMap } from "./elements/elements_factory";
 
 /**
  * The PieceCreator class declares the factory method that is supposed to return an
@@ -77,6 +77,6 @@ export class ElementPieceCreator extends PieceCreator {
     }
 
     public factoryMethod(): PieceModel {
-        return new ElementFactoryMap[this.element_type]().createElement();
+        return new ElementModelFactoryMap[this.element_type]().createElementModel();
     }
 }

@@ -1,6 +1,6 @@
-import Board, { BoardModelMap } from "./board";
+import { BoardModel, BoardModelMap } from "./board";
 import { Mapper } from "@/game/utils/mapper";
-import Player, { PlayerModelMap } from "./player";
+import { PlayerModel, PlayerModelMap } from "./player";
 import { TurnModel, TurnModelMap } from "./turn";
 
 export enum GameStates {
@@ -17,8 +17,8 @@ export enum GameType {
 
 export interface IGameModel {
     state: GameStates,
-    player_list: Array<Player>,
-    board: Board,
+    player_list: Array<PlayerModel>,
+    board: BoardModel,
     turn: TurnModel,
     game_type: GameType,
     loser_uuid: string | null,
@@ -27,8 +27,8 @@ export interface IGameModel {
 export class GameModel implements IGameModel {
 
     state: GameStates = GameStates.NewGame;
-    player_list: Array<Player> = [];
-    board: Board = new Board();
+    player_list: Array<PlayerModel> = [];
+    board: BoardModel = new BoardModel();
     turn: TurnModel = new TurnModel(0); // default overrided later
     game_type: GameType = GameType.TwoPlayersGame; // default overrided later
     loser_uuid: string | null = null

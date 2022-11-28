@@ -37,9 +37,10 @@ export class GameController implements IGameController {
 
     public setupGame(game_type: number): void {
         // Resets the board
+        const board_controller: BoardController = new BoardController(this.model.board);
         this.model.board = new BoardModel();
         this.model.player_list.forEach((player) => {
-            this.model.board.createSageByPlayerAndGameType(player, game_type);
+            board_controller.createSageByPlayerAndGameType(player, game_type);
         })
         this.model.game_type = game_type;
         this.model.state = GameStates.GameRunning;
@@ -108,6 +109,7 @@ export class GameController implements IGameController {
 
     public movePlayerSage(player: IPlayerModel, position: Position): void {
         const turn_controller: TurnController = new TurnController(this.model.turn);
+        const board_controller: BoardController = new BoardController(this.model.board);
 
         if (this.model.state != GameStates.GameRunning) {
             throw new Error("Moving sage is not allowed in the current game state: " + this.model.state)
@@ -115,7 +117,7 @@ export class GameController implements IGameController {
         if (turn_controller.isMovingSageAllowed() == false) {
             throw new Error("Cannot move sage, not available moves to spend");
         }
-        this.model.board.placePlayerSage(player, position);
+        board_controller.placePlayerSage(player, position);
 
         if (turn_controller.isEndOfTurn()) {
             this.nextPlayerTurn();
@@ -124,10 +126,12 @@ export class GameController implements IGameController {
 
     public endOfPlayerTurn(): void {
         const turn_controller: TurnController = new TurnController(this.model.turn);
+        const board_controller: BoardController = new BoardController(this.model.board);
+
         const remaining_elements: Array<ElementTypes> = turn_controller.getRemainingElements();
 
         for (let element of remaining_elements) {
-            this.model.board.returnElementToPool(element);
+            board_controller.returnElementToPool(element);
         }
         this.nextPlayerTurn();
     }

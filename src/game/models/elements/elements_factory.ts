@@ -1,29 +1,29 @@
-import { Earth } from "./earth";
-import { Element } from "./elements";
-import { Fire } from "./fire";
-import { Water } from "./water";
-import { Wind } from "./wind";
+import { EarthModel } from "./earth";
+import { ElementModel } from "./elements";
+import { FireModel } from "./fire";
+import { WaterModel } from "./water";
+import { WindModel } from "./wind";
 
 /**
- * The ElementCreator class declares the factory method that is supposed to return an
- * object of a Element class. The ElementCreator's subclasses usually provide the
+ * The ElementModelCreator class declares the factory method that is supposed to return an
+ * object of a ElementModel class. The ElementModelCreator's subclasses usually provide the
  * implementation of this method.
  */
- abstract class ElementCreator {
+abstract class ElementModelCreator {
     /**
-     * Note that the ElementCreator may also provide some default implementation of the
+     * Note that the ElementModelCreator may also provide some default implementation of the
      * factory method.
      */
-    public abstract factoryMethod(): Element;
+    public abstract factoryMethod(): ElementModel;
     /**
-     * Also note that, despite its name, the ElementCreator's primary responsibility is
+     * Also note that, despite its name, the ElementModelCreator's primary responsibility is
      * not creating elements. Usually, it contains some core business logic that
-     * relies on Element objects, returned by the factory method. Subclasses can
+     * relies on ElementModel objects, returned by the factory method. Subclasses can
      * indirectly change that business logic by overriding the factory method
      * and returning a different type of element from it.
      */
-    public createElement(): Element {
-        // Call the factory method to create an Element object.
+    public createElementModel(): ElementModel {
+        // Call the factory method to create an ElementModel object.
         const element = this.factoryMethod();
         // Now, use the product.
         return element;
@@ -32,72 +32,72 @@ import { Wind } from "./wind";
 }
 
 /**
- * EarthCreator override the factory method in order to change the
+ * EarthModelCreator override the factory method in order to change the
  * resulting piece's type.
  */
-  class EarthCreator extends ElementCreator {
+class EarthModelCreator extends ElementModelCreator {
     /**
      * Note that the signature of the method still uses the abstract pieces
      * type, even though the empty piece is actually returned from the
      * method. This way the PieceCreator can stay independent of piece type
      * classes.
      */
-    public factoryMethod(): Element {
-        return new Earth();
+    public factoryMethod(): ElementModel {
+        return new EarthModel();
     }
 }
 
 /**
- * WaterCreator override the factory method in order to change the
+ * WaterModelCreator override the factory method in order to change the
  * resulting piece's type.
  */
-  class WaterCreator extends ElementCreator {
+class WaterModelCreator extends ElementModelCreator {
     /**
      * Note that the signature of the method still uses the abstract pieces
      * type, even though the empty piece is actually returned from the
      * method. This way the PieceCreator can stay independent of piece type
      * classes.
      */
-    public factoryMethod(): Element {
-        return new Water();
+    public factoryMethod(): ElementModel {
+        return new WaterModel();
     }
 }
 
 /**
- * FireCreator override the factory method in order to change the
+ * FireModelCreator override the factory method in order to change the
  * resulting piece's type.
  */
-  class FireCreator extends ElementCreator {
+class FireModelCreator extends ElementModelCreator {
     /**
      * Note that the signature of the method still uses the abstract pieces
      * type, even though the empty piece is actually returned from the
      * method. This way the PieceCreator can stay independent of piece type
      * classes.
      */
-    public factoryMethod(): Element {
-        return new Fire();
+    public factoryMethod(): ElementModel {
+        return new FireModel();
     }
 }
 
 /**
- * WindCreator override the factory method in order to change the
+ * WindModelCreator override the factory method in order to change the
  * resulting piece's type.
  */
-  class WindCreator extends ElementCreator {
+class WindModelCreator extends ElementModelCreator {
     /**
      * Note that the signature of the method still uses the abstract pieces
      * type, even though the empty piece is actually returned from the
      * method. This way the PieceCreator can stay independent of piece type
      * classes.
      */
-    public factoryMethod(): Element {
-        return new Wind();
+    public factoryMethod(): ElementModel {
+        return new WindModel();
     }
 }
 
-export const ElementFactoryMap = {
-    "Fire": FireCreator,
-    "Water": WaterCreator,
-    "Earth": EarthCreator,
-    "Wind": WindCreator
+export const ElementModelFactoryMap = {
+    "Fire": FireModelCreator,
+    "Water": WaterModelCreator,
+    "Earth": EarthModelCreator,
+    "Wind": WindModelCreator
 };

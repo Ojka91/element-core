@@ -3,12 +3,14 @@ import { WindModel } from "./elements/wind";
 import { PositionUtils, Position } from "../utils/position_utils"
 import { IGridModel } from "./grid";
 import GridController from "../controllers/grid_controller";
+import { WindController } from "../controllers/elements/wind_controller";
 
 export class MovementManager {
 
     public static isWindBlocked(grid: IGridModel, origin: Position, wind: WindModel) : boolean{
         
         const grid_controller: GridController = new GridController(grid);
+        const wind_controller: WindController = new WindController(wind);
         // Distance of each axis
         const x_dist: number = wind.position.column - origin.column;
         const y_dist: number = wind.position.row - origin.row;
@@ -17,7 +19,7 @@ export class MovementManager {
         const x_dir: number = x_dist != 0 ? x_dist / Math.abs(x_dist) : x_dist;
         const y_dir: number = y_dist != 0 ? y_dist / Math.abs(y_dist) : y_dist;
 
-        const jump_distance = wind.getNumberOfStackedWinds();
+        const jump_distance = wind_controller.getNumberOfStackedWinds();
 
         const landing_position: Position = {
             row: wind.position.row + jump_distance * y_dir,
@@ -90,8 +92,9 @@ export class MovementManager {
                 return false;
             }
 
+            const wind_controller: WindController = new WindController(grid_controller.getGridCellByPosition(next_piece_pos) as WindModel);
             // Get cell piece
-            const jump_distance: number = (grid_controller.getGridCellByPosition(next_piece_pos) as WindModel).getNumberOfStackedWinds();
+            const jump_distance: number = wind_controller.getNumberOfStackedWinds();
 
             for (let cell: number = 1; cell <= jump_distance; cell++){
                 // Get cell piece
