@@ -1,132 +1,157 @@
-import Grid, { Position } from "../../grid"
-import { Earth } from "../earth"
-import { Fire } from "../fire"
-import { Water } from "../water"
-import { Wind } from "../wind"
+import { EarthModel } from "@/game/models/elements/earth";
+import { FireModel } from "@/game/models/elements/fire";
+import { WaterModel } from "@/game/models/elements/water";
+import { WindModel } from "@/game/models/elements/wind";
+import { GridModel } from "@/game/models/grid";
+import { Position } from "@/game/utils/position_utils";
+import GridController from "../../grid_controller";
+import { EarthController } from "../earth_controller";
+import { WindController } from "../wind_controller";
 
-describe('Wind: Rule of replacement', () => {
-    
+
+describe('WindController: Rule of replacement', () => {
+
     it('Rule of replacement: Should return true if replaces Earth', async () => {
         let result;
-        const wind = new Wind();
-        result = wind.ruleOfReplacement(new Earth())
+        const wind = new WindModel();
+        result = new WindController(wind).ruleOfReplacement(new EarthModel())
 
         expect(result).toBe(true)
     })
 
     it('Rule of replacement: Should return true if replaces Wind', async () => {
         let result;
-        const wind = new Wind();
-        
-        result = wind.ruleOfReplacement(new Wind())
+        const wind = new WindModel();
+
+        result = new WindController(wind).ruleOfReplacement(new WindModel())
 
         expect(result).toBe(true)
     })
 
     it('Rule of replacement: Should return false if replaces anything else', async () => {
         let result;
-        const wind = new Wind();
-        
-        result = wind.ruleOfReplacement(new Fire())
+        const wind = new WindModel();
+
+        result = new WindController(wind).ruleOfReplacement(new FireModel())
         expect(result).toBe(false)
 
-        result = wind.ruleOfReplacement(new Water())
+        result = new WindController(wind).ruleOfReplacement(new WaterModel())
         expect(result).toBe(false)
-    
+
     })
 
     it('Rule of replacement: Should return false if replacing a max whirlwind', async () => {
         let result;
-        const wind = new Wind();
+        const wind = new WindModel();
 
-        const whirlwind: Wind = new Wind();
-        whirlwind.increaseStackedWinds();
-        whirlwind.increaseStackedWinds();
-        whirlwind.increaseStackedWinds();
-        whirlwind.increaseStackedWinds();
+        const whirlwind: WindModel = new WindModel();
+        new WindController(whirlwind).increaseStackedWinds();
+        new WindController(whirlwind).increaseStackedWinds();
+        new WindController(whirlwind).increaseStackedWinds();
+        new WindController(whirlwind).increaseStackedWinds();
 
-        expect(whirlwind.isMaxWhirlwind()).toBe(true);
+        expect(new WindController(whirlwind).isMaxWhirlwind()).toBe(true);
 
-        result = wind.ruleOfReplacement(whirlwind);
+        result = new WindController(wind).ruleOfReplacement(whirlwind);
 
         expect(result).toBe(true)
-    
+
     })
 
 })
 
-describe('Wind: place', () => {
+describe('WindController: place', () => {
     it('place: it should stack winds', async () => {
-        
-        const grid: Grid = new Grid(2,2);
-        let wind: Wind = new Wind();
-        const new_wind: Wind = new Wind();
-        const pos: Position = {row: 1, column: 1};
-        
-        // Set grid
-        wind.place(grid, pos);
-        new_wind.place(grid, pos);
 
-        expect(grid.isWhirlwindCell(pos)).toBe(true);
-        wind = grid.getGridCellByPosition(pos) as Wind
-        expect(wind.getNumberOfStackedWinds()==2).toBe(true);
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
+
+        let wind: WindModel = new WindModel();
+        const new_wind: WindModel = new WindModel();
+        const pos: Position = { row: 1, column: 1 };
+
+        // Set grid
+        new WindController(wind).place(grid, pos);
+        new WindController(new_wind).place(grid, pos);
+
+        expect(grid_controller.isWhirlwindCell(pos)).toBe(true);
+        wind = grid_controller.getGridCellByPosition(pos) as WindModel
+        expect(new WindController(wind).getNumberOfStackedWinds() == 2).toBe(true);
     })
 
     it('place: it should not stack winds on a max whirlwind', async () => {
-        
-        const grid: Grid = new Grid(2,2);
-        let wind: Wind = new Wind();
-        const new_wind: Wind = new Wind();
-        const pos: Position = {row: 1, column: 1};
-        
+
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
+
+        let wind: WindModel = new WindModel();
+        const new_wind: WindModel = new WindModel();
+        const pos: Position = { row: 1, column: 1 };
+
         // Set grid
-        wind.place(grid, pos);
-        
-        for (let stacked_winds: number = 1; stacked_winds < 5; stacked_winds++){
-            wind = grid.getGridCellByPosition(pos) as Wind
-            expect(wind.getNumberOfStackedWinds()==stacked_winds).toBe(true);
-            
-            const new_wind: Wind = new Wind();
-            new_wind.place(grid, pos);
+        new WindController(wind).place(grid, pos);
+
+        for (let stacked_winds: number = 1; stacked_winds < 5; stacked_winds++) {
+            wind = grid_controller.getGridCellByPosition(pos) as WindModel
+            expect(new WindController(wind).getNumberOfStackedWinds() == stacked_winds).toBe(true);
+
+            const new_wind: WindModel = new WindModel();
+            new WindController(new_wind).place(grid, pos);
         }
-        
-        wind = grid.getGridCellByPosition(pos) as Wind
-        expect(wind.getNumberOfStackedWinds()==5).toBe(false);
+
+        wind = grid_controller.getGridCellByPosition(pos) as WindModel
+        expect(new WindController(wind).getNumberOfStackedWinds() == 5).toBe(false);
     })
 
     it('place: it should replace earth', async () => {
-        
-        const grid: Grid = new Grid(2,2);
-        const earth: Earth = new Earth();
-        const new_wind: Wind = new Wind();
-        const pos: Position = {row: 1, column: 1};
-        
-        // Set grid
-        earth.place(grid, pos);
 
-        expect(grid.isEarthCell(pos)).toBe(true);
-        new_wind.place(grid, pos);
-        expect(grid.isWindCell(pos)).toBe(true);
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
+
+        const earth: EarthModel = new EarthModel();
+        const new_wind: WindModel = new WindModel();
+        const pos: Position = { row: 1, column: 1 };
+
+        // Set grid
+        new EarthController(earth).place(grid, pos);
+
+        expect(grid_controller.isEarthCell(pos)).toBe(true);
+        new WindController(new_wind).place(grid, pos);
+        expect(grid_controller.isWindCell(pos)).toBe(true);
     })
 
     it('place: it should not replace mountains nor ranges', async () => {
-        
-        const grid: Grid = new Grid(2,2);
-        const earth: Earth = new Earth();
-        const new_wind: Wind = new Wind();
-        const pos: Position = {row: 1, column: 1};
-        
+
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
+
+        const earth: EarthModel = new EarthModel();
+        const new_wind: WindModel = new WindModel();
+        const pos: Position = { row: 1, column: 1 };
+
         // Set grid
-        earth.promoteToMountain();
-        earth.place(grid, pos);
+        new EarthController(earth).promoteToMountain();
+        new EarthController(earth).place(grid, pos);
 
-        expect(grid.isMountainCell(pos)).toBe(true);
-        new_wind.place(grid, pos);
-        expect(grid.isWindCell(pos)).toBe(false);
+        expect(grid_controller.isMountainCell(pos)).toBe(true);
+        new WindController(new_wind).place(grid, pos);
+        expect(grid_controller.isWindCell(pos)).toBe(false);
 
-        expect(grid.isRangeCell(pos)).toBe(true);
-        new_wind.place(grid, pos);
-        expect(grid.isWindCell(pos)).toBe(false);
+        expect(grid_controller.isRangeCell(pos)).toBe(true);
+        new WindController(new_wind).place(grid, pos);
+        expect(grid_controller.isWindCell(pos)).toBe(false);
+    })
+
+    it('reaction: There is no earth reaction', () => {
+        
+        const grid: GridModel = new GridModel();
+        const piece_pos: Position = { row: 1, column: 1 };
+
+        expect(new WindController(new WindModel()).reaction(grid, piece_pos) == null).toBe(true);
     })
 
 })

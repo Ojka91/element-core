@@ -1,9 +1,9 @@
 
-import { WindModel } from "./elements/wind";
-import { PositionUtils, Position } from "../utils/position_utils"
-import { IGridModel } from "./grid";
-import GridController from "../controllers/grid_controller";
-import { WindController } from "../controllers/elements/wind_controller";
+import { WindModel } from "../models/elements/wind";
+import { PositionUtils, Position } from "@/game/utils/position_utils"
+import { IGridModel } from "@/game/models/grid";
+import GridController from "./grid_controller";
+import { WindController } from "./elements/wind_controller";
 
 export class MovementManager {
 
@@ -25,6 +25,11 @@ export class MovementManager {
             row: wind.position.row + jump_distance * y_dir,
             column: wind.position.column + jump_distance * x_dir,
         }
+
+        if(grid_controller.isPositionValid(landing_position) == false){
+            return false;
+        }
+
         if(grid_controller.isPositionEmpty(landing_position)){
             return false;
         } else if(grid_controller.isWindCell(landing_position)){

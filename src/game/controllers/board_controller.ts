@@ -9,7 +9,7 @@ import ElementPoolManager from "./element_pool_controller";
 import { ElementModel, ElementTypes, IElementModel } from "../models/elements/elements";
 import { GameType } from "../models/game";
 import GridController from "./grid_controller";
-import { MovementManager } from "../models/movement_manager";
+import { MovementManager } from "./movement_manager";
 import { ElementController } from "./elements/elements_controller";
 import { IPieceModel } from "../models/pieces/pieces";
 import { IPlayerModel } from "../models/player";

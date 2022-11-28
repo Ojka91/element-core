@@ -1,188 +1,235 @@
-import { Earth } from "../elements/earth";
-import { Fire } from "../elements/fire";
-import { Water } from "../elements/water";
-import { Wind } from "../elements/wind";
-import Grid, { Position } from "../grid";
-import { SagePieceCreator } from "../pieces_factory";
+import { EarthModel } from "@/game/models/elements/earth";
+import { FireModel } from "@/game/models/elements/fire";
+import { WaterModel } from "@/game/models/elements/water";
+import { WindModel } from "@/game/models/elements/wind";
+import { GridModel } from "@/game/models/grid";
+import { SageModel } from "@/game/models/pieces/sage";
+import { SagePieceCreator } from "@/game/models/pieces_factory";
+import { Position } from "@/game/utils/position_utils";
+import { EarthController } from "../elements/earth_controller";
+import { FireController } from "../elements/fire_controller";
+import { WaterController } from "../elements/water_controller";
+import { WindController } from "../elements/wind_controller";
+import GridController from "../grid_controller";
+import { SageController } from "../pieces/sage_controller";
 
 describe('Grid', () => {
     it('getWidth: ensure the grid width return the creation width', async () => {
-        let grid = new Grid(10, 10);
-        
-        expect(grid.getWidth()==10).toBe(true);
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
+
+
+        expect(grid_controller.getWidth() == 10).toBe(true);
     })
 
     it('getHeight: ensure the grid width return the creation height', async () => {
-        let grid = new Grid(10, 10);
-        
-        expect(grid.getHeight()==10).toBe(true);
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
+
+
+        expect(grid_controller.getHeight() == 8).toBe(true);
     })
 
 
     it('updateGridCell: cells must updated with new item', async () => {
-        let grid = new Grid(10, 10);
-        const sage = new SagePieceCreator().createPiece();
-        const position: Position = {row: 2, column: 2};
-        sage.updatePosition(position);
-        grid.updateGridCell(sage);
-        
-        expect(grid.getGridCellByPosition(position)).toStrictEqual(sage);
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
+
+        const sage: SageModel = new SagePieceCreator().createPieceModel() as SageModel;
+        const position: Position = { row: 2, column: 2 };
+        new SageController(sage).updatePosition(position);
+        grid_controller.updateGridCell(sage);
+
+        expect(grid_controller.getGridCellByPosition(position)).toStrictEqual(sage);
     })
 
     it('clearCell: cells must cleared to empty', async () => {
-        let grid = new Grid(10, 10);
-        const sage = new SagePieceCreator().createPiece();
-        const position: Position = {row: 2, column: 2};
-        sage.updatePosition(position);
-        grid.updateGridCell(sage);
-        
-        expect(grid.getGridCellByPosition(position)).toStrictEqual(sage);
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
 
-        grid.clearCell(position);
-        expect(grid.isPositionEmpty(position)).toBe(true);
+        const sage: SageModel = new SagePieceCreator().createPieceModel() as SageModel;
+        const position: Position = { row: 2, column: 2 };
+        new SageController(sage).updatePosition(position);
+        grid_controller.updateGridCell(sage);
+
+        expect(grid_controller.getGridCellByPosition(position)).toStrictEqual(sage);
+
+        grid_controller.clearCell(position);
+        expect(grid_controller.isPositionEmpty(position)).toBe(true);
 
     })
 
     it('isPositionValid: must return true is position between grid boundaries, false othwerwise', async () => {
-        let grid = new Grid(10, 10);
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
 
-        const position: Position = {row: 2, column: 2};
-        const incorrect_position: Position = {row: 11, column: 11};
-        
-        expect(grid.isPositionValid(position)).toBe(true);
 
-        expect(grid.isPositionValid(incorrect_position)).toBe(false);
+        const position: Position = { row: 2, column: 2 };
+        const incorrect_position: Position = { row: 11, column: 11 };
+
+        expect(grid_controller.isPositionValid(position)).toBe(true);
+
+        expect(grid_controller.isPositionValid(incorrect_position)).toBe(false);
 
     })
 
     it('isPositionEmpty: must return true if position is empty, false othwerwise', async () => {
-        let grid = new Grid(10, 10);
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
 
-        const sage = new SagePieceCreator().createPiece();
-        const position: Position = {row: 0, column: 0};
-        
+
+        const sage: SageModel = new SagePieceCreator().createPieceModel() as SageModel;
+        const position: Position = { row: 0, column: 0 };
+
         // Upon creation grid is empty
-        expect(grid.isPositionEmpty(position)).toBe(true);
+        expect(grid_controller.isPositionEmpty(position)).toBe(true);
 
-        sage.updatePosition(position);
-        grid.updateGridCell(sage);
+        new SageController(sage).updatePosition(position);
+        grid_controller.updateGridCell(sage);
 
-        expect(grid.isPositionEmpty(position)).toBe(false);
+        expect(grid_controller.isPositionEmpty(position)).toBe(false);
 
     })
 
     it('isFireCell: must return true if position is fire, false othwerwise', async () => {
-        let grid = new Grid(10, 10);
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
 
-        const piece: Fire = new Fire();
-        const position: Position = {row: 0, column: 0};
-        
+
+        const piece: FireModel = new FireModel();
+        const position: Position = { row: 0, column: 0 };
+
         // Upon creation grid is empty
-        expect(grid.isFireCell(position)).toBe(false);
+        expect(grid_controller.isFireCell(position)).toBe(false);
 
-        piece.updatePosition(position);
-        grid.updateGridCell(piece);
+        new FireController(piece).updatePosition(position);
+        grid_controller.updateGridCell(piece);
 
-        expect(grid.isFireCell(position)).toBe(true);
+        expect(grid_controller.isFireCell(position)).toBe(true);
 
     })
 
     it('isEarthCell: must return true if position is earth, false othwerwise', async () => {
-        let grid = new Grid(10, 10);
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
 
-        const piece: Earth = new Earth();
-        const position: Position = {row: 0, column: 0};
-        
+
+        const piece: EarthModel = new EarthModel();
+        const position: Position = { row: 0, column: 0 };
+
         // Upon creation grid is empty
-        expect(grid.isEarthCell(position)).toBe(false);
+        expect(grid_controller.isEarthCell(position)).toBe(false);
 
-        piece.updatePosition(position);
-        grid.updateGridCell(piece);
+        new EarthController(piece).updatePosition(position);
+        grid_controller.updateGridCell(piece);
 
-        expect(grid.isEarthCell(position)).toBe(true);
+        expect(grid_controller.isEarthCell(position)).toBe(true);
 
     })
 
     it('isWaterCell: must return true if position is Water, false othwerwise', async () => {
-        let grid = new Grid(10, 10);
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
 
-        const piece: Water = new Water();
-        const position: Position = {row: 0, column: 0};
-        
+
+        const piece: WaterModel = new WaterModel();
+        const position: Position = { row: 0, column: 0 };
+
         // Upon creation grid is empty
-        expect(grid.isWaterCell(position)).toBe(false);
+        expect(grid_controller.isWaterCell(position)).toBe(false);
 
-        piece.updatePosition(position);
-        grid.updateGridCell(piece);
+        new WaterController(piece).updatePosition(position);
+        grid_controller.updateGridCell(piece);
 
-        expect(grid.isWaterCell(position)).toBe(true);
+        expect(grid_controller.isWaterCell(position)).toBe(true);
 
     })
 
     it('isWindCell: must return true if position is Wind, false othwerwise', async () => {
-        let grid = new Grid(10, 10);
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
 
-        const piece: Wind = new Wind();
-        const position: Position = {row: 0, column: 0};
-        
+
+        const piece: WindModel = new WindModel();
+        const position: Position = { row: 0, column: 0 };
+
         // Upon creation grid is empty
-        expect(grid.isWindCell(position)).toBe(false);
+        expect(grid_controller.isWindCell(position)).toBe(false);
 
-        piece.updatePosition(position);
-        grid.updateGridCell(piece);
+        new WindController(piece).updatePosition(position);
+        grid_controller.updateGridCell(piece);
 
-        expect(grid.isWindCell(position)).toBe(true);
+        expect(grid_controller.isWindCell(position)).toBe(true);
 
     })
 
     it('isWhirlwindCell: must return true if position is Whirlwind, false othwerwise', async () => {
-        let grid = new Grid(10, 10);
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
 
-        const piece: Wind = new Wind();
-        piece.increaseStackedWinds();
-        const position: Position = {row: 0, column: 0};
-        
+
+        const piece: WindModel = new WindModel();
+        new WindController(piece).increaseStackedWinds();
+        const position: Position = { row: 0, column: 0 };
+
         // Upon creation grid is empty
-        expect(grid.isWhirlwindCell(position)).toBe(false);
+        expect(grid_controller.isWhirlwindCell(position)).toBe(false);
 
-        piece.updatePosition(position);
-        grid.updateGridCell(piece);
+        new WindController(piece).updatePosition(position);
+        grid_controller.updateGridCell(piece);
 
-        expect(grid.isWhirlwindCell(position)).toBe(true);
+        expect(grid_controller.isWhirlwindCell(position)).toBe(true);
 
     })
 
     it('isMountainCell: must return true if position is Mountain, false othwerwise', async () => {
-        let grid = new Grid(10, 10);
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
 
-        const piece: Earth = new Earth();
-        piece.promoteToMountain();
-        const position: Position = {row: 0, column: 0};
-        
+
+        const piece: EarthModel = new EarthModel();
+        new EarthController(piece).promoteToMountain();
+        const position: Position = { row: 0, column: 0 };
+
         // Upon creation grid is empty
-        expect(grid.isMountainCell(position)).toBe(false);
+        expect(grid_controller.isMountainCell(position)).toBe(false);
 
-        piece.updatePosition(position);
-        grid.updateGridCell(piece);
+        new EarthController(piece).updatePosition(position);
+        grid_controller.updateGridCell(piece);
 
-        expect(grid.isMountainCell(position)).toBe(true);
+        expect(grid_controller.isMountainCell(position)).toBe(true);
 
     })
 
     it('isRangeCell: must return true if position is Range, false othwerwise', async () => {
-        let grid = new Grid(10, 10);
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
 
-        const piece: Earth = new Earth();
-        piece.promoteToRange();
-        const position: Position = {row: 0, column: 0};
-        
+
+        const piece: EarthModel = new EarthModel();
+        new EarthController(piece).promoteToRange();
+        const position: Position = { row: 0, column: 0 };
+
         // Upon creation grid is empty
-        expect(grid.isRangeCell(position)).toBe(false);
+        expect(grid_controller.isRangeCell(position)).toBe(false);
 
-        piece.updatePosition(position);
-        grid.updateGridCell(piece);
+        new EarthController(piece).updatePosition(position);
+        grid_controller.updateGridCell(piece);
 
-        expect(grid.isRangeCell(position)).toBe(true);
+        expect(grid_controller.isRangeCell(position)).toBe(true);
 
     })
 })

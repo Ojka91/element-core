@@ -4,10 +4,11 @@ import { IPieceModel } from "@/game/models/pieces/pieces";
 import { AxisIncrement, Position, PositionUtils } from "@/game/utils/position_utils";
 import { WindModel } from "@/game/models/elements/wind";
 import { IGridModel } from "@/game/models/grid";
-import ElementPoolManager from "../element_pool_controller";
 import GridController from "../grid_controller";
 import { ElementTypes } from "@/game/models/elements/elements";
 import { WindController } from "./wind_controller";
+import { ElementPoolManagerModel } from "@/game/models/element_pool";
+import ElementPoolManager from "../element_pool_controller";
 
 const propagation_map: Map<string, AxisIncrement> = PositionUtils.orthogonal_increment_map;
 
@@ -20,7 +21,7 @@ const propagation_map: Map<string, AxisIncrement> = PositionUtils.orthogonal_inc
  */
 export interface IFireController extends IElementController {
     ruleOfReplacement(piece_to_replace: IPieceModel): boolean;
-    reaction(grid: IGridModel, cell: Position, element_pool_manager?: ElementPoolManager): void;
+    reaction(grid: IGridModel, cell: Position, element_pool_manager?: ElementPoolManagerModel): void;
 }
 
 export class FireController extends ElementController implements IFireController {
@@ -41,7 +42,7 @@ export class FireController extends ElementController implements IFireController
         return false;
     }
 
-    public reaction(grid: IGridModel, cell: Position, element_pool_manager?: ElementPoolManager): void {
+    public reaction(grid: IGridModel, cell: Position, element_pool_manager?: ElementPoolManagerModel): void {
 
         if (element_pool_manager === undefined) {
             throw new Error("Element pool is required for Fire reaction")
@@ -52,7 +53,7 @@ export class FireController extends ElementController implements IFireController
     }
 
     /** Propagation shall be done by looking for Orthogonal lines of fire and adding one extra fire in the opposite side of the placed cell */
-    private propagate(grid: IGridModel, cell: Position, direction: AxisIncrement, element_pool_manager: ElementPoolManager): void {
+    private propagate(grid: IGridModel, cell: Position, direction: AxisIncrement, element_pool_manager: ElementPoolManagerModel): void {
 
         const grid_controller: GridController = new GridController(grid);
 
@@ -68,7 +69,7 @@ export class FireController extends ElementController implements IFireController
                 new FireController(free_fire).updatePosition(evaluation_cell);
 
                 try {
-                    element_pool_manager.removeElement(ElementTypes.Fire);
+                    new ElementPoolManager(element_pool_manager).removeElement(ElementTypes.Fire);
                 } catch {
                     /** Cannot propagate anymore since there are no fire elements to draw */
                     return;

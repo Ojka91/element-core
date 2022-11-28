@@ -17,6 +17,7 @@ export interface IGridController {
     updateGridCell(piece: IPieceModel): void
     getGridCellByPosition(position: Position): IPieceModel
     displayGrid(): void
+    generateInitialGrid(width: number, height: number): void;
     clearCell(cell: Position): void
     isPositionValid(new_position: Position): boolean
     isPositionEmpty(new_position: Position): boolean
@@ -62,19 +63,22 @@ export class GridController implements IGridController {
         }
     }
 
-    private generateInitialGrid(width: number, height: number): IPieceModel[][] {
-        let cells: IPieceModel[][] = new Array(height);
+    public generateInitialGrid(width: number, height: number): void {
+        this.model.width = width;
+        this.model.height = height;
+        
+        let cells: Array<Array<IPieceModel>> = new Array(height);
         for (let row = 0; row < height; row++) {
             cells[row] = new Array(width);
             for (let col = 0; col < width; col++) {
                 const new_position: Position = { row: row, column: col };
 
-                let new_piece = new EmptyPieceCreator().createPieceModel();
+                const new_piece = new EmptyPieceCreator().createPieceModel();
                 new EmptyController(new_piece).updatePosition(new_position);
                 cells[row][col] = new_piece;
             }
         }
-        return cells;
+        this.model.cells = cells;
     }
 
     /** Clears the cell by placing an empty piece */
