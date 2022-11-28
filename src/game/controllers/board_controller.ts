@@ -26,7 +26,7 @@ import { IWindModel, WindModel } from "../models/elements/wind";
 class BoardController {
 
     private model: BoardModel;
-    private element_pool_manager = ElementPoolManager
+    private element_pool_manager = ElementPoolManager;
 
     constructor(model: BoardModel){
         this.model = model;
@@ -121,7 +121,7 @@ class BoardController {
                 break;
             case ElementTypes.Fire:
                 element_controller = new FireController(element as IFireModel);
-                element_controller.reaction(this.model.grid, position, new this.element_pool_manager(this.model.elementPool));
+                element_controller.reaction(this.model.grid, position, this.model.elementPool);
                 break;
             case ElementTypes.Earth:
                 element_controller = new EarthController(element as IEarthModel);

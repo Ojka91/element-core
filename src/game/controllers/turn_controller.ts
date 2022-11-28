@@ -55,6 +55,9 @@ export class TurnController implements ITurnController{
     }
 
     public removeElementFromList(element: ElementTypes): boolean {
+        if ( this.model.chosen_elements.includes(element) == false ){
+            return false;
+        }
         const removed: boolean = this.model.chosen_elements.splice(this.model.chosen_elements.indexOf(element), 1).length == 1;
         this.endOfTurnCheck();
         return removed;

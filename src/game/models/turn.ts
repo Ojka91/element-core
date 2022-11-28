@@ -2,9 +2,9 @@ import { ElementTypes } from "./elements/elements";
 import { Mapper } from "../utils/mapper";
 
 export enum TurnStates {
-    DrawingElements,
-    MovesAvailables,
-    EndTurn
+    DrawingElements = 1,
+    MovesAvailables = 2,
+    EndTurn = 3
 }
 
 export interface ITurnModel {

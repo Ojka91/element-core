@@ -1,81 +1,89 @@
+import { BoardModel } from "@/game/models/board";
+import { EarthModel } from "@/game/models/elements/earth";
+import { ElementTypes } from "@/game/models/elements/elements";
+import { GameType } from "@/game/models/game";
+import { GridModel } from "@/game/models/grid";
+import { SageModel } from "@/game/models/pieces/sage";
+import { PlayerModel } from "@/game/models/player";
+import { Position } from "@/game/utils/position_utils";
 import { WaterReaction } from "@/schemas/player_actions";
-import Board from "../board";
-import { ElementTypes } from "../elements/elements";
-import { GameType } from "../game_utils";
-import Grid, { Position } from "../grid";
-import { Empty } from "../pieces/pieces";
-import Player from "../player";
+import BoardController from "../board_controller";
+import { EarthController } from "../elements/earth_controller";
+import GridController from "../grid_controller";
+import { SageController } from "../pieces/sage_controller";
 
-
-
-describe('Board', () => {
-    it('generateInitialGrid: ensure the Board has the correct dimensions ', async () => {
-        let board = new Board();
-        let grid = board.getGrid();
-        const num_rows = grid.getWidth();
-        const num_columns = grid.getHeight();
-
-        expect(num_rows == 11).toBe(true);
-        expect(num_columns == 11).toBe(true);
-    })
-
-    it('generateInitialGrid: ensure the Board is initialized with empty pieces ', async () => {
-        let board = new Board();
-        let grid = board.getGrid();
-
-        for (let row = 0; row < grid.getWidth(); row++) {
-            for (let column = 0; column < grid.getHeight(); column++) {
-                const position: Position = { row: row, column: column };
-                expect(grid.getGridCellByPosition(position) instanceof Empty).toBe(true);
-            }
-        }
-    })
+describe('BoardController', () => {
 
     it('placePlayerSage: a legal player sage is placed in the grid', async () => {
-        let board = new Board();
-        let player = new Player(0);
-        let grid = board.getGrid();
-        board.createSageByPlayerAndGameType(player, GameType.FourPlayersGame);
+        const board: BoardModel = new BoardModel();
+        const board_controller: BoardController = new BoardController(board);
+        const grid_controller: GridController = new GridController(board.grid);
+        grid_controller.generateInitialGrid(5,5)
+        
+        const player: PlayerModel = new PlayerModel(0);
+
+        board_controller.createSageByPlayerAndGameType(player, GameType.FourPlayersGame);
 
         const new_position: Position = { row: 2, column: 1 }; // Orthogonally move to left
-        board.placePlayerSage(player, new_position);
+        board_controller.placePlayerSage(player, new_position);
 
-        expect(player.getSage()).toStrictEqual(grid.getGridCellByPosition(new_position));
+        expect(player.sage).toStrictEqual(grid_controller.getGridCellByPosition(new_position));
     })
 
     it('placePlayerSage: an illegal player sage is placed in the grid', async () => {
-        let board = new Board();
-        let player = new Player(0);
-        board.createSageByPlayerAndGameType(player, GameType.FourPlayersGame);
+        const board: BoardModel = new BoardModel();
+        const board_controller: BoardController = new BoardController(board);
+        const grid_controller: GridController = new GridController(board.grid);
+        grid_controller.generateInitialGrid(5,5)
+        
+        const player: PlayerModel = new PlayerModel(0);
+        board_controller.createSageByPlayerAndGameType(player, GameType.FourPlayersGame);
 
         const new_position: Position = { row: 1, column: 4 };
-        expect(() => { board.placePlayerSage(player, new_position); }).toThrow("Sage movement is not valid");
+        expect(() => { board_controller.placePlayerSage(player, new_position); }).toThrow("Sage movement is not valid");
     })
 
     it('placePlayerSage: player sage is placed outside the grid boundaries', async () => {
-        let board = new Board();
-        let player = new Player(0);
-        board.createSageByPlayerAndGameType(player, GameType.FourPlayersGame);
+        const board: BoardModel = new BoardModel();
+        const board_controller: BoardController = new BoardController(board);
+        const grid_controller: GridController = new GridController(board.grid);
+        grid_controller.generateInitialGrid(5,5)
+        
+        const player: PlayerModel = new PlayerModel(0);
+        board_controller.createSageByPlayerAndGameType(player, GameType.FourPlayersGame);
 
         const new_position: Position = { row: 100, column: 4 }; // Orthogonally move to left
-        expect(() => { board.placePlayerSage(player, new_position); }).toThrow("Incorrect new row or new column dimensions");
+        expect(() => { board_controller.placePlayerSage(player, new_position); }).toThrow("Incorrect new row or new column dimensions");
     })
 
     it('getGrid: must return a grid object', async () => {
-        let board = new Board();
-        expect(board.getGrid() instanceof Grid).toBe(true);
+        const board: BoardModel = new BoardModel();
+        const board_controller: BoardController = new BoardController(board);
+        const grid_controller: GridController = new GridController(board.grid);
+        grid_controller.generateInitialGrid(5,5)
+        
+        const player: PlayerModel = new PlayerModel(0);
+        expect(board_controller.getGrid() instanceof GridModel).toBe(true);
     })
 
     it('getElementFromPool & returnElementToPool: it should add/remove the element to/off the pool', async () => {
-        let board = new Board();
-        board.getElementFromPool(ElementTypes.Fire);
+        const board: BoardModel = new BoardModel();
+        const board_controller: BoardController = new BoardController(board);
+        const grid_controller: GridController = new GridController(board.grid);
+        grid_controller.generateInitialGrid(5,5)
+        
+        board_controller.getElementFromPool(ElementTypes.Fire);
         expect(board.elementPool.fire.amount == 29).toBe(true);
-        board.returnElementToPool(ElementTypes.Fire);
+        board_controller.returnElementToPool(ElementTypes.Fire);
         expect(board.elementPool.fire.amount == 30).toBe(true);
     })
 
     it('placeElement: it should place an element into the board', async () => {
-        let board = new Board();
+        const board: BoardModel = new BoardModel();
+        const board_controller: BoardController = new BoardController(board);
+        const grid_controller: GridController = new GridController(board.grid);
+        grid_controller.generateInitialGrid(5,5)
+        
         const pos: Position = {
             row: 0,
             column: 0
@@ -86,17 +94,21 @@ describe('Board', () => {
             column: 0
         }
 
-        expect(board.placeElement(ElementTypes.Fire, pos) == null).toBe(true);
-        expect(() => { board.placeElement(ElementTypes.Earth, pos); }).toThrow("Cannot replace the cell due to a rule of replacement");
-        expect(board.placeElement(ElementTypes.Water, pos) == null).toBe(true);
-        expect(board.placeElement(ElementTypes.Earth, pos) == null).toBe(true);
-        expect(board.placeElement(ElementTypes.Wind, pos) == null).toBe(true);
-        expect(() => { board.placeElement(ElementTypes.Earth, pos2); }).toThrow("Invalid position, outside grid boundaries");
+        expect(board_controller.placeElement(ElementTypes.Fire, pos) == null).toBe(true);
+        expect(() => { board_controller.placeElement(ElementTypes.Earth, pos); }).toThrow("Cannot replace the cell due to a rule of replacement");
+        expect(board_controller.placeElement(ElementTypes.Water, pos) == null).toBe(true);
+        expect(board_controller.placeElement(ElementTypes.Earth, pos) == null).toBe(true);
+        expect(board_controller.placeElement(ElementTypes.Wind, pos) == null).toBe(true);
+        expect(() => { board_controller.placeElement(ElementTypes.Earth, pos2); }).toThrow("Invalid position, outside grid boundaries");
 
     })
 
     it('performElementReaction: it should react to a water element next to a river', async () => {
-        let board = new Board();
+        const board: BoardModel = new BoardModel();
+        const board_controller: BoardController = new BoardController(board);
+        const grid_controller: GridController = new GridController(board.grid);
+        grid_controller.generateInitialGrid(5,5)
+        
         const pos1: Position = {
             row: 0,
             column: 0
@@ -116,16 +128,20 @@ describe('Board', () => {
 
         const reaction: WaterReaction = new WaterReaction(river, new_river);
 
-        expect(board.placeElement(ElementTypes.Water, pos1) == null).toBe(true);
-        expect(board.performElementReaction(ElementTypes.Water, pos1, reaction) == null).toBe(true);
-        expect(board.placeElement(ElementTypes.Water, pos2) == null).toBe(true);
-        expect(board.performElementReaction(ElementTypes.Water, pos2, reaction) == null).toBe(true);
-        //expect(() => {board.placeElement(ElementTypes.Earth, pos);}).toThrow("Cannot replace the cell due to a rule of replacement");
+        expect(board_controller.placeElement(ElementTypes.Water, pos1) == null).toBe(true);
+        expect(board_controller.performElementReaction(ElementTypes.Water, pos1, reaction) == null).toBe(true);
+        expect(board_controller.placeElement(ElementTypes.Water, pos2) == null).toBe(true);
+        expect(board_controller.performElementReaction(ElementTypes.Water, pos2, reaction) == null).toBe(true);
+        //expect(() => {board_controller.placeElement(ElementTypes.Earth, pos);}).toThrow("Cannot replace the cell due to a rule of replacement");
 
     })
 
     it('performElementReaction: it should react to a fire element next to another fire', async () => {
-        let board = new Board();
+        const board: BoardModel = new BoardModel();
+        const board_controller: BoardController = new BoardController(board);
+        const grid_controller: GridController = new GridController(board.grid);
+        grid_controller.generateInitialGrid(5,5)
+        
         const pos1: Position = {
             row: 0,
             column: 0
@@ -135,15 +151,19 @@ describe('Board', () => {
             column: 1
         }
 
-        expect(board.placeElement(ElementTypes.Fire, pos1) == null).toBe(true);
-        expect(board.placeElement(ElementTypes.Fire, pos2) == null).toBe(true);
-        expect(board.performElementReaction(ElementTypes.Fire, pos1) == null).toBe(true);
-        //expect(() => {board.placeElement(ElementTypes.Earth, pos);}).toThrow("Cannot replace the cell due to a rule of replacement");
+        expect(board_controller.placeElement(ElementTypes.Fire, pos1) == null).toBe(true);
+        expect(board_controller.placeElement(ElementTypes.Fire, pos2) == null).toBe(true);
+        expect(board_controller.performElementReaction(ElementTypes.Fire, pos1) == null).toBe(true);
+        //expect(() => {board_controller.placeElement(ElementTypes.Earth, pos);}).toThrow("Cannot replace the cell due to a rule of replacement");
 
     })
 
     it('performElementReaction: it should react to earth elements', async () => {
-        let board = new Board();
+        const board: BoardModel = new BoardModel();
+        const board_controller: BoardController = new BoardController(board);
+        const grid_controller: GridController = new GridController(board.grid);
+        grid_controller.generateInitialGrid(5,5)
+        
         const pos1: Position = {
             row: 0,
             column: 0
@@ -153,14 +173,18 @@ describe('Board', () => {
             column: 1
         }
 
-        expect(board.placeElement(ElementTypes.Earth, pos1) == null).toBe(true);
-        expect(board.placeElement(ElementTypes.Earth, pos2) == null).toBe(true);
-        expect(board.performElementReaction(ElementTypes.Earth, pos1) == null).toBe(true);
-        //expect(() => {board.placeElement(ElementTypes.Earth, pos);}).toThrow("Cannot replace the cell due to a rule of replacement");
+        expect(board_controller.placeElement(ElementTypes.Earth, pos1) == null).toBe(true);
+        expect(board_controller.placeElement(ElementTypes.Earth, pos2) == null).toBe(true);
+        expect(board_controller.performElementReaction(ElementTypes.Earth, pos1) == null).toBe(true);
+        //expect(() => {board_controller.placeElement(ElementTypes.Earth, pos);}).toThrow("Cannot replace the cell due to a rule of replacement");
     })
 
     it('performElementReaction: it should react to wind elements', async () => {
-        let board = new Board();
+        const board: BoardModel = new BoardModel();
+        const board_controller: BoardController = new BoardController(board);
+        const grid_controller: GridController = new GridController(board.grid);
+        grid_controller.generateInitialGrid(5,5)
+        
         const pos1: Position = {
             row: 0,
             column: 0
@@ -170,9 +194,82 @@ describe('Board', () => {
             column: 1
         }
 
-        expect(board.placeElement(ElementTypes.Wind, pos1) == null).toBe(true);
-        expect(board.placeElement(ElementTypes.Wind, pos2) == null).toBe(true);
-        expect(board.performElementReaction(ElementTypes.Wind, pos1) == null).toBe(true);
-        //expect(() => {board.placeElement(ElementTypes.Earth, pos);}).toThrow("Cannot replace the cell due to a rule of replacement");
+        expect(board_controller.placeElement(ElementTypes.Wind, pos1) == null).toBe(true);
+        expect(board_controller.placeElement(ElementTypes.Wind, pos2) == null).toBe(true);
+        expect(board_controller.performElementReaction(ElementTypes.Wind, pos1) == null).toBe(true);
+        //expect(() => {board_controller.placeElement(ElementTypes.Earth, pos);}).toThrow("Cannot replace the cell due to a rule of replacement");
+    })
+
+    it('performElementReaction: it should react to water elements', async () => {
+        const board: BoardModel = new BoardModel();
+        const board_controller: BoardController = new BoardController(board);
+        const grid_controller: GridController = new GridController(board.grid);
+        grid_controller.generateInitialGrid(5,5)
+        
+        const pos1: Position = {
+            row: 0,
+            column: 0
+        }
+
+        expect(board_controller.placeElement(ElementTypes.Water, pos1) == null).toBe(true);
+        expect(board_controller.performElementReaction(ElementTypes.Water, pos1) == null).toBe(true);
+        //expect(() => {board_controller.placeElement(ElementTypes.Earth, pos);}).toThrow("Cannot replace the cell due to a rule of replacement");
+    })
+
+    it('checkElementPoolAvailability: check it is being called', async () => {
+        const board: BoardModel = new BoardModel();
+        const board_controller: BoardController = new BoardController(board);
+        
+        const elements: Array<ElementTypes> = [ElementTypes.Water];
+        
+        board.elementPool.water.amount = 5;
+
+        expect(board_controller.checkElementPoolAvailability(elements)).toBe(true);
+    })
+
+    it('displayGrid: check it is being called', async () => {
+        const board: BoardModel = new BoardModel();
+        const board_controller: BoardController = new BoardController(board);
+
+        expect(board_controller.displayGrid() == null).toBe(true);
+    })
+
+    it('winningCondition: check if placed piece is a winning condition. It return null if no winning condition or the uuid of the loser', async () => {
+        const board: BoardModel = new BoardModel();
+        const board_controller: BoardController = new BoardController(board);
+    
+        const player: PlayerModel = new PlayerModel(0);
+
+        const grid_controller: GridController = new GridController(board.grid);
+        grid_controller.generateInitialGrid(5,5);
+
+        board_controller.createSageByPlayerAndGameType(player, GameType.FourPlayersGame);
+
+
+        const sage: SageModel = new SageModel();
+        
+        const position: Position = {row: 1, column: 1};
+        const placed_piece: Position = {row: 3, column: 3};
+        
+        // Fill grid with earths
+        for (let row  = 1; row < 4; row++){
+            for (let col = 1; col < 4; col++){
+                new EarthController(new EarthModel()).place(board.grid, {row: row, column: col})
+            }
+        }
+
+        grid_controller.clearCell(position);
+        
+        
+        sage.position = position;
+        grid_controller.updateGridCell(sage);
+        
+        expect(board_controller.winningCondition(position) == sage.uuid).toBe(true);
+        
+        grid_controller.clearCell(placed_piece);
+
+        expect(board_controller.winningCondition(position) == null).toBe(false);
+
+        
     })
 })
