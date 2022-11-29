@@ -42,6 +42,7 @@ export class GameController implements IGameController {
     public setupGame(game_type: number): void {
         // Resets the board
         this.model.board = new BoardModel();
+        this.board_controller = new BoardController(this.model.board);
         this.board_controller.initBoard();
         
         this.model.player_list.forEach((player) => {

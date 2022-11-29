@@ -44,7 +44,10 @@ class RoomController implements IRoomController {
             }
             const player: PlayerModel = new PlayerModel(this.model.user_list.length)
             this.game_controller.addPlayer(player);
-            this.model.user_to_player_map.set(new UserController(user).getUuid(), new PlayerController(player).getUuid());
+            this.model.user_to_player_map.push({
+                user_uuid: new UserController(user).getUuid(),
+                player_uuid: new PlayerController(player).getUuid()
+            });
             this.model.user_list.push(user);
             user_added = true;
         }

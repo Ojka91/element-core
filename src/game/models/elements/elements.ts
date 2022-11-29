@@ -1,4 +1,4 @@
-import { IPieceModel, PieceModel, PieceModelMap } from "../pieces/pieces";
+import { IPieceModel, PieceModel, PieceModelMap, PieceTypes } from "../pieces/pieces";
 
 /** mapping of the element to the corresponding class */
 export enum ElementTypes {
@@ -19,6 +19,7 @@ export abstract class ElementModel extends PieceModel {
 
     constructor() {
         super();
+        this.type = PieceTypes.Element;
     }
 }
 

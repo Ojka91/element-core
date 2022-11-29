@@ -27,6 +27,7 @@ export class GridModelMap extends Mapper{
         grid.width = raw.width;
         grid.height = raw.height;
         for (let row of raw.cells){
+            let row_cells: Array<PieceModel> = [];
             for (let piece of row){
                 let mapper: SageModelMap | EmptyModelMap | ElementModelMap;
                 switch(piece.type){
@@ -41,8 +42,9 @@ export class GridModelMap extends Mapper{
                         mapper = new EmptyModelMap();
                         break;
                 }
-                grid.cells.push(mapper.toDomain(piece))
+                row_cells.push(mapper.toDomain(piece))
             }
+            grid.cells.push(row_cells);
         }
         return grid;
     }
