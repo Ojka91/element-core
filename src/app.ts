@@ -35,32 +35,32 @@ var server = app.listen(process.env.PORT || 3000, () => {
 /* Game debugging endpoints */
 let room_id: string;
 app.get('/game', async (_req: Request, res: Response) => {
-  const room: RoomModel = new RoomModel();
-  const room_controller: RoomController = new RoomController(room);
-  const game: GameController = new GameController(room.game);
-  room_id = room_controller.getUuid()
+ // const room: RoomModel = new RoomModel();
+  // const room_controller: RoomController = new RoomController(room);
+  // const game: GameController = new GameController(room.game);
+  // room_id = room_controller.getUuid()
 
-  const user_1: UserModel = new UserModel();
-  const user_2: UserModel = new UserModel();
-  user_1.name = "Arkk92";
-  user_2.name = "Ojka";
+  // const user_1: UserModel = new UserModel();
+  // const user_2: UserModel = new UserModel();
+  // user_1.name = "Arkk92";
+  // user_2.name = "Ojka";
 
-  room_controller.addUser(user_1);
-  room_controller.addUser(user_2);
+  // room_controller.addUser(user_1);
+  // room_controller.addUser(user_2);
 
-  await room_controller.gameStart();
+  // await room_controller.gameStart();
 
-  return res.send(room);
+  return res.send('room');
 });
 
 /** Debugging purposes: Display the entire room */
 app.get('/display_room', async (_req: Request, res: Response) => {
   
-  const room: RoomModel = new RoomModel()
-  const room_controller: RoomController = new RoomController(room)
-  await room_controller.loadRoomById(room_id);
+  // const room: RoomModel = new RoomModel()
+  // const room_controller: RoomController = new RoomController(room)
+  // await room_controller.loadRoomById(room_id);
 
-  return res.send(room);
+  return res.send('room');
 });
 
 app.get('/add', async (_req: Request, res: Response) => {
@@ -80,21 +80,21 @@ app.get('/add', async (_req: Request, res: Response) => {
 });
 
 app.get('/get', async (_req: Request, res: Response) => {
-  const gameController = new GameController();
+  // const gameController = new GameController();
 
-  // let roomId: string = await gameController.createRoom();
-  // let rooma = await gameController.loadRoom(roomId);
-  // let room = Object.assign(new Room(), rooma)
-  // gameController.addUser(room, 'oscar')
-  // await gameController.gameStart(room);
-  let room: Room = new Room();
-  room.addUser(new User("oscar"))
-  room.addUser(new User("pep"))
-  room.gameStart()
+  // // let roomId: string = await gameController.createRoom();
+  // // let rooma = await gameController.loadRoom(roomId);
+  // // let room = Object.assign(new Room(), rooma)
+  // // gameController.addUser(room, 'oscar')
+  // // await gameController.gameStart(room);
+  // let room: Room = new Room();
+  // room.addUser(new User("oscar"))
+  // room.addUser(new User("pep"))
+  // room.gameStart()
 
-  console.log( room)
+  // console.log( room)
   
-  return res.send( room);
+  return res.send( 'room');
 });
 
 if (process.env.ENV != 'development') RedisSingleton.getInstance().connect()

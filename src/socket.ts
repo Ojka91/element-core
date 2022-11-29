@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
-import { GameController } from "./game/game_controller";
-import Room from "./game/models/room";
+import { GameController } from "./game/controllers/game_controller";
+import RoomController from "./game/controllers/room_controller";
+import { RoomModel } from "./game/models/room";
 import { QueueController } from "./game/queue_controller";
 import { PublicServerResponse } from "./schemas/server_response";
 interface ServerToClientEvents {
@@ -36,7 +37,7 @@ export type JoinGame = {
 }
 export type EndTurn = {
   roomId: string,
-  room: Room
+  room: RoomModel
 }
 
 /**
@@ -54,8 +55,6 @@ class Socket {
       >(server)
   }
   public init() {
-
-    const gameController = new GameController();
 
     const queueController = new QueueController();
 
@@ -78,9 +77,13 @@ class Socket {
         // 2. Checking if that queue have enough players
         if(queueController.isQueueFull(data)) {
           // 2.1 Creating and saving new room
-          let roomId: string = await gameController.createRoom();
+          const roomModel = new RoomModel(this.getNumberQueue(data));
+          const roomController = new RoomController(roomModel);
+          
+          await roomController.gameStart();
+          //let roomId: string = await gameController.createRoom();
           // 2.1 Sending roomId to client for them to join
-          this.io.to(data.queue).emit('gameFound', {roomId: roomId});
+          this.io.to(data.queue).emit('gameFound', {roomId: roomController.getUuid()});
           // 2.1 Cleaning queue room from those players that found the game !! This system may fail if we have a lot of concurrency, we may change it in the future
           this.io.socketsLeave(data.queue);
         }
@@ -169,6 +172,21 @@ class Socket {
 
     })
 
+  }
+
+  private getNumberQueue(queue: JoinQueue): number {
+    switch(queue.queue) {
+      case 'queue2': {
+        return 2
+      }
+      case 'queue3': {
+        return 3
+      }
+      case 'queue4': {
+        return 4
+      }
+    }
+    return 5;
   }
 
   public emmitRoom() {
