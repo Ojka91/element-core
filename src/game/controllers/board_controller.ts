@@ -23,26 +23,33 @@ import { WaterModel, IWaterModel } from "../models/elements/water";
 import { FireModel, IFireModel } from "../models/elements/fire";
 import { IWindModel, WindModel } from "../models/elements/wind";
 
+
+const BOARD_WIDTH: number = 11;
+const BOARD_HEIGHT: number = 11;
+
 class BoardController {
 
     private model: BoardModel;
-    private element_pool_manager = ElementPoolManager;
+    private element_pool_manager: ElementPoolManager; 
+    private grid_controller: GridController;
 
-    constructor(model: BoardModel){
+    constructor(model: BoardModel) {
         this.model = model;
+        this.element_pool_manager = new ElementPoolManager(this.model.elementPool);
+        this.grid_controller = new GridController(this.model.grid);
     }
 
     public returnElementToPool(element: ElementTypes): void {
-        new this.element_pool_manager(this.model.elementPool).addElement(element);
+        this.element_pool_manager.addElement(element);
     }
 
     public getElementFromPool(element: ElementTypes): void {
-        new this.element_pool_manager(this.model.elementPool).removeElement(element);
+        this.element_pool_manager.removeElement(element);
     }
 
     /** Method to check whether the requested elements can be taken or not */
     public checkElementPoolAvailability(elements: Array<ElementTypes>): boolean {
-        return new this.element_pool_manager(this.model.elementPool).checkElementListAvailability(elements);
+        return this.element_pool_manager.checkElementListAvailability(elements);
     }
 
     /** Grid getter */
@@ -50,41 +57,46 @@ class BoardController {
         return this.model.grid;
     }
 
+    public initBoard(): void {
+        this.grid_controller.generateInitialGrid(BOARD_WIDTH, BOARD_HEIGHT);
+    }
+
     /** Method to create the sages for the players */
     public createSageByPlayerAndGameType(player: IPlayerModel, game_type: GameType): void {
         const sage: SageModel = new SagePieceCreator().createPieceModel() as SageModel;
         const sage_controller: SageController = new SageController(sage);
         const player_controller: PlayerController = new PlayerController(player);
-        
+
         sage_controller.updatePosition(sage_controller.getSageInitialPosition(game_type as number, player_controller.getPlayerNumber()));
         player_controller.setSage(sage);
-        new GridController(this.model.grid).updateGridCell(player_controller.getSage());
+        this.grid_controller.updateGridCell(player_controller.getSage());
         this.model.sage_list.push(sage);
     }
 
     /** Method to place the player sage in the board */
     public placePlayerSage(player: IPlayerModel, new_position: Position): void {
         let sage = new PlayerController(player).getSage();
-        const grid_controller: GridController = new GridController(this.model.grid);
-        if (grid_controller.isPositionValid(new_position) == false){
+        
+        if (this.grid_controller.isPositionValid(new_position) == false) {
             throw new Error("Incorrect new row or new column dimensions");
         }
-        if(MovementManager.isSageMoveValid(this.model.grid, sage.position, new_position) == false){
+        if (MovementManager.isSageMoveValid(this.model.grid, sage.position, new_position) == false) {
             throw new Error("Sage movement is not valid");
         }
+        this.grid_controller.clearCell(sage.position);
         new SageController(sage).updatePosition(new_position);
-        grid_controller.updateGridCell(sage);
+        this.grid_controller.updateGridCell(sage);
     }
 
     /** Method to place an element in the board */
     public placeElement(element_type: ElementTypes, position: Position): void {
-        
+
         const element: ElementModel = new ElementPieceCreator(element_type).createPieceModel() as ElementModel
-        if (new GridController(this.model.grid).isPositionValid(position) == false){
+        if (this.grid_controller.isPositionValid(position) == false) {
             throw new Error("Invalid position, outside grid boundaries");
         }
         let element_controller: ElementController;
-        switch(element_type){
+        switch (element_type) {
             case ElementTypes.Earth:
                 element_controller = new EarthController(element as EarthModel);
                 break;
@@ -100,8 +112,8 @@ class BoardController {
         }
 
         element_controller.updatePosition(position);
-        
-        if(element_controller.place(this.model.grid, position) == false){
+
+        if (element_controller.place(this.model.grid, position) == false) {
             throw new Error("Cannot replace the cell due to a rule of replacement")
         }
     }
@@ -109,14 +121,14 @@ class BoardController {
     public performElementReaction(element_type: ElementTypes, position: Position, reaction?: Reaction): void {
         const element: IElementModel = new ElementPieceCreator(element_type).createPieceModel() as ElementModel
         let element_controller;
-        switch(element_type){
+        switch (element_type) {
             case ElementTypes.Water:
                 element_controller = new WaterController(element as IWaterModel);
-                if(reaction instanceof WaterReaction){
+                if (reaction instanceof WaterReaction) {
                     const water_reaction: WaterReaction = reaction as WaterReaction
                     element_controller.reaction(this.model.grid, position, water_reaction.initial_river, water_reaction.new_river);
-                }else{
-                    element_controller.reaction(this.model.grid, position);    
+                } else {
+                    element_controller.reaction(this.model.grid, position);
                 }
                 break;
             case ElementTypes.Fire:
@@ -134,25 +146,26 @@ class BoardController {
         }
     }
 
-    public winningCondition(position: Position): string | null {
-        for(let sage of this.model.sage_list){
-            if(PositionUtils.isStrictPosition(sage.position, position)){
-                if(this.isSageCaptured(sage)){
+    public winningCondition(position: Position): string {
+        for (let sage of this.model.sage_list) {
+            if (PositionUtils.isStrictPosition(sage.position, position)) {
+                if (this.isSageCaptured(sage)) {
                     return sage.uuid;
                 }
             }
         }
-        return null;
+        return "";
     }
 
     private isSageCaptured(sage: ISageModel): boolean {
-        const grid_controller: GridController = new GridController(this.model.grid);
-        const piece_list: Array<IPieceModel> = grid_controller.getSurroundingPieces(sage.position);
-        for(let piece of piece_list){
-            if(grid_controller.isWindCell(piece.position)){
-                return MovementManager.isWindBlocked(this.model.grid, piece.position, piece as WindModel);
+        const piece_list: Array<IPieceModel> = this.grid_controller.getSurroundingPieces(sage.position);
+        for (let piece of piece_list) {
+            if (this.grid_controller.isWindCell(piece.position)) {
+                if (MovementManager.isWindBlocked(this.model.grid, sage.position, piece as WindModel) == false) {
+                    return false;
+                }
             }
-            if(MovementManager.isSageMoveValid(this.model.grid, sage.position, piece.position)){
+            if (MovementManager.isSageMoveValid(this.model.grid, sage.position, piece.position)) {
                 return false;
             }
         }
@@ -160,9 +173,9 @@ class BoardController {
     }
 
     public displayGrid(): void {
-        new GridController(this.model.grid).displayGrid();
+        this.grid_controller.displayGrid();
     }
-    
+
 }
 
 export default BoardController;

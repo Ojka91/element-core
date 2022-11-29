@@ -21,7 +21,7 @@ export interface IGameModel {
     board: BoardModel,
     turn: TurnModel,
     game_type: GameType,
-    loser_uuid: string | null,
+    loser_uuid: string,
 }
 
 export class GameModel implements IGameModel {
@@ -31,7 +31,7 @@ export class GameModel implements IGameModel {
     board: BoardModel = new BoardModel();
     turn: TurnModel = new TurnModel(0); // default overrided later
     game_type: GameType = GameType.TwoPlayersGame; // default overrided later
-    loser_uuid: string | null = null
+    loser_uuid: string = ""
 
 }
 

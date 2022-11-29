@@ -1,5 +1,5 @@
 import { ElementTypes } from "../models/elements/elements";
-import { ITurnModel, TurnStates } from '../models/turn'
+import { ITurnModel, TurnModel, TurnStates } from '../models/turn'
 
 const MAX_ALLOWED_ELEMENTS: number = 3;
 const MIN_SAGE_MOVEMENTS: number = 2;
@@ -71,6 +71,10 @@ export class TurnController implements ITurnController{
 
     public getPlayer(): number {
         return this.model.player;
+    }
+
+    public changeTurn(player_number: number): void {
+        Object.assign(this.model, new TurnModel(player_number));
     }
 
 }

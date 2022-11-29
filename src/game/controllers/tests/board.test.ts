@@ -1,16 +1,17 @@
 import { BoardModel } from "@/game/models/board";
 import { EarthModel } from "@/game/models/elements/earth";
 import { ElementTypes } from "@/game/models/elements/elements";
+import { WindModel } from "@/game/models/elements/wind";
 import { GameType } from "@/game/models/game";
 import { GridModel } from "@/game/models/grid";
-import { SageModel } from "@/game/models/pieces/sage";
 import { PlayerModel } from "@/game/models/player";
 import { Position } from "@/game/utils/position_utils";
 import { WaterReaction } from "@/schemas/player_actions";
 import BoardController from "../board_controller";
 import { EarthController } from "../elements/earth_controller";
+import { WindController } from "../elements/wind_controller";
 import GridController from "../grid_controller";
-import { SageController } from "../pieces/sage_controller";
+import PlayerController from "../player_controller";
 
 describe('BoardController', () => {
 
@@ -18,8 +19,8 @@ describe('BoardController', () => {
         const board: BoardModel = new BoardModel();
         const board_controller: BoardController = new BoardController(board);
         const grid_controller: GridController = new GridController(board.grid);
-        grid_controller.generateInitialGrid(5,5)
-        
+        grid_controller.generateInitialGrid(5, 5)
+
         const player: PlayerModel = new PlayerModel(0);
 
         board_controller.createSageByPlayerAndGameType(player, GameType.FourPlayersGame);
@@ -34,8 +35,8 @@ describe('BoardController', () => {
         const board: BoardModel = new BoardModel();
         const board_controller: BoardController = new BoardController(board);
         const grid_controller: GridController = new GridController(board.grid);
-        grid_controller.generateInitialGrid(5,5)
-        
+        grid_controller.generateInitialGrid(5, 5)
+
         const player: PlayerModel = new PlayerModel(0);
         board_controller.createSageByPlayerAndGameType(player, GameType.FourPlayersGame);
 
@@ -47,8 +48,8 @@ describe('BoardController', () => {
         const board: BoardModel = new BoardModel();
         const board_controller: BoardController = new BoardController(board);
         const grid_controller: GridController = new GridController(board.grid);
-        grid_controller.generateInitialGrid(5,5)
-        
+        grid_controller.generateInitialGrid(5, 5)
+
         const player: PlayerModel = new PlayerModel(0);
         board_controller.createSageByPlayerAndGameType(player, GameType.FourPlayersGame);
 
@@ -60,8 +61,8 @@ describe('BoardController', () => {
         const board: BoardModel = new BoardModel();
         const board_controller: BoardController = new BoardController(board);
         const grid_controller: GridController = new GridController(board.grid);
-        grid_controller.generateInitialGrid(5,5)
-        
+        grid_controller.generateInitialGrid(5, 5)
+
         const player: PlayerModel = new PlayerModel(0);
         expect(board_controller.getGrid() instanceof GridModel).toBe(true);
     })
@@ -70,8 +71,8 @@ describe('BoardController', () => {
         const board: BoardModel = new BoardModel();
         const board_controller: BoardController = new BoardController(board);
         const grid_controller: GridController = new GridController(board.grid);
-        grid_controller.generateInitialGrid(5,5)
-        
+        grid_controller.generateInitialGrid(5, 5)
+
         board_controller.getElementFromPool(ElementTypes.Fire);
         expect(board.elementPool.fire.amount == 29).toBe(true);
         board_controller.returnElementToPool(ElementTypes.Fire);
@@ -82,8 +83,8 @@ describe('BoardController', () => {
         const board: BoardModel = new BoardModel();
         const board_controller: BoardController = new BoardController(board);
         const grid_controller: GridController = new GridController(board.grid);
-        grid_controller.generateInitialGrid(5,5)
-        
+        grid_controller.generateInitialGrid(5, 5)
+
         const pos: Position = {
             row: 0,
             column: 0
@@ -107,8 +108,8 @@ describe('BoardController', () => {
         const board: BoardModel = new BoardModel();
         const board_controller: BoardController = new BoardController(board);
         const grid_controller: GridController = new GridController(board.grid);
-        grid_controller.generateInitialGrid(5,5)
-        
+        grid_controller.generateInitialGrid(5, 5)
+
         const pos1: Position = {
             row: 0,
             column: 0
@@ -140,8 +141,8 @@ describe('BoardController', () => {
         const board: BoardModel = new BoardModel();
         const board_controller: BoardController = new BoardController(board);
         const grid_controller: GridController = new GridController(board.grid);
-        grid_controller.generateInitialGrid(5,5)
-        
+        grid_controller.generateInitialGrid(5, 5)
+
         const pos1: Position = {
             row: 0,
             column: 0
@@ -162,8 +163,8 @@ describe('BoardController', () => {
         const board: BoardModel = new BoardModel();
         const board_controller: BoardController = new BoardController(board);
         const grid_controller: GridController = new GridController(board.grid);
-        grid_controller.generateInitialGrid(5,5)
-        
+        grid_controller.generateInitialGrid(5, 5)
+
         const pos1: Position = {
             row: 0,
             column: 0
@@ -183,8 +184,8 @@ describe('BoardController', () => {
         const board: BoardModel = new BoardModel();
         const board_controller: BoardController = new BoardController(board);
         const grid_controller: GridController = new GridController(board.grid);
-        grid_controller.generateInitialGrid(5,5)
-        
+        grid_controller.generateInitialGrid(5, 5)
+
         const pos1: Position = {
             row: 0,
             column: 0
@@ -204,8 +205,8 @@ describe('BoardController', () => {
         const board: BoardModel = new BoardModel();
         const board_controller: BoardController = new BoardController(board);
         const grid_controller: GridController = new GridController(board.grid);
-        grid_controller.generateInitialGrid(5,5)
-        
+        grid_controller.generateInitialGrid(5, 5)
+
         const pos1: Position = {
             row: 0,
             column: 0
@@ -219,9 +220,9 @@ describe('BoardController', () => {
     it('checkElementPoolAvailability: check it is being called', async () => {
         const board: BoardModel = new BoardModel();
         const board_controller: BoardController = new BoardController(board);
-        
+
         const elements: Array<ElementTypes> = [ElementTypes.Water];
-        
+
         board.elementPool.water.amount = 5;
 
         expect(board_controller.checkElementPoolAvailability(elements)).toBe(true);
@@ -234,42 +235,51 @@ describe('BoardController', () => {
         expect(board_controller.displayGrid() == null).toBe(true);
     })
 
+    it('initBoard: check it is being called', async () => {
+        const board: BoardModel = new BoardModel();
+        const board_controller: BoardController = new BoardController(board);
+
+        expect(board_controller.initBoard() == null).toBe(true);
+    })
+
     it('winningCondition: check if placed piece is a winning condition. It return null if no winning condition or the uuid of the loser', async () => {
         const board: BoardModel = new BoardModel();
         const board_controller: BoardController = new BoardController(board);
-    
+
         const player: PlayerModel = new PlayerModel(0);
+        const player_controller: PlayerController = new PlayerController(player);
 
         const grid_controller: GridController = new GridController(board.grid);
-        grid_controller.generateInitialGrid(5,5);
+        grid_controller.generateInitialGrid(5, 5);
 
         board_controller.createSageByPlayerAndGameType(player, GameType.FourPlayersGame);
 
+        const blocking_wind: Position = { row: 0, column: 0 };
+        const wind_position: Position = { row: 1, column: 1 };
+        const placed_piece: Position = { row: 3, column: 3 };
 
-        const sage: SageModel = new SageModel();
-        
-        const position: Position = {row: 1, column: 1};
-        const placed_piece: Position = {row: 3, column: 3};
-        
         // Fill grid with earths
-        for (let row  = 1; row < 4; row++){
-            for (let col = 1; col < 4; col++){
-                new EarthController(new EarthModel()).place(board.grid, {row: row, column: col})
+        for (let row = 1; row < 4; row++) {
+            for (let col = 1; col < 4; col++) {
+                new EarthController(new EarthModel()).place(board.grid, { row: row, column: col })
             }
         }
 
-        grid_controller.clearCell(position);
-        
-        
-        sage.position = position;
-        grid_controller.updateGridCell(sage);
-        
-        expect(board_controller.winningCondition(position) == sage.uuid).toBe(true);
-        
+        let result: string = board_controller.winningCondition(placed_piece);
+        expect(result).toStrictEqual(player_controller.getSage().uuid);
+
+        new WindController(new WindModel()).place(board.grid, wind_position);
+        result = board_controller.winningCondition(placed_piece);
+        expect(result).toStrictEqual("");
+
+        new EarthController(new EarthModel()).place(board.grid, blocking_wind);
+        result = board_controller.winningCondition(placed_piece);
+        expect(result).toStrictEqual(player_controller.getSage().uuid);
+
         grid_controller.clearCell(placed_piece);
 
-        expect(board_controller.winningCondition(position) == null).toBe(false);
+        result = board_controller.winningCondition(placed_piece);
+        expect(result).toStrictEqual("");
 
-        
     })
 })
