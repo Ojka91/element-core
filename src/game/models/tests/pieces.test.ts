@@ -13,7 +13,7 @@ describe('Pieces', () => {
         const sage_factory = new SagePieceCreator().createPiece();
         const sage = new Sage();
 
-        expect(sage_factory).toStrictEqual(sage);
+        expect(sage_factory instanceof Sage && sage instanceof Sage).toBe(true);
     })
 
     it('Pieces factory: Can create Empty pieces', async () => {

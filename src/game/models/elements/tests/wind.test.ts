@@ -55,49 +55,46 @@ describe('Wind: Rule of replacement', () => {
 
 })
 
-describe('Wind: reaction', () => {
-    it('reaction: it should stack winds', async () => {
+describe('Wind: place', () => {
+    it('place: it should stack winds', async () => {
         
         const grid: Grid = new Grid(2,2);
-        const wind: Wind = new Wind();
+        let wind: Wind = new Wind();
         const new_wind: Wind = new Wind();
         const pos: Position = {row: 1, column: 1};
         
         // Set grid
-        wind.updatePosition(pos);
-        new_wind.updatePosition(pos);
-        grid.updateGridCell(wind);
-
-        new_wind.reaction(grid, pos);
+        wind.place(grid, pos);
+        new_wind.place(grid, pos);
 
         expect(grid.isWhirlwindCell(pos)).toBe(true);
+        wind = grid.getGridCellByPosition(pos) as Wind
         expect(wind.getNumberOfStackedWinds()==2).toBe(true);
     })
 
-    it('reaction: it should not stack winds on a max whirlwind', async () => {
+    it('place: it should not stack winds on a max whirlwind', async () => {
         
         const grid: Grid = new Grid(2,2);
-        const wind: Wind = new Wind();
+        let wind: Wind = new Wind();
         const new_wind: Wind = new Wind();
         const pos: Position = {row: 1, column: 1};
         
         // Set grid
-        wind.updatePosition(pos);
-        new_wind.updatePosition(pos);
-        grid.updateGridCell(wind);
-
-        expect(wind.getNumberOfStackedWinds()==1).toBe(true);
-        new_wind.reaction(grid, pos);
-        expect(wind.getNumberOfStackedWinds()==2).toBe(true);
-        new_wind.reaction(grid, pos);
-        expect(wind.getNumberOfStackedWinds()==3).toBe(true);
-        new_wind.reaction(grid, pos);
-        expect(wind.getNumberOfStackedWinds()==4).toBe(true);
-        new_wind.reaction(grid, pos);
+        wind.place(grid, pos);
+        
+        for (let stacked_winds: number = 1; stacked_winds < 5; stacked_winds++){
+            wind = grid.getGridCellByPosition(pos) as Wind
+            expect(wind.getNumberOfStackedWinds()==stacked_winds).toBe(true);
+            
+            const new_wind: Wind = new Wind();
+            new_wind.place(grid, pos);
+        }
+        
+        wind = grid.getGridCellByPosition(pos) as Wind
         expect(wind.getNumberOfStackedWinds()==5).toBe(false);
     })
 
-    it('reaction: it should replace earth', async () => {
+    it('place: it should replace earth', async () => {
         
         const grid: Grid = new Grid(2,2);
         const earth: Earth = new Earth();
@@ -105,16 +102,14 @@ describe('Wind: reaction', () => {
         const pos: Position = {row: 1, column: 1};
         
         // Set grid
-        earth.updatePosition(pos);
-        new_wind.updatePosition(pos);
-        grid.updateGridCell(earth);
+        earth.place(grid, pos);
 
         expect(grid.isEarthCell(pos)).toBe(true);
-        new_wind.reaction(grid, pos);
+        new_wind.place(grid, pos);
         expect(grid.isWindCell(pos)).toBe(true);
     })
 
-    it('reaction: it should not replace mountains nor ranges', async () => {
+    it('place: it should not replace mountains nor ranges', async () => {
         
         const grid: Grid = new Grid(2,2);
         const earth: Earth = new Earth();
@@ -123,16 +118,14 @@ describe('Wind: reaction', () => {
         
         // Set grid
         earth.promoteToMountain();
-        earth.updatePosition(pos);
-        new_wind.updatePosition(pos);
-        grid.updateGridCell(earth);
+        earth.place(grid, pos);
 
         expect(grid.isMountainCell(pos)).toBe(true);
-        new_wind.reaction(grid, pos);
+        new_wind.place(grid, pos);
         expect(grid.isWindCell(pos)).toBe(false);
 
         expect(grid.isRangeCell(pos)).toBe(true);
-        new_wind.reaction(grid, pos);
+        new_wind.place(grid, pos);
         expect(grid.isWindCell(pos)).toBe(false);
     })
 

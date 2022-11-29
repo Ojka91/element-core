@@ -1,13 +1,17 @@
 import { User } from "../user";
 import { Game } from "./game";
+import { GameType } from "./game_utils";
 import Player from "./player"
-
-const MAX_PLAYERS_PER_ROOM = 4;
 
 class Room {
     private uuid: string = "room1"
     private user_map_list: Map<User, Player> = new Map();
     private game: Game = new Game();
+    private game_type: GameType = GameType.TwoPlayersGame;
+
+    constructor(game_type: GameType){
+        this.game_type = game_type
+    }
 
     /** Returns the room uuid */
     public getUuid(): string {
@@ -58,19 +62,22 @@ class Room {
      * return true if room is full, false otherwise
     */
     public isRoomFull(): boolean {
-        return this.user_map_list.size == MAX_PLAYERS_PER_ROOM;
+        return this.user_map_list.size == this.game_type;
     }
 
     /** Starts the game */
-    public gameStart(): void {
-        if(this.user_map_list.size < 2){
-            throw new Error("To start a game it's required at least 2 players");
+    public gameStart(): boolean {
+        if(this.user_map_list.size != this.game_type){
+            return false;
         }
+
         this.user_map_list.forEach((player, user)=> {
             this.game.addPlayer(player);
         })
 
-        this.game.startGame();
+        this.game.setupGame(this.game_type);
+
+        return true;
         
         
     }

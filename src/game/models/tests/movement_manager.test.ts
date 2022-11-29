@@ -409,17 +409,13 @@ describe('movement_manager', () => {
       // Generate Whirlwind
       let wind = new Wind();
       wind.increaseStackedWinds();
-      wind.updatePosition(wind_pos);
-      grid.updateGridCell(wind);
+      wind.place(grid, wind_pos);
       
       let earth = new Earth();
-      earth.updatePosition(earth_pos);
-      grid.updateGridCell(earth);
-      earth.reaction(grid, mountain_pos);
+      earth.place(grid, earth_pos);
 
       let earth_mountain_1 = new Earth();
-      earth_mountain_1.updatePosition(mountain_pos);
-      earth_mountain_1.reaction(grid, mountain_pos);
+      earth_mountain_1.place(grid, mountain_pos);
       
       // No range -> Valid jump
       let result = MovementManager.isSageMoveValid(grid, cur_pos, new_pos);
@@ -427,9 +423,7 @@ describe('movement_manager', () => {
 
       // Add second earth to convert the earth into Mountain and range the surrounding earths
       let earth_mountain_2 = new Earth();
-      earth_mountain_2.updatePosition(mountain_pos);
-      grid.updateGridCell(earth_mountain_1);
-      earth_mountain_2.reaction(grid, mountain_pos);
+      earth_mountain_2.place(grid, mountain_pos);
 
       expect(grid.isRangeCell(earth_pos)).toBe(true);
 

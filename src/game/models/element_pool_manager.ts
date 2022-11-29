@@ -69,6 +69,26 @@ class ElementPoolManager {
             pool_item.empty();
         }
     }
+
+    public checkElementAvailable(element: ElementTypes): boolean {
+        const amount: number = this.mapper.get(element).amount
+        if((amount - 1) < 0){
+            return false;
+        }
+        return true;
+    }
+
+    public checkElementListAvailability(elements: Array<ElementTypes>): boolean {
+        for(let element_type in ElementTypes){
+            const amount_requested: number = elements.filter(element => element === element_type ).length
+            const amount: number = this.mapper.get(element_type).amount
+
+            if((amount - amount_requested) < 0){
+                return false;
+            }
+        }
+        return true;
+    }
     
 }
 

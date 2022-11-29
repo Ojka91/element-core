@@ -19,6 +19,26 @@ const MAX_STACKED_WINDS: number = 4;
         super();
     }
 
+    // Override parent method
+    public place(grid: Grid, cell: Position): boolean {
+        const piece: Piece = grid.getGridCellByPosition(cell);
+        this.position = cell;
+        if(piece instanceof Wind){
+            if(piece.isMaxWhirlwind() == false){
+                this.stacked_winds = (piece as Wind).getNumberOfStackedWinds() + 1;
+                grid.updateGridCell(this);
+                return true;
+            } else {
+                return false;
+            }
+        }
+        if(grid.isPositionEmpty(cell) || (this.ruleOfReplacement(piece))){
+            grid.updateGridCell(this);
+            return true;
+        }
+        return false;
+    }
+
     public isMaxWhirlwind(): boolean {
         return this.stacked_winds == MAX_STACKED_WINDS;
     }
@@ -46,7 +66,7 @@ const MAX_STACKED_WINDS: number = 4;
     }
 
     public reaction(grid: Grid, cell: Position): void {
-        const piece: Piece = grid.getGridCellByPosition(cell);
+        /*const piece: Piece = grid.getGridCellByPosition(cell);
         if(grid.isWindCell(cell)){
             if(this.ruleOfReplacement(piece as Wind)){
                 (piece as Wind).increaseStackedWinds();
@@ -58,6 +78,7 @@ const MAX_STACKED_WINDS: number = 4;
                 wind.updatePosition(cell);
                 grid.updateGridCell(wind);
             }
-        }
+        }*/
+        return;
     }
 }

@@ -1,11 +1,12 @@
 import { User } from "@/game/user";
+import { GameType } from "../game_utils";
 import Player from "../player";
 import Room from "../room";
 
 
 describe('Room', () => {
     it('addUser: user should be added to the user list map ', async () => {
-        const room: Room = new Room();
+        const room: Room = new Room(GameType.TwoPlayersGame);
         const user: User = new User("Ark");
         
         const result = room.addUser(user);
@@ -17,7 +18,7 @@ describe('Room', () => {
     });
 
     it('addUser: there cannot be identical users in same room ', async () => {
-        const room: Room = new Room();
+        const room: Room = new Room(GameType.TwoPlayersGame);
         const user: User = new User("Ark");
         
         const result = room.addUser(user);
@@ -28,7 +29,7 @@ describe('Room', () => {
     });
 
     it('addUser: cannot add more users on a full room ', async () => {
-        const room: Room = new Room();
+        const room: Room = new Room(GameType.TwoPlayersGame);
         const user: User = new User("Ark");
         
         const user4: User = new User("Ark4");
@@ -47,7 +48,7 @@ describe('Room', () => {
 
 
     it('isRoomFull: should return true if room has 4 players, false otherwise ', async () => {
-        const room: Room = new Room();
+        const room: Room = new Room(GameType.TwoPlayersGame);
         const user4: User = new User("Ark4");
         const user1: User = new User("Ark1");
         const user2: User = new User("Ark2");
@@ -63,32 +64,34 @@ describe('Room', () => {
     });
 
     it('getUserList: should return an array of the user added to the room ', async () => {
-        const room: Room = new Room();
+        const room: Room = new Room(GameType.FourPlayersGame);
         const user4: User = new User("Ark4");
         const user1: User = new User("Ark1");
         const user2: User = new User("Ark2");
         const user3: User = new User("Ark3");
         
         expect(room.getUserList().length == 0).toBe(true);
-        room.addUser(user1);
-        room.addUser(user2);
-        room.addUser(user3);
-        room.addUser(user4);
+        expect(room.addUser(user1)).toBe(true);
+        expect(room.addUser(user2)).toBe(true);
+        expect(room.addUser(user3)).toBe(true);
+        expect(room.addUser(user4)).toBe(true);
         expect(room.getUserList().length == 4).toBe(true);
     });
 
-    it('gameStart: should throw error if there is less than 2 users in the room ', async () => {
-        const room: Room = new Room();
+    it('addUser and gameStart: should not let add more user than allowed to the room and game should start ', async () => {
+        const game_type: GameType = GameType.TwoPlayersGame;
+        const room: Room = new Room(game_type);
         const user4: User = new User("Ark4");
         const user1: User = new User("Ark1");
         const user2: User = new User("Ark2");
         const user3: User = new User("Ark3");
         
-        expect(()=>{room.gameStart()}).toThrow("To start a game it's required at least 2 players")
-        room.addUser(user1);
-        expect(()=>{room.gameStart()}).toThrow("To start a game it's required at least 2 players")
-        room.addUser(user2);
-        expect(room.gameStart() == null).toBe(true);
+        expect(room.gameStart()).toBe(false)
+        expect(room.addUser(user1)).toBe(true);
+        expect(room.gameStart()).toBe(false)
+        expect(room.addUser(user2)).toBe(true);
+        expect(room.gameStart()).toBe(true);
+        expect(room.addUser(user3)).toBe(false);
     });
 })
   

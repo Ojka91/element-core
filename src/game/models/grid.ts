@@ -2,8 +2,9 @@ import { Earth } from "./elements/earth";
 import { Fire } from "./elements/fire";
 import { Water } from "./elements/water";
 import { Wind } from "./elements/wind";
-import { Empty, Piece } from "./pieces";
+import { Empty, Piece, Sage } from "./pieces";
 import { EmptyPieceCreator } from "./pieces_factory";
+import { PositionUtils } from "./position_utils";
 
 export type Position = {
     row: number,
@@ -146,6 +147,21 @@ export class Grid {
             return (piece as Earth).isRange();
         }
         return false;
+    }
+
+    /** Get surrounding pieces of the provided position 
+     * return Piece list
+    */
+    public getSurroundingPieces(position: Position): Array<Piece> {
+        let piece_list: Array<Piece> = []
+        for(let axis_inc of PositionUtils.all_direction_increment_map.values()){
+            const piece_pos: Position = {
+                row: position.row + axis_inc.y,
+                column: position.column + axis_inc.x,
+            }
+            piece_list.push(this.getGridCellByPosition(piece_pos));
+        }
+        return piece_list;
     }
 }
 

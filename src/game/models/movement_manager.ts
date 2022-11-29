@@ -5,6 +5,30 @@ import { PositionUtils } from "./position_utils"
 
 export class MovementManager {
 
+    public static isWindBlocked(grid: Grid, origin: Position, wind: Wind) : boolean{
+        // Distance of each axis
+        const x_dist: number = wind.position.column - origin.column;
+        const y_dist: number = wind.position.row - origin.row;
+
+        // Directions bounded to [-1, 0, 1]
+        const x_dir: number = x_dist != 0 ? x_dist / Math.abs(x_dist) : x_dist;
+        const y_dir: number = y_dist != 0 ? y_dist / Math.abs(y_dist) : y_dist;
+
+        const jump_distance = wind.getNumberOfStackedWinds();
+
+        const landing_position: Position = {
+            row: wind.position.row + jump_distance * y_dir,
+            column: wind.position.column + jump_distance * x_dir,
+        }
+        if(grid.isPositionEmpty(landing_position)){
+            return false;
+        } else if(grid.isWindCell(landing_position)){
+            return this.isWindBlocked(grid, landing_position, grid.getGridCellByPosition(landing_position) as Wind);
+        }
+        return true
+
+    }
+
     /** Performs all checkers for the sage movement */
     public static isSageMoveValid(grid: Grid, current_position: Position, new_position: Position): boolean {
         

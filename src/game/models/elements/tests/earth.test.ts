@@ -88,29 +88,25 @@ describe('Earth: reaction', () => {
         expect(grid.isEarthCell(earth_pos)).toBe(true);
     });
 
-    it('reaction: water must be replaced by earth', async () => {
+    it('place: water must be replaced by earth', async () => {
         
         const earth = new Earth()
 
         expect(grid.isWaterCell(water_pos)).toBe(true);
-        earth.updatePosition(water_pos);
-        earth.reaction(grid, water_pos);
+        expect(earth.place(grid, water_pos)).toBe(true);
 
         expect(grid.isEarthCell(water_pos)).toBe(true);
     })
 
-    it('reaction: earth must be promoted to mountain', async () => {
+    it('place: earth must be promoted to mountain', async () => {
         const grid: Grid = new Grid(9,7);
         const earth_pos: Position = {row: 1, column: 1};
         const earth = new Earth()
         const new_earth: Earth = new Earth();
 
-        earth.updatePosition(earth_pos);
-        new_earth.updatePosition(earth_pos);
-        grid.updateGridCell(earth);
-
+        expect(earth.place(grid, earth_pos)).toBe(true);
         expect(grid.isEarthCell(earth_pos)).toBe(true);
-        new_earth.reaction(grid, earth_pos);
+        expect(new_earth.place(grid, earth_pos)).toBe(true);
         
         expect(grid.isMountainCell(earth_pos)).toBe(true);
     })
@@ -140,7 +136,7 @@ describe('Earth: reaction', () => {
     */
     const place_earth_pos: Position = {row: 1, column: 2};
     const new_earth: Earth = new Earth();
-    new_earth.reaction(grid, place_earth_pos);
+    new_earth.place(grid, place_earth_pos);
     
 
     it.each(rangeable_earth_positions)('Reaction: range formation: check range formation succedded on rangeable earths', (earth_pos) => {

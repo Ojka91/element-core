@@ -1,5 +1,6 @@
 import { GameType } from "./game_utils";
 import { Position } from "./grid";
+import {v4 as uuidv4} from 'uuid';
 
 export abstract class Piece {
     position: Position = {
@@ -39,12 +40,15 @@ export class Sage extends Piece {
     
     public static initial_position_map: Map<GameType, Map<number, Position> > = new Map([
         [GameType.TwoPlayersGame, this.initial_position_2_players],
-        [GameType.TwoPlayersGame, this.initial_position_4_players]
+        [GameType.ThreePlayersGame, this.initial_position_4_players],
+        [GameType.FourPlayersGame, this.initial_position_4_players]
     
     ])
+    uuid: string;
 
     constructor(){
         super();
+        this.uuid = uuidv4();
         this.string_representation = "S"
     }
 
