@@ -80,8 +80,21 @@ app.get('/add', async (_req: Request, res: Response) => {
 });
 
 app.get('/get', async (_req: Request, res: Response) => {
-  let redis = RedisSingleton.getInstance();
-  return res.send(await redis.get('1234'));
+  const gameController = new GameController();
+
+  // let roomId: string = await gameController.createRoom();
+  // let rooma = await gameController.loadRoom(roomId);
+  // let room = Object.assign(new Room(), rooma)
+  // gameController.addUser(room, 'oscar')
+  // await gameController.gameStart(room);
+  let room: Room = new Room();
+  room.addUser(new User("oscar"))
+  room.addUser(new User("pep"))
+  room.gameStart()
+
+  console.log( room)
+  
+  return res.send( room);
 });
 
 if (process.env.ENV != 'development') RedisSingleton.getInstance().connect()
