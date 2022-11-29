@@ -97,11 +97,11 @@ describe('RoomController', () => {
         user1.name = "Test1";
         user2.name = "Test2";
 
-        expect(room_controller.gameStart()).toBe(false);
+        expect(await room_controller.gameStart()).toBe(false);
         expect(room_controller.addUser(user1)).toBe(true);
-        expect(room_controller.gameStart()).toBe(false);
+        expect(await room_controller.gameStart()).toBe(false);
         expect(room_controller.addUser(user2)).toBe(true);
-        expect(room_controller.gameStart()).toBe(true);
+        expect(await room_controller.gameStart()).toBe(true);
     });
 
     it('getUuid: should return the room uuid ', async () => {

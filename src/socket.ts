@@ -77,10 +77,10 @@ class Socket {
         // 2. Checking if that queue have enough players
         if(queueController.isQueueFull(data)) {
           // 2.1 Creating and saving new room
-          const roomModel = new RoomModel(this.getNumberQueue(data));
+          const roomModel = new RoomModel(this.getSizeRoom(data));
           const roomController = new RoomController(roomModel);
           
-          await roomController.gameStart();
+          await roomController.save();
           //let roomId: string = await gameController.createRoom();
           // 2.1 Sending roomId to client for them to join
           this.io.to(data.queue).emit('gameFound', {roomId: roomController.getUuid()});
@@ -174,7 +174,7 @@ class Socket {
 
   }
 
-  private getNumberQueue(queue: JoinQueue): number {
+  private getSizeRoom(queue: JoinQueue): number {
     switch(queue.queue) {
       case 'queue2': {
         return 2

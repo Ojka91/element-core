@@ -13,9 +13,10 @@ interface IRoomController {
     addUser(user: UserModel): boolean;
     getUserList(): Array<UserModel>;
     isRoomFull(): boolean;
-    gameStart(): boolean;
+    gameStart(): Promise<boolean>;
     getGame(): IGameModel;
     loadRoomById(room_id: string): Promise<void>;
+    save(): Promise<void>;
 }
 
 
@@ -67,13 +68,13 @@ class RoomController implements IRoomController {
     }
 
     /** Starts the game */
-    public gameStart(): boolean {
+    public async gameStart(): Promise<boolean> {
         if (this.isRoomFull() == false) {
             return false;
         }
 
         this.game_controller.setupGame(this.model.size);
-        GameCache.saveRoom(this.model);
+        await GameCache.saveRoom(this.model);
 
         return true;
     }
@@ -89,6 +90,10 @@ class RoomController implements IRoomController {
     /** returns the game */
     public getGame(): IGameModel {
         return this.model.game;
+    }
+
+    public async save(): Promise<void> {
+        await GameCache.saveRoom(this.model);
     }
 }
 
