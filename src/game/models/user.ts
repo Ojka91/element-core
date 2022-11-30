@@ -4,11 +4,13 @@ import {v4 as uuidv4} from 'uuid';
 export interface IUserModel {
     name: string;
     uuid: string;
+    socket_id: string;
 }
 
 export class UserModel {
     name: string = "";
     uuid: string = "";
+    socket_id: string = "";
 
     constructor(){
         this.uuid = uuidv4();
