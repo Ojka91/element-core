@@ -157,4 +157,13 @@ export class GameController implements IGameController {
         return null;
 
     }
+    
+    /**
+    * loadGame
+    */
+     public async loadGame(game: IGameModel): Promise<void> {
+        this.model = game;
+
+    }
+
 }

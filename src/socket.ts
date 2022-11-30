@@ -1,8 +1,7 @@
 import { Server } from "socket.io";
-import { GameController } from "./game/controllers/game_controller";
 import RoomController from "./game/controllers/room_controller";
+import { GameService } from "./game/game_service";
 import { RoomModel } from "./game/models/room";
-import { UserModel } from "./game/models/user";
 import { QueueController } from "./game/queue_controller";
 import { PublicServerResponse } from "./schemas/server_response";
 interface ServerToClientEvents {
@@ -58,6 +57,7 @@ class Socket {
   public init() {
 
     const queueController = new QueueController();
+    const gameService = new GameService()
 
     this.io.on("connection", (socket: any) => {
 
@@ -78,13 +78,10 @@ class Socket {
         // 2. Checking if that queue have enough players
         if (queueController.isQueueFull(data)) {
           // 2.1 Creating and saving new room
-          const roomModel = new RoomModel(this.getSizeRoom(data));
-          const roomController = new RoomController(roomModel);
+          const roomId = await gameService.createRoom(data);
 
-          await roomController.save();
-          //let roomId: string = await game_controller.createRoom();
           // 2.1 Sending roomId to client for them to join
-          this.io.to(data.queue).emit('gameFound', { roomId: roomController.getUuid() });
+          this.io.to(data.queue).emit('gameFound', { roomId: roomId });
           // 2.1 Cleaning queue room from those players that found the game !! This system may fail if we have a lot of concurrency, we may change it in the future
           this.io.socketsLeave(data.queue);
         }
@@ -103,26 +100,17 @@ class Socket {
         // 1. Join game/roomId socket
         socket.join(data.roomId)
         // 1. Join user into the game room
-        const room: RoomModel = new RoomModel(0);
-        const room_controller: RoomController = new RoomController(room);
-        await room_controller.loadRoomById(data.roomId);
-
-        const user: UserModel = new UserModel()
-        user.name = socket.id;
-        user.socket_id = socket.id;
-
-        room_controller.addUser(user)
+        const roomController: RoomController = await gameService.joinGame(data.roomId, socket.id);
 
 
         // 2. Checking if room is full so game can start
-        if (room_controller.isRoomFull()) { // TBD TODO !!! we have no way to check if the room is created for 2, 3 or 4 players yet! should we implement it??!
+        if (roomController.isRoomFull()) {
           // 2.1 Starting game
-          await room_controller.gameStart();
-          /* MLG: Commented due to removing the old game controller this method was removed too. */
-          //const response: PublicServerResponse = game_controller.preparePublicResponse(room);
+          await roomController.gameStart();
+          const response: PublicServerResponse = gameService.preparePublicResponse(roomController);
 
           // 2.1 We emit a game update for the clients to start playing
-          //this.io.to(data.roomId).emit('gameUpdate', response); // TODO TBD My proposal is to use the event "gameUpdate" each time a player does something. So client...
+          this.io.to(data.roomId).emit('gameUpdate', response); //My proposal is to use the event "gameUpdate" each time a player does something. So client...
           //... will have to listen to 'gameUpdate' and react accordingly
         }
 
@@ -134,18 +122,10 @@ class Socket {
       socket.on("endTurn", async (data: EndTurn) => {
         console.log(data.roomId)
 
-        const room: RoomModel = new RoomModel(0);
-        const room_controller: RoomController = new RoomController(room);
-        await room_controller.loadRoomById(data.roomId);
-
-        const game_controller: GameController = new GameController(room.game);
-
-        game_controller.endOfPlayerTurn();
-
-        this.io.to(data.roomId).emit('gameUpdate', room)
+        const response: PublicServerResponse = await gameService.endTurn(data.roomId)
+        this.io.to(data.roomId).emit('gameUpdate', response)
 
       })
-
 
 
 
@@ -189,20 +169,6 @@ class Socket {
 
   }
 
-  private getSizeRoom(queue: JoinQueue): number {
-    switch (queue.queue) {
-      case 'queue2': {
-        return 2
-      }
-      case 'queue3': {
-        return 3
-      }
-      case 'queue4': {
-        return 4
-      }
-    }
-    return 5;
-  }
 
   public emmitRoom() {
     this.io.to("room1").emit('something', { some: 'data' });

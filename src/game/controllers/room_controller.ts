@@ -87,6 +87,14 @@ class RoomController implements IRoomController {
 
     }
 
+    /**
+    * loadRoom
+    */
+    public loadRoom(room: IRoomModel):void {
+        this.model = room;
+
+    }
+
     /** returns the game */
     public getGame(): IGameModel {
         return this.model.game;
