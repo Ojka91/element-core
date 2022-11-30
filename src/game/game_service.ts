@@ -54,7 +54,7 @@ export class GameService {
 
         gameController.loadGame(roomController.getGame())
 
-        if(!this.isPlayerTurn(socketId)) {
+        if(!this.isPlayerTurn(socketId, gameController)) {
             throw new Error('Its not your turn')
         }
 
@@ -72,7 +72,7 @@ export class GameService {
 
         gameController.loadGame(roomController.getGame())
 
-        if(!this.isPlayerTurn(socketId)) {
+        if(!this.isPlayerTurn(socketId, gameController)) {
             throw new Error('Its not your turn')
         }
 
@@ -90,7 +90,7 @@ export class GameService {
 
         gameController.loadGame(roomController.getGame())
 
-        if(!this.isPlayerTurn(socketId)) {
+        if(!this.isPlayerTurn(socketId, gameController)) {
             throw new Error('Its not your turn')
         }
         
@@ -102,8 +102,7 @@ export class GameService {
 
     }
 
-    public isPlayerTurn(socketId: string): boolean {
-        const [_roomController, gameController] = this.createControllers()
+    public isPlayerTurn(socketId: string, gameController: GameController): boolean {
        return socketId === gameController.getTurnPlayer().uuid
     }
 
