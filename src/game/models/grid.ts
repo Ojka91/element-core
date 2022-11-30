@@ -16,7 +16,7 @@ export interface IGridModel {
 
 export class GridModel {
 
-    cells: PieceModel[][] = [];
+    cells: Array<Array<PieceModel>> = [];
     width: number = 0;
     height: number = 0;
 }

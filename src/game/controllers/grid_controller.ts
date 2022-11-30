@@ -67,18 +67,16 @@ export class GridController implements IGridController {
         this.model.width = width;
         this.model.height = height;
         
-        let cells: Array<Array<IPieceModel>> = new Array(height);
+        this.model.cells = new Array(height);
         for (let row = 0; row < height; row++) {
-            cells[row] = new Array(width);
+            this.model.cells[row] = new Array(width);
             for (let col = 0; col < width; col++) {
                 const new_position: Position = { row: row, column: col };
 
-                const new_piece = new EmptyPieceCreator().createPieceModel();
-                new EmptyController(new_piece).updatePosition(new_position);
-                cells[row][col] = new_piece;
+                this.model.cells[row][col] = new EmptyPieceCreator().createPieceModel() as EmptyModel;
+                new EmptyController(this.model.cells[row][col]).updatePosition(new_position);
             }
         }
-        this.model.cells = cells;
     }
 
     /** Clears the cell by placing an empty piece */

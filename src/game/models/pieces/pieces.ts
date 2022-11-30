@@ -2,6 +2,7 @@ import { Position } from "../../utils/position_utils";
 import { Mapper } from "../../utils/mapper";
 
 export enum PieceTypes {
+    None,
     Empty,
     Sage,
     Element
@@ -20,7 +21,7 @@ export abstract class PieceModel implements IPieceModel {
     };
     // debugging purposes
     string_representation: string = "";
-    type: PieceTypes = PieceTypes.Empty;
+    type: PieceTypes = PieceTypes.None;
 }
 
 export abstract class PieceModelMap extends Mapper{
