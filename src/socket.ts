@@ -8,6 +8,7 @@ import { ElementTypes } from "./game/models/elements/elements";
 import { Position } from "./game/utils/position_utils";
 import { Reaction } from "./schemas/player_actions";
 import { IPlayerModel } from "./game/models/player";
+import { logger } from "./utils/logger";
 
 interface ServerToClientEvents {
   noArg: () => void;
@@ -159,6 +160,7 @@ class Socket {
           response = await gameService.drawElements(data.roomId, data.elements, socket.id);
         } catch (error) {
           // If there is any error we will notify only to the client who generate the error
+          logger.warn(error)
           socket.emit('gameUpdate', error)
         }
         this.io.to(data.roomId).emit('gameUpdate', response)
@@ -177,6 +179,7 @@ class Socket {
           response = await gameService.placeElement(data.roomId, socket.id, data.element, data.position, data.reaction);
         } catch (error) {
           // If there is any error we will notify only to the client who generate the error
+          logger.warn(error)
           socket.emit('gameUpdate', error)
         }
         this.io.to(data.roomId).emit('gameUpdate', response)
@@ -193,8 +196,10 @@ class Socket {
         try {
           
           response = await gameService.moveSage(data.roomId, socket.id, data.player, data.position);
+          
         } catch (error) {
           // If there is any error we will notify only to the client who generate the error
+          logger.warn(error)
           socket.emit('gameUpdate', error)
         }
         this.io.to(data.roomId).emit('gameUpdate', response)
