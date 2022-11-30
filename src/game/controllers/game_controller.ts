@@ -157,4 +157,16 @@ export class GameController implements IGameController {
         return null;
 
     }
+
+    /**
+     * getPlayerById
+     */
+    public getPlayerById(player_id: string): IPlayerModel {
+        for (let player of this.model.player_list){
+            if(player.uuid === player_id){
+                return player;
+            }
+        }
+        throw new Error("Player Id not found");
+    }
 }

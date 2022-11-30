@@ -37,7 +37,7 @@ let room_id: string;
 app.get('/game', async (_req: Request, res: Response) => {
   const room: RoomModel = new RoomModel(2);
   const room_controller: RoomController = new RoomController(room);
-
+  
   room_id = room_controller.getUuid()
 
   const user_1: UserModel = new UserModel();
@@ -56,11 +56,11 @@ app.get('/game', async (_req: Request, res: Response) => {
 /** Debugging purposes: Display the entire room */
 app.get('/display_room', async (_req: Request, res: Response) => {
 
-  // const room: RoomModel = new RoomModel()
-  // const room_controller: RoomController = new RoomController(room)
-  // await room_controller.loadRoomById(room_id);
-
-  return res.send('room');
+  let room: RoomModel = new RoomModel(0)
+  const room_controller: RoomController = new RoomController(room)
+  await room_controller.loadRoomById(room_id);
+  console.log(room)
+  return res.send(room);
 });
 
 app.get('/add', async (_req: Request, res: Response) => {
@@ -94,7 +94,7 @@ app.get('/get', async (_req: Request, res: Response) => {
 
   // console.log( room)
 
-  return res.send('room');
+  return res.send('room_asdasda');
 });
 
 if (process.env.ENV != 'development') RedisSingleton.getInstance().connect()
