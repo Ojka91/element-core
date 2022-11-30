@@ -1,6 +1,4 @@
-import ElementPoolManager from "../element_pool_manager";
-import Grid, { Position } from "../grid";
-import { Piece } from "../pieces";
+import { IPieceModel, PieceModel, PieceModelMap, PieceTypes } from "../pieces/pieces";
 
 /** mapping of the element to the corresponding class */
 export enum ElementTypes {
@@ -10,29 +8,20 @@ export enum ElementTypes {
     Wind = "Wind"
 };
 
+export interface IElementModel extends IPieceModel {
+    element_type: ElementTypes;
+}
 
 /** Abstract class for all elements */
-export abstract class Element extends Piece {
+export abstract class ElementModel extends PieceModel {
     
-    constructor(){
+    element_type: ElementTypes = ElementTypes.Fire;
+
+    constructor() {
         super();
+        this.type = PieceTypes.Element;
     }
+}
 
-    /** All Elements has their own rule of replacement, this function return if it's allowed to be replace the piece with the element */
-    abstract ruleOfReplacement(piece_to_replace: Piece): boolean
-
-    /** Reaction of placing the element into the board */
-    abstract reaction(grid: Grid, cell: Position): void
-
-    /** Function to place the element into a grid */
-    public place(grid: Grid, cell: Position): boolean {
-        const piece: Piece = grid.getGridCellByPosition(cell);
-        if(grid.isPositionEmpty(cell) || (this.ruleOfReplacement(piece))){
-            this.position = cell;
-            grid.updateGridCell(this)
-            return true;
-        }
-        
-        return false;
-    }
+export abstract class ElementModelMap extends PieceModelMap {
 }

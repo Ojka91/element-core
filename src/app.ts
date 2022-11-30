@@ -8,10 +8,11 @@ import Swagger from './utils/swagger';
 import Socket from './socket';
 export const app: Express = express();
 import { RedisSingleton } from './redis';
-import Room from './game/models/room';
-import { User } from './game/user';
-import { GameController } from './game/game_controller';
-import { GameType } from './game/models/game_utils';
+import { GameController } from './game/controllers/game_controller';
+import { RoomModel } from './game/models/room';
+import RoomController from './game/controllers/room_controller';
+import { UserModel } from './game/models/user';
+import user from './database/models/user';
 //import { User } from './controllers/user';
 dotenv.config({ path: `.env${process.env.NODE_ENV}` });
 
@@ -34,29 +35,32 @@ var server = app.listen(process.env.PORT || 3000, () => {
 /* Game debugging endpoints */
 let room_id: string;
 app.get('/game', async (_req: Request, res: Response) => {
-  let room = new Room(GameType.TwoPlayersGame);
-  const game: GameController = new GameController(room);
-  room_id = room.getUuid()
+ // const room: RoomModel = new RoomModel();
+  // const room_controller: RoomController = new RoomController(room);
+  // const game: GameController = new GameController(room.game);
+  // room_id = room_controller.getUuid()
 
-  const user_1: User = new User("Arkk92");
-  const user_2: User = new User("Ojka");
+  // const user_1: UserModel = new UserModel();
+  // const user_2: UserModel = new UserModel();
+  // user_1.name = "Arkk92";
+  // user_2.name = "Ojka";
 
-  room.addUser(user_1);
-  room.addUser(user_2);
+  // room_controller.addUser(user_1);
+  // room_controller.addUser(user_2);
 
-  await game.gameStart();
+  // await room_controller.gameStart();
 
-  return res.send(room);
+  return res.send('room');
 });
 
 /** Debugging purposes: Display the entire room */
 app.get('/display_room', async (_req: Request, res: Response) => {
   
-  const room: Room = new Room(GameType.TwoPlayersGame); // Overrided since a Room is going to be loaded
-  const game: GameController = new GameController(room);
-  await game.loadRoom(room_id);
+  // const room: RoomModel = new RoomModel()
+  // const room_controller: RoomController = new RoomController(room)
+  // await room_controller.loadRoomById(room_id);
 
-  return res.send(room);
+  return res.send('room');
 });
 
 app.get('/add', async (_req: Request, res: Response) => {
@@ -76,21 +80,21 @@ app.get('/add', async (_req: Request, res: Response) => {
 });
 
 app.get('/get', async (_req: Request, res: Response) => {
-  const gameController = new GameController();
+  // const gameController = new GameController();
 
-  // let roomId: string = await gameController.createRoom();
-  // let rooma = await gameController.loadRoom(roomId);
-  // let room = Object.assign(new Room(), rooma)
-  // gameController.addUser(room, 'oscar')
-  // await gameController.gameStart(room);
-  let room: Room = new Room();
-  room.addUser(new User("oscar"))
-  room.addUser(new User("pep"))
-  room.gameStart()
+  // // let roomId: string = await gameController.createRoom();
+  // // let rooma = await gameController.loadRoom(roomId);
+  // // let room = Object.assign(new Room(), rooma)
+  // // gameController.addUser(room, 'oscar')
+  // // await gameController.gameStart(room);
+  // let room: Room = new Room();
+  // room.addUser(new User("oscar"))
+  // room.addUser(new User("pep"))
+  // room.gameStart()
 
-  console.log( room)
+  // console.log( room)
   
-  return res.send( room);
+  return res.send( 'room');
 });
 
 if (process.env.ENV != 'development') RedisSingleton.getInstance().connect()

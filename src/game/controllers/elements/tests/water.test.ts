@@ -1,153 +1,168 @@
-import Grid, { Position } from "../../grid"
-import { Sage } from "../../pieces"
-import { Earth } from "../earth"
-import { Fire } from "../fire"
-import { Water } from "../water"
-import { Wind } from "../wind"
+import { EarthModel } from "@/game/models/elements/earth";
+import { FireModel } from "@/game/models/elements/fire";
+import { WaterModel } from "@/game/models/elements/water";
+import { WindModel } from "@/game/models/elements/wind";
+import { GridModel } from "@/game/models/grid";
+import { SageModel } from "@/game/models/pieces/sage";
+import { Position } from "@/game/utils/position_utils";
+import GridController from "../../grid_controller";
+import { SageController } from "../../pieces/sage_controller";
+import { EarthController } from "../earth_controller";
+import { WaterController } from "../water_controller";
 
-describe('Water: ruleOfReplacement', () => {
+
+describe('WaterController: ruleOfReplacement', () => {
     let result;
     it('Rule of replacement: Should return true if replaces Fire', async () => {
-        const water = new Water()
-        result = water.ruleOfReplacement(new Fire())
+        const water = new WaterModel()
+        result = new WaterController(water).ruleOfReplacement(new FireModel())
 
         expect(result).toBe(true)
     })
 
     it('Rule of replacement: Should return false if replaces anything else', async () => {
-        const water = new Water()
-        result = water.ruleOfReplacement(new Earth())
+        const water = new WaterModel()
+        result = new WaterController(water).ruleOfReplacement(new EarthModel())
         expect(result).toBe(false)
-        result = water.ruleOfReplacement(new Wind())
+        result = new WaterController(water).ruleOfReplacement(new WindModel())
         expect(result).toBe(false)
-        result = water.ruleOfReplacement(new Water())
+        result = new WaterController(water).ruleOfReplacement(new WaterModel())
         expect(result).toBe(false)
-    
+
     })
 
 })
 
-describe('Water: reaction', () => {
+describe('WaterController: reaction', () => {
     it('reaction: Should return nothing if no river is formed', async () => {
-        const grid: Grid = new Grid(10, 8);
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
+
         const placed_water_pos: Position = {
             row: 3, column: 5
         }
 
         // Place water
-        const placed_water: Water = new Water();
-        placed_water.place(grid, placed_water_pos);
+        const placed_water: WaterModel = new WaterModel();
+        new WaterController(placed_water).place(grid, placed_water_pos);
 
         // Perform water reaction
-        const result = placed_water.reaction(grid, placed_water_pos);
+        const result = new WaterController(placed_water).reaction(grid, placed_water_pos);
         expect(result == null).toBe(true);
     })
 
     it('reaction: Should throw error if placed water forms a river but no rivers are passed', async () => {
-        
-        const grid: Grid = new Grid(10, 8);
+
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
         const water_pos_list: Array<Position> = [
-            {row: 3, column: 4}, 
+            { row: 3, column: 4 },
         ]
         const placed_water_pos: Position = {
             row: 3, column: 5
         }
         const new_water_sequence: Array<Position> = [
-            {row: 3, column: 6},
-            {row: 3, column: 7}
+            { row: 3, column: 6 },
+            { row: 3, column: 7 }
         ]
 
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
-            const water: Water = new Water();
-            water.place(grid, water_pos);
+            const water: WaterModel = new WaterModel();
+            new WaterController(water).place(grid, water_pos);
         })
 
         // Place water
-        const placed_water: Water = new Water();
-        placed_water.place(grid, placed_water_pos);
+        const placed_water: WaterModel = new WaterModel();
+        new WaterController(placed_water).place(grid, placed_water_pos);
 
         // Perform water reaction tests
         expect(() => {
-            placed_water.reaction(grid, placed_water_pos, [], new_water_sequence);
+            new WaterController(placed_water).reaction(grid, placed_water_pos, [], new_water_sequence);
         }).toThrow("Water reaction requires an old river array with at least 1 position. Got undefined or 0");
 
         expect(() => {
-            placed_water.reaction(grid, placed_water_pos, undefined, new_water_sequence);
+            new WaterController(placed_water).reaction(grid, placed_water_pos, undefined, new_water_sequence);
         }).toThrow("Water reaction requires an old river array with at least 1 position. Got undefined or 0");
 
         expect(() => {
-            placed_water.reaction(grid, placed_water_pos, water_pos_list);
+            new WaterController(placed_water).reaction(grid, placed_water_pos, water_pos_list);
         }).toThrow("Water reaction requires a new river array with at least 1 position. Got undefined or 0");
 
         expect(() => {
-            placed_water.reaction(grid, placed_water_pos, water_pos_list, []);
+            new WaterController(placed_water).reaction(grid, placed_water_pos, water_pos_list, []);
         }).toThrow("Water reaction requires a new river array with at least 1 position. Got undefined or 0");
-        
+
     })
 
     it('reaction: Should throw error if current river length + placed water is different than new river length', async () => {
-        
-        const grid: Grid = new Grid(10, 8);
+
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
         const water_pos_list: Array<Position> = [
-            {row: 3, column: 4}, 
+            { row: 3, column: 4 },
         ]
         const placed_water_pos: Position = {
             row: 3, column: 5
         }
         const new_water_sequence: Array<Position> = [
-            {row: 3, column: 6},
+            { row: 3, column: 6 },
         ]
 
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
-            const water: Water = new Water();
-            water.place(grid, water_pos);
+            const water: WaterModel = new WaterModel();
+            new WaterController(water).place(grid, water_pos);
         })
 
         // Place water
-        const placed_water: Water = new Water();
-        placed_water.place(grid, placed_water_pos);
+        const placed_water: WaterModel = new WaterModel();
+        new WaterController(placed_water).place(grid, placed_water_pos);
 
         // Perform water reaction tests
         expect(() => {
-            placed_water.reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
+            new WaterController(placed_water).reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
         }).toThrow("New river must have the old river length + 1");
     })
 
     it('reaction: Should throw error if river heads are not orthogonal to placed water', async () => {
-        
-        const grid: Grid = new Grid(10, 8);
+
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
         const water_pos_list: Array<Position> = [
-            {row: 3, column: 4},
-            {row: 3, column: 3}, 
+            { row: 3, column: 4 },
+            { row: 3, column: 3 },
         ]
         const placed_water_pos: Position = {
             row: 3, column: 5
         }
         const new_water_sequence: Array<Position> = [
-            {row: 3, column: 6},
-            {row: 3, column: 7},
-            {row: 3, column: 8},
+            { row: 3, column: 6 },
+            { row: 3, column: 7 },
+            { row: 3, column: 8 },
         ]
 
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
-            const water: Water = new Water();
-            water.place(grid, water_pos);
+            const water: WaterModel = new WaterModel();
+            new WaterController(water).place(grid, water_pos);
         })
 
         // Place water
-        const placed_water: Water = new Water();
-        placed_water.place(grid, placed_water_pos);
+        const placed_water: WaterModel = new WaterModel();
+        new WaterController(placed_water).place(grid, placed_water_pos);
 
         // Perform water reaction tests
         expect(() => {
-            placed_water.reaction(grid, placed_water_pos, JSON.parse(JSON.stringify(water_pos_list)).reverse(), new_water_sequence);
+            new WaterController(placed_water).reaction(grid, placed_water_pos, JSON.parse(JSON.stringify(water_pos_list)).reverse(), new_water_sequence);
         }).toThrow("River is illegal. Heads of the rivers must be opposite to the new water piece position");
 
         expect(() => {
-            placed_water.reaction(grid, placed_water_pos, water_pos_list, JSON.parse(JSON.stringify(new_water_sequence)).reverse());
+            new WaterController(placed_water).reaction(grid, placed_water_pos, water_pos_list, JSON.parse(JSON.stringify(new_water_sequence)).reverse());
         }).toThrow("River is illegal. Heads of the rivers must be opposite to the new water piece position");
     })
 
@@ -178,43 +193,46 @@ describe('Water: reaction', () => {
         7  |   |   |   |   |   |   |   |   |   |   |        7  |   |   |   |   |   |   |   |   |   |   |
             -----------------------------------------           -----------------------------------------
         */
-        const grid: Grid = new Grid(9, 8);
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
+
         const water_pos_list: Array<Position> = [
-            {row: 3, column: 4}, 
-            {row: 3, column: 3}
+            { row: 3, column: 4 },
+            { row: 3, column: 3 }
         ]
         const placed_water_pos: Position = {
             row: 3, column: 5
         }
         const new_water_sequence: Array<Position> = [
-            {row: 3, column: 6},
-            {row: 3, column: 7},
-            {row: 3, column: 8}
+            { row: 3, column: 6 },
+            { row: 3, column: 7 },
+            { row: 3, column: 8 }
         ]
 
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
-            const water: Water = new Water();
-            water.place(grid, water_pos);
-            
+            const water: WaterModel = new WaterModel();
+            new WaterController(water).place(grid, water_pos);
+
         })
 
-        const earth: Earth = new Earth();
-        earth.place(grid, water_pos_list[1]);
-        
+        const earth: EarthModel = new EarthModel();
+        new EarthController(earth).place(grid, water_pos_list[1]);
+
 
         // Place water
-        const placed_water: Water = new Water();
-        placed_water.place(grid, placed_water_pos);
-        
+        const placed_water: WaterModel = new WaterModel();
+        new WaterController(placed_water).place(grid, placed_water_pos);
+
 
         // Perform water reaction
         expect(() => {
-            placed_water.reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
+            new WaterController(placed_water).reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
         }).toThrow("River data provided is invalid")
 
     })
-    
+
     it('reaction: Should move river horizontally to placed water', async () => {
         /* 
             PW: Placed Water
@@ -241,41 +259,43 @@ describe('Water: reaction', () => {
         7  |   |   |   |   |   |   |   |   |   |   |        7  |   |   |   |   |   |   |   |   |   |   |
             -----------------------------------------           -----------------------------------------
         */
-        const grid: Grid = new Grid(10, 8);
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
         const water_pos_list: Array<Position> = [
-            {row: 3, column: 4}, 
+            { row: 3, column: 4 },
         ]
         const placed_water_pos: Position = {
             row: 3, column: 5
         }
         const new_water_sequence: Array<Position> = [
-            {row: 3, column: 6},
-            {row: 3, column: 7}
+            { row: 3, column: 6 },
+            { row: 3, column: 7 }
         ]
 
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
-            const water: Water = new Water();
-            water.place(grid, water_pos);
-            
+            const water: WaterModel = new WaterModel();
+            new WaterController(water).place(grid, water_pos);
+
         })
 
         // Place water
-        const placed_water: Water = new Water();
-        placed_water.place(grid, placed_water_pos);
-        
+        const placed_water: WaterModel = new WaterModel();
+        new WaterController(placed_water).place(grid, placed_water_pos);
+
 
         // Perform water reaction
-        placed_water.reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
+        new WaterController(placed_water).reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
 
-        for (let pos of new_water_sequence){
-            expect(grid.isWaterCell(pos)).toBe(true);
+        for (let pos of new_water_sequence) {
+            expect(grid_controller.isWaterCell(pos)).toBe(true);
         }
 
-        for (let pos of water_pos_list){
-            expect(grid.isWaterCell(pos)).toBe(false);
+        for (let pos of water_pos_list) {
+            expect(grid_controller.isWaterCell(pos)).toBe(false);
         }
-        expect(grid.isWaterCell(placed_water_pos)).toBe(false);
+        expect(grid_controller.isWaterCell(placed_water_pos)).toBe(false);
 
     })
 
@@ -305,43 +325,45 @@ describe('Water: reaction', () => {
         7  |   |   |   |   |   |   |   |   |   |   |        7  |   |   |   |   | NW|   |   |   |   |   |
             -----------------------------------------           -----------------------------------------
         */
-        const grid: Grid = new Grid(10, 8);
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
         const water_pos_list: Array<Position> = [
-            {row: 3, column: 4},
-            {row: 2, column: 4},
+            { row: 3, column: 4 },
+            { row: 2, column: 4 },
         ]
         const placed_water_pos: Position = {
             row: 4, column: 4
         }
         const new_water_sequence: Array<Position> = [
-            {row: 5, column: 4},
-            {row: 6, column: 4},
-            {row: 7, column: 4}
+            { row: 5, column: 4 },
+            { row: 6, column: 4 },
+            { row: 7, column: 4 }
         ]
 
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
-            const water: Water = new Water();
-            water.place(grid, water_pos);
-            
+            const water: WaterModel = new WaterModel();
+            new WaterController(water).place(grid, water_pos);
+
         })
 
         // Place water
-        const placed_water: Water = new Water();
-        placed_water.place(grid, placed_water_pos);
-        
+        const placed_water: WaterModel = new WaterModel();
+        new WaterController(placed_water).place(grid, placed_water_pos);
+
 
         // Perform water reaction
-        placed_water.reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
+        new WaterController(placed_water).reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
 
-        for (let pos of new_water_sequence){
-            expect(grid.isWaterCell(pos)).toBe(true);
+        for (let pos of new_water_sequence) {
+            expect(grid_controller.isWaterCell(pos)).toBe(true);
         }
 
-        for (let pos of water_pos_list){
-            expect(grid.isWaterCell(pos)).toBe(false);
+        for (let pos of water_pos_list) {
+            expect(grid_controller.isWaterCell(pos)).toBe(false);
         }
-        expect(grid.isWaterCell(placed_water_pos)).toBe(false);
+        expect(grid_controller.isWaterCell(placed_water_pos)).toBe(false);
 
     })
 
@@ -371,51 +393,53 @@ describe('Water: reaction', () => {
         7  |   |   |   |   | PW|   |   |   |   |   |        7  |   |   |   |   |   | NW| NW|   |   |   |
             -----------------------------------------           -----------------------------------------
         */
-        const grid: Grid = new Grid(10, 8);
-        
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
+
         const placed_water_pos: Position = {
             row: 7, column: 4
         }
         const water_pos_list: Array<Position> = [
-            {row: 6, column: 4},
-            {row: 5, column: 4},
-            {row: 4, column: 4},
-            {row: 3, column: 4},
-            {row: 2, column: 4},
+            { row: 6, column: 4 },
+            { row: 5, column: 4 },
+            { row: 4, column: 4 },
+            { row: 3, column: 4 },
+            { row: 2, column: 4 },
         ]
-        
+
         const new_water_sequence: Array<Position> = [
-            {row: 7, column: 5},
-            {row: 7, column: 6},
-            {row: 6, column: 6},
-            {row: 5, column: 6},
-            {row: 5, column: 5},
-            {row: 4, column: 5},
+            { row: 7, column: 5 },
+            { row: 7, column: 6 },
+            { row: 6, column: 6 },
+            { row: 5, column: 6 },
+            { row: 5, column: 5 },
+            { row: 4, column: 5 },
         ]
 
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
-            const water: Water = new Water();
-            water.place(grid, water_pos);
-            
+            const water: WaterModel = new WaterModel();
+            new WaterController(water).place(grid, water_pos);
+
         })
 
         // Place water
-        const placed_water: Water = new Water();
-        placed_water.place(grid, placed_water_pos);
-        
+        const placed_water: WaterModel = new WaterModel();
+        new WaterController(placed_water).place(grid, placed_water_pos);
+
 
         // Perform water reaction
-        placed_water.reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
+        new WaterController(placed_water).reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
 
-        for (let pos of new_water_sequence){
-            expect(grid.isWaterCell(pos)).toBe(true);
+        for (let pos of new_water_sequence) {
+            expect(grid_controller.isWaterCell(pos)).toBe(true);
         }
 
-        for (let pos of water_pos_list){
-            expect(grid.isWaterCell(pos)).toBe(false);
+        for (let pos of water_pos_list) {
+            expect(grid_controller.isWaterCell(pos)).toBe(false);
         }
-        expect(grid.isWaterCell(placed_water_pos)).toBe(false);
+        expect(grid_controller.isWaterCell(placed_water_pos)).toBe(false);
 
     })
 
@@ -446,63 +470,65 @@ describe('Water: reaction', () => {
         7  |   |   |   |   | PW| F |   |   |   |   |        7  |   |   |   |   |   | NW| NW|   |   |   |
             -----------------------------------------           -----------------------------------------
         */
-        const grid: Grid = new Grid(10, 8);
-        
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
+
         const placed_water_pos: Position = {
             row: 7, column: 4
         }
         const water_pos_list: Array<Position> = [
-            {row: 6, column: 4},
-            {row: 5, column: 4},
-            {row: 4, column: 4},
-            {row: 3, column: 4},
-            {row: 2, column: 4},
+            { row: 6, column: 4 },
+            { row: 5, column: 4 },
+            { row: 4, column: 4 },
+            { row: 3, column: 4 },
+            { row: 2, column: 4 },
         ]
-        
+
         const new_water_sequence: Array<Position> = [
-            {row: 7, column: 5},
-            {row: 7, column: 6},
-            {row: 6, column: 6},
-            {row: 5, column: 6},
-            {row: 5, column: 5},
-            {row: 4, column: 5},
+            { row: 7, column: 5 },
+            { row: 7, column: 6 },
+            { row: 6, column: 6 },
+            { row: 5, column: 6 },
+            { row: 5, column: 5 },
+            { row: 4, column: 5 },
         ]
 
         const fire_pos_list: Array<Position> = [
-            {row: 7, column: 5},
-            {row: 6, column: 6},
-            {row: 5, column: 5},
-            {row: 4, column: 5},
+            { row: 7, column: 5 },
+            { row: 6, column: 6 },
+            { row: 5, column: 5 },
+            { row: 4, column: 5 },
         ]
 
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
-            const water: Water = new Water();
-            water.place(grid, water_pos);
-            
+            const water: WaterModel = new WaterModel();
+            new WaterController(water).place(grid, water_pos);
+
         })
 
         fire_pos_list.forEach((fire_pos) => {
-            const fire: Fire = new Fire();
-            fire.place(grid, fire_pos);
+            const fire: FireModel = new FireModel();
+            new WaterController(fire).place(grid, fire_pos);
         })
 
         // Place water
-        const placed_water: Water = new Water();
-        placed_water.place(grid, placed_water_pos);
-        
+        const placed_water: WaterModel = new WaterModel();
+        new WaterController(placed_water).place(grid, placed_water_pos);
+
 
         // Perform water reaction
-        placed_water.reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
+        new WaterController(placed_water).reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
 
-        for (let pos of new_water_sequence){
-            expect(grid.isWaterCell(pos)).toBe(true);
+        for (let pos of new_water_sequence) {
+            expect(grid_controller.isWaterCell(pos)).toBe(true);
         }
 
-        for (let pos of water_pos_list){
-            expect(grid.isWaterCell(pos)).toBe(false);
+        for (let pos of water_pos_list) {
+            expect(grid_controller.isWaterCell(pos)).toBe(false);
         }
-        expect(grid.isWaterCell(placed_water_pos)).toBe(false);
+        expect(grid_controller.isWaterCell(placed_water_pos)).toBe(false);
 
     })
 
@@ -533,26 +559,28 @@ describe('Water: reaction', () => {
         7  |   |   |   |   | PW|   | X |   |   |   |        7  |   |   |   |   |   | NW| X |   |   |   | <-- Wrong!
             -----------------------------------------           -----------------------------------------
         */
-        const grid: Grid = new Grid(10, 8);
-        
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
+
         const placed_water_pos: Position = {
             row: 7, column: 4
         }
         const water_pos_list: Array<Position> = [
-            {row: 6, column: 4},
-            {row: 5, column: 4},
-            {row: 4, column: 4},
-            {row: 3, column: 4},
-            {row: 2, column: 4},
+            { row: 6, column: 4 },
+            { row: 5, column: 4 },
+            { row: 4, column: 4 },
+            { row: 3, column: 4 },
+            { row: 2, column: 4 },
         ]
-        
+
         const new_water_sequence: Array<Position> = [
-            {row: 7, column: 5},
-            {row: 7, column: 6},
-            {row: 6, column: 6},
-            {row: 5, column: 6},
-            {row: 5, column: 5},
-            {row: 4, column: 5},
+            { row: 7, column: 5 },
+            { row: 7, column: 6 },
+            { row: 6, column: 6 },
+            { row: 5, column: 6 },
+            { row: 5, column: 5 },
+            { row: 4, column: 5 },
         ]
 
         const other_element_pos: Position = {
@@ -561,62 +589,62 @@ describe('Water: reaction', () => {
 
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
-            const water: Water = new Water();
-            water.place(grid, water_pos);
-            
+            const water: WaterModel = new WaterModel();
+            new WaterController(water).place(grid, water_pos);
+
         })
 
         // Place water
-        const placed_water: Water = new Water();
-        placed_water.place(grid, placed_water_pos);
-        
+        const placed_water: WaterModel = new WaterModel();
+        new WaterController(placed_water).place(grid, placed_water_pos);
+
 
         /* 
         TEST WITH other element: Earth
         */
-        const earth: Earth = new Earth();
-        earth.place(grid, other_element_pos);
-         
+        const earth: EarthModel = new EarthModel();
+        new WaterController(earth).place(grid, other_element_pos);
+
 
         expect(() => {
-            placed_water.reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
+            new WaterController(placed_water).reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
         }).toThrow("New river data provided is invalid");
 
         /* 
         TEST WITH other element: Water
         */
-        const water: Water = new Water();
-        water.place(grid, other_element_pos);
-         
+        const water: WaterModel = new WaterModel();
+        new WaterController(water).place(grid, other_element_pos);
+
 
         expect(() => {
-            placed_water.reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
+            new WaterController(placed_water).reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
         }).toThrow("New river data provided is invalid");
 
         /* 
         TEST WITH other element: Wind
         */
-        const wind: Wind = new Wind();
-        wind.place(grid, other_element_pos);
-         
+        const wind: WindModel = new WindModel();
+        new WaterController(wind).place(grid, other_element_pos);
+
 
         expect(() => {
-            placed_water.reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
+            new WaterController(placed_water).reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
         }).toThrow("New river data provided is invalid");
 
         /* 
         TEST WITH other element: Sage
         */
-        const sage: Sage = new Sage();
-        sage.updatePosition(other_element_pos);
-        grid.updateGridCell(sage);
-         
+        const sage: SageModel = new SageModel();
+        new SageController(sage).updatePosition(other_element_pos);
+        grid_controller.updateGridCell(sage);
+
 
         expect(() => {
-            placed_water.reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
+            new WaterController(placed_water).reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
         }).toThrow("New river data provided is invalid");
 
-        
+
 
     })
 
@@ -646,35 +674,37 @@ describe('Water: reaction', () => {
         7  |   |   |   |   |   |   |   |   |   |   |        7  |   |   |   |   |   |   |   |   |   |   |
             -----------------------------------------           -----------------------------------------
         */
-        const grid: Grid = new Grid(10, 8);
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
         const water_pos_list: Array<Position> = [
-            {row: 3, column: 9},
-            {row: 2, column: 9},
+            { row: 3, column: 9 },
+            { row: 2, column: 9 },
         ]
         const placed_water_pos: Position = {
             row: 4, column: 9
         }
         const new_water_sequence: Array<Position> = [
-            {row: 5, column: 9},
-            {row: 6, column: 9},
-            {row: 6, column: 10}
+            { row: 5, column: 9 },
+            { row: 6, column: 9 },
+            { row: 6, column: 10 }
         ]
 
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
-            const water: Water = new Water();
-            water.place(grid, water_pos);
-            
+            const water: WaterModel = new WaterModel();
+            new WaterController(water).place(grid, water_pos);
+
         })
 
         // Place water
-        const placed_water: Water = new Water();
-        placed_water.place(grid, placed_water_pos);
-        
+        const placed_water: WaterModel = new WaterModel();
+        new WaterController(placed_water).place(grid, placed_water_pos);
+
 
         // Perform water reaction
-        expect( () => {
-            placed_water.reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
+        expect(() => {
+            new WaterController(placed_water).reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
         }).toThrow("New river data provided is invalid");
 
     })
@@ -705,45 +735,46 @@ describe('Water: reaction', () => {
         7  |   |   |   |   |   |   |   |   |   |   |        7  |   |   |   |   |   |   |   |   |   |   |
             -----------------------------------------           -----------------------------------------
         */
-        const grid: Grid = new Grid(10, 8);
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
         const water_pos_list: Array<Position> = [
-            {row: 3, column: 9},
-            {row: 1, column: 9},
+            { row: 3, column: 9 },
+            { row: 1, column: 9 },
         ]
         const placed_water_pos: Position = {
             row: 4, column: 9
         }
         const new_water_sequence: Array<Position> = [
-            {row: 4, column: 8},
-            {row: 4, column: 7},
-            {row: 4, column: 5}
+            { row: 4, column: 8 },
+            { row: 4, column: 7 },
+            { row: 4, column: 5 }
         ]
 
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
-            const water: Water = new Water();
-            water.place(grid, water_pos);
-            
+            const water: WaterModel = new WaterModel();
+            new WaterController(water).place(grid, water_pos);
+
         })
 
         // Place water
-        const placed_water: Water = new Water();
-        placed_water.place(grid, placed_water_pos);
-        
+        const placed_water: WaterModel = new WaterModel();
+        new WaterController(placed_water).place(grid, placed_water_pos);
+
 
         // Perform water reaction
-        expect( () => {
-            placed_water.reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
+        expect(() => {
+            new WaterController(placed_water).reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
         }).toThrow("New river data provided is invalid");
 
         // Fix new river
         new_water_sequence[2].column = 6;
 
-        expect( () => {
-            placed_water.reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
+        expect(() => {
+            new WaterController(placed_water).reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
         }).toThrow("River data provided is invalid");
 
     })
 
 })
-  

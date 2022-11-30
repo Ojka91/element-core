@@ -1,68 +1,38 @@
 import { ElementTypes } from "./elements/elements";
+import { Mapper } from "../utils/mapper";
 
-enum TurnStates {
-    DrawingElements,
-    MovesAvailables,
-    EndTurn
+export enum TurnStates {
+    DrawingElements = 1,
+    MovesAvailables = 2,
+    EndTurn = 3
 }
 
-const MAX_ALLOWED_ELEMENTS: number = 3;
-const MIN_SAGE_MOVEMENTS: number = 2;
+export interface ITurnModel {
+    chosen_elements: Array<ElementTypes>;
+    available_sage_moves: number;
+    state: TurnStates;
+    player: number;
+}
 
-export class Turn {
+export class TurnModel implements ITurnModel {
 
-    static MAX_ALLOWED_ELEMENTS: number = MAX_ALLOWED_ELEMENTS;
-    static MIN_SAGE_MOVEMENTS: number = MIN_SAGE_MOVEMENTS;
+    chosen_elements: Array<ElementTypes> = [];
+    available_sage_moves: number = 0;
+    state: TurnStates = TurnStates.DrawingElements;
+    player: number = 0; // Overrided later
 
-    private chosen_elements: Array<ElementTypes> = [];
-    private available_sage_moves: number = MIN_SAGE_MOVEMENTS;
-    private state: TurnStates = TurnStates.DrawingElements;
-    private player: number = 0; // Overrided later
-
-    constructor(player_number: number){
+    constructor(player_number: number) {
         this.player = player_number;
     }
+}
 
-    public isEndOfTurn(): boolean {
-        return this.state == TurnStates.EndTurn;
+export class TurnModelMap extends Mapper {
+    public toDomain(raw: any): ITurnModel {
+        const turn: TurnModel = new TurnModel(0);
+        turn.state = raw.state;
+        turn.player = raw.player;
+        turn.available_sage_moves = raw.available_sage_moves;
+        turn.chosen_elements = raw.chosen_elements;
+        return turn;
     }
-
-    public isDrawingElementsAllowed(): boolean {
-        return this.state == TurnStates.DrawingElements;
-    }
-
-    public isMovingSageAllowed(): boolean {
-        return this.state == TurnStates.MovesAvailables && this.available_sage_moves > 0;
-    }
-
-    public isPlaceElementAllowed(): boolean {
-        return this.state == TurnStates.MovesAvailables && this.chosen_elements.length > 0;
-    }
-
-    public setDrawnElements(elements: Array<ElementTypes>): void {
-        this.chosen_elements = elements;
-        this.available_sage_moves = MIN_SAGE_MOVEMENTS + MAX_ALLOWED_ELEMENTS - elements.length;
-        this.state =TurnStates.MovesAvailables;
-    }
-
-    public getRemainingElements(): Array<ElementTypes> {
-        return this.chosen_elements;
-    }
-
-    public removeElementFromList(element: ElementTypes): boolean {
-        const removed: boolean = this.chosen_elements.splice(this.chosen_elements.indexOf(element), 1).length == 1;
-        this.endOfTurnCheck();
-        return removed;
-    }
-
-    private endOfTurnCheck(): void {
-        if(this.chosen_elements.length == 0 && this.available_sage_moves == 0){
-            this.state = TurnStates.EndTurn;
-        }
-    }
-
-    public getPlayer() : number {
-        return this.player;
-    }
-
 }

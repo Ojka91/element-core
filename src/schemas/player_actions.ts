@@ -1,3 +1,6 @@
+import { ElementTypes } from "@/game/models/elements/elements";
+import { Position } from "@/game/utils/position_utils";
+
 enum Events {
     Piece = "Piece",
     EndTurn = "EndTurn"
@@ -11,30 +14,17 @@ enum Pieces {
     Wind = "Wind"
 }
 
-enum Elements {
-    Sage = "Sage",
-    Water = "Water",
-    Fire = "Fire",
-    Earth = "Earth",
-    Wind = "Wind"
-}
-
-type Position = {
-    row: number;
-    column: number;
-}
-
 type River = Array<Position>
 
 export abstract class Reaction {
 }
 
 export class WaterReaction extends Reaction {
-    
+
     initial_river: River;;
     new_river: River;
 
-    constructor(initial_river: River, new_river: River){
+    constructor(initial_river: River, new_river: River) {
         super();
         this.initial_river = initial_river;
         this.new_river = new_river;
@@ -62,9 +52,9 @@ export type PlacePieceSchema = MessageHeader & {
 }
 
 export type StartOfTurnSchema = MessageHeader & {
-    requested_pieces: Array<Elements>;
+    requested_pieces: Array<ElementTypes>;
 }
 
 export type EndOfTurnSchema = MessageHeader & {
-    
+
 }

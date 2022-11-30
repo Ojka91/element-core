@@ -1,8 +1,4 @@
-import { Position } from "../grid";
-import { PositionUtils } from "../position_utils";
-
-
-
+import { PositionUtils, Position } from "../position_utils";
 
 describe('PositionUtils', () => {
     it('isSamePosition: should return true if positions are equal ', async () => {

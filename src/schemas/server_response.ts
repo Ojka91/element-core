@@ -1,4 +1,4 @@
-import Board from '@/game/models/board'
+import { IBoardModel } from '@/game/models/board'
 
 enum PrivateServerResponseStatus {
     ERROR = "ERROR",
@@ -12,10 +12,10 @@ type MessageHeader = {
 export type PrivateServerResponse = MessageHeader & {
     status: PrivateServerResponse;
     message: string | null;
-    board: Board;
+    board: IBoardModel;
 }
 
 export type PublicServerResponse = MessageHeader & {
-    board: Board;
+    board: IBoardModel;
     player_turn_uuid: string;
 }

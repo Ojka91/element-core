@@ -1,132 +1,34 @@
-import { Grid, Position } from "./grid";
-import { Element, ElementTypes } from "./elements/elements";
-import ElementPoolManager from "./element_pool_manager";
-import Player from "./player";
-import { MovementManager } from "./movement_manager";
-import { Piece, Sage } from "./pieces";
-import { ElementPieceCreator, SagePieceCreator } from "./pieces_factory";
-import { GameType } from "./game_utils";
-import { Water } from "./elements/water";
-import { Fire } from "./elements/fire";
-import { Reaction, WaterReaction } from "@/schemas/player_actions";
-import { PositionUtils } from "./position_utils";
-import { Wind } from "./elements/wind";
+import { GridModel, GridModelMap} from "./grid";
+import { ElementPoolManagerModel, ElementPoolManagerModelMap } from "./element_pool";
+import { SageModel, SageModelMap } from "./pieces/sage";
+
+import { Mapper } from "../utils/mapper";
 
 const COLUMN_PIECES_WIDTH: number = 11;
 const ROW_PIECES_HEIGHT: number = 11;
 
-class Board {
-
-    private grid: Grid = new Grid(ROW_PIECES_HEIGHT, COLUMN_PIECES_WIDTH);
-    private sage_list: Array<Sage> = [];
-    public elementPool: ElementPoolManager = new ElementPoolManager();
-
-
-    public returnElementToPool(element: ElementTypes): void {
-        this.elementPool.addElement(element);
-    }
-
-    public getElementFromPool(element: ElementTypes): void {
-        this.elementPool.removeElement(element);
-    }
-
-    /** Method to check whether the requested elements can be taken or not */
-    public checkElementPoolAvailability(elements: Array<ElementTypes>): boolean {
-        return this.elementPool.checkElementListAvailability(elements);
-    }
-
-    /** Grid getter */
-    public getGrid(): Grid {
-        return this.grid;
-    }
-
-    /** Method to create the sages for the players */
-    public createSageByPlayerAndGameType(player: Player, game_type: GameType): void {
-        const sage: Sage = new SagePieceCreator().createPiece() as Sage;
-        sage.updatePosition(Sage.initial_position_map.get(game_type)!.get(player.getPlayerNumber())!)
-        player.setSage(sage);
-        this.grid.updateGridCell(player.getSage());
-        this.sage_list.push(sage);
-    }
-
-    /** Method to place the player sage in the board */
-    public placePlayerSage(player: Player, new_position: Position): void {
-        let sage = player.getSage();
-        if (this.grid.isPositionValid(new_position) == false){
-            throw new Error("Incorrect new row or new column dimensions");
-        }
-        if(MovementManager.isSageMoveValid(this.grid, sage.position, new_position) == false){
-            throw new Error("Sage movement is not valid");
-        }
-        sage.updatePosition(new_position);
-        this.grid.updateGridCell(sage);
-    }
-
-    /** Method to place an element in the board */
-    public placeElement(element_type: ElementTypes, position: Position): void {
-        
-        const element: Element = new ElementPieceCreator(element_type).createPiece() as Element
-
-        if (this.grid.isPositionValid(position) == false){
-            throw new Error("Invalid position, outside grid boundaries");
-        }
-        
-
-        element.updatePosition(position);
-        
-        if(element.place(this.grid, position) == false){
-            throw new Error("Cannot replace the cell due to a rule of replacement")
-        }
-    }
-
-    public performElementReaction(element_type: ElementTypes, position: Position, reaction?: Reaction): void {
-        const element: Element = new ElementPieceCreator(element_type).createPiece() as Element
-        switch(element_type){
-            case ElementTypes.Water:
-                if(reaction instanceof WaterReaction){
-                    const water_reaction: WaterReaction = reaction as WaterReaction
-                    (element as Water).reaction(this.grid, position, water_reaction.initial_river, water_reaction.new_river);
-                }else{
-                    (element as Water).reaction(this.grid, position);    
-                }
-                break;
-            case ElementTypes.Fire:
-                (element as Fire).reaction(this.grid, position, this.elementPool);
-                break;
-            default:
-                element.reaction(this.grid, position);
-                break;
-        }
-    }
-
-    public winningCondition(position: Position): string | null {
-        for(let sage of this.sage_list){
-            if(PositionUtils.isStrictPosition(sage.position, position)){
-                if(this.isSageCaptured(sage)){
-                    return sage.uuid;
-                }
-            }
-        }
-        return null;
-    }
-
-    private isSageCaptured(sage: Sage): boolean {
-        const piece_list: Array<Piece> = this.grid.getSurroundingPieces(sage.position);
-        for(let piece of piece_list){
-            if(this.grid.isWindCell(piece.position)){
-                return MovementManager.isWindBlocked(this.grid, piece.position, piece as Wind);
-            }
-            if(MovementManager.isSageMoveValid(this.grid, sage.position, piece.position)){
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public displayGrid(): void {
-        this.grid.displayGrid();
-    }
-    
+export interface IBoardModel {
+    grid: GridModel;
+    sage_list: Array<SageModel>;
+    elementPool: ElementPoolManagerModel;
 }
 
-export default Board;
+export class BoardModel {
+
+    grid: GridModel = new GridModel();
+    sage_list: Array<SageModel> = [];
+    elementPool: ElementPoolManagerModel = new ElementPoolManagerModel();
+}
+
+export class BoardModelMap extends Mapper {
+    public toDomain(raw: any): IBoardModel {
+        const board: BoardModel = new BoardModel();
+        board.grid = new GridModelMap().toDomain(raw.grid);
+        for (let sage of raw.sage_list){
+            const sage_model: SageModel = new SageModelMap().toDomain(sage);
+            board.sage_list.push(sage_model);
+        }
+        board.elementPool = new ElementPoolManagerModelMap().toDomain(raw.elementPool);
+        return board;
+    }
+}

@@ -1,97 +1,49 @@
-import { User } from "@/game/user";
-import { GameType } from "../game_utils";
-import Player from "../player";
-import Room from "../room";
+import { GameController } from "@/game/controllers/game_controller";
+import RoomController from "@/game/controllers/room_controller";
+import { ElementTypes } from "../elements/elements";
+import { RoomModel, RoomModelMap } from "../room";
+import { UserModel } from "../user";
 
 
-describe('Room', () => {
-    it('addUser: user should be added to the user list map ', async () => {
-        const room: Room = new Room(GameType.TwoPlayersGame);
-        const user: User = new User("Ark");
-        
-        const result = room.addUser(user);
-        expect(result).toBe(true);
+describe('RoomModelMap', () => {
+    it('toDomain: should return a Room model with all models mapped from a json string', async () => {
+        const room: RoomModel = new RoomModel(4);
+        const room_controller: RoomController = new RoomController(room);
 
-        expect(room.getUserList().length==0).toBe(false)
+        const user1: UserModel = new UserModel();
+        const user2: UserModel = new UserModel();
+        const user3: UserModel = new UserModel();
+        const user4: UserModel = new UserModel();
 
-        expect(room.getPlayerByUser(user) instanceof Player).toBe(true);
-    });
+        user1.name = "Test1";
+        user2.name = "Test2";
+        user3.name = "Test3";
+        user4.name = "Test4";
+        room_controller.addUser(user1);
+        room_controller.addUser(user2);
+        room_controller.addUser(user3);
+        room_controller.addUser(user4);
 
-    it('addUser: there cannot be identical users in same room ', async () => {
-        const room: Room = new Room(GameType.TwoPlayersGame);
-        const user: User = new User("Ark");
-        
-        const result = room.addUser(user);
-        expect(result).toBe(true);
-        
-        expect( () => { room.addUser(user);}).toThrow("The same user cannot be in the Room twice");
+        expect(await room_controller.gameStart()).toBe(true);
 
-    });
+        const game_controller: GameController = new GameController(room.game);
+        game_controller.drawingElements([ElementTypes.Fire, ElementTypes.Water, ElementTypes.Earth]);
+        game_controller.placeElement(ElementTypes.Fire, {row: 0, column: 0})
+        game_controller.placeElement(ElementTypes.Water, {row: 1, column: 0})
+        game_controller.placeElement(ElementTypes.Earth, {row: 2, column: 0})
+        game_controller.endOfPlayerTurn();
 
-    it('addUser: cannot add more users on a full room ', async () => {
-        const room: Room = new Room(GameType.TwoPlayersGame);
-        const user: User = new User("Ark");
-        
-        const user4: User = new User("Ark4");
-        const user1: User = new User("Ark1");
-        const user2: User = new User("Ark2");
-        const user3: User = new User("Ark3");
-        
-        room.addUser(user1);
-        room.addUser(user2);
-        room.addUser(user3);
-        room.addUser(user4);
-        const result = room.addUser(user);
-        expect(result).toBe(false);
+        game_controller.drawingElements([ElementTypes.Wind]);
+        game_controller.placeElement(ElementTypes.Wind, {row: 0, column: 3});
+        game_controller.endOfPlayerTurn();
 
-    });
+        const room_map: RoomModelMap = new RoomModelMap()
+        const stringified: string = room_map.toDao(room);
 
+        const obj: Object = JSON.parse(stringified);
 
-    it('isRoomFull: should return true if room has 4 players, false otherwise ', async () => {
-        const room: Room = new Room(GameType.TwoPlayersGame);
-        const user4: User = new User("Ark4");
-        const user1: User = new User("Ark1");
-        const user2: User = new User("Ark2");
-        const user3: User = new User("Ark3");
-        
-        room.addUser(user1);
-        expect(room.isRoomFull()).toBe(false);
-        room.addUser(user2);
-        room.addUser(user3);
-        room.addUser(user4);
+        const load_room: RoomModel = room_map.toDomain(obj);
 
-        expect(room.isRoomFull()).toBe(true);
-    });
-
-    it('getUserList: should return an array of the user added to the room ', async () => {
-        const room: Room = new Room(GameType.FourPlayersGame);
-        const user4: User = new User("Ark4");
-        const user1: User = new User("Ark1");
-        const user2: User = new User("Ark2");
-        const user3: User = new User("Ark3");
-        
-        expect(room.getUserList().length == 0).toBe(true);
-        expect(room.addUser(user1)).toBe(true);
-        expect(room.addUser(user2)).toBe(true);
-        expect(room.addUser(user3)).toBe(true);
-        expect(room.addUser(user4)).toBe(true);
-        expect(room.getUserList().length == 4).toBe(true);
-    });
-
-    it('addUser and gameStart: should not let add more user than allowed to the room and game should start ', async () => {
-        const game_type: GameType = GameType.TwoPlayersGame;
-        const room: Room = new Room(game_type);
-        const user4: User = new User("Ark4");
-        const user1: User = new User("Ark1");
-        const user2: User = new User("Ark2");
-        const user3: User = new User("Ark3");
-        
-        expect(room.gameStart()).toBe(false)
-        expect(room.addUser(user1)).toBe(true);
-        expect(room.gameStart()).toBe(false)
-        expect(room.addUser(user2)).toBe(true);
-        expect(room.gameStart()).toBe(true);
-        expect(room.addUser(user3)).toBe(false);
+        expect(load_room).toStrictEqual(room);
     });
 })
-  

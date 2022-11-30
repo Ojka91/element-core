@@ -1,84 +1,27 @@
-import Grid, { Position } from "../grid";
-import { Piece } from "../pieces";
-import { Earth } from "./earth";
-import { Element } from "./elements";
+import { Mapper } from "@/game/utils/mapper";
+import { ElementModel, ElementTypes, IElementModel } from "./elements";
 
-const MAX_STACKED_WINDS: number = 4;
+export interface IWindModel extends IElementModel {
+    stacked_winds: number;
+}
 
-/**
- * Wind class
- * @brief   Wind allows the sage to jump through the piece.
- *          Jumping thorugh Wind can be performed both diagonally and orthogonally
- *          Wind can replace Earth elements but NEVER replace Mountains.
- *          Stacking two Wind elements in the same piece will upgrade the element to Whirlwind
- */
- export class Wind extends Element{
-    private stacked_winds: number = 1;
+export class WindModel extends ElementModel implements IWindModel {
+    stacked_winds: number = 1;
 
-    constructor(){
+    constructor() {
         super();
+        this.element_type = ElementTypes.Wind;
     }
+}
 
-    // Override parent method
-    public place(grid: Grid, cell: Position): boolean {
-        const piece: Piece = grid.getGridCellByPosition(cell);
-        this.position = cell;
-        if(piece instanceof Wind){
-            if(piece.isMaxWhirlwind() == false){
-                this.stacked_winds = (piece as Wind).getNumberOfStackedWinds() + 1;
-                grid.updateGridCell(this);
-                return true;
-            } else {
-                return false;
-            }
-        }
-        if(grid.isPositionEmpty(cell) || (this.ruleOfReplacement(piece))){
-            grid.updateGridCell(this);
-            return true;
-        }
-        return false;
-    }
+export class WindModelMap extends Mapper {
+    public toDomain(raw: any): WindModel {
+        const wind: WindModel = new WindModel();
+        wind.position = raw.position;
+        wind.string_representation = raw.string_representation;
+        wind.type = raw.type;
+        wind.stacked_winds = raw.stacked_winds;
 
-    public isMaxWhirlwind(): boolean {
-        return this.stacked_winds == MAX_STACKED_WINDS;
-    }
-
-    public increaseStackedWinds(): void {
-        if(this.stacked_winds < MAX_STACKED_WINDS){
-            this.stacked_winds++;
-        }
-    }
-
-    public getNumberOfStackedWinds(): number {
-        return this.stacked_winds;
-    }
-
-    public ruleOfReplacement(piece_to_replace: Piece): boolean {
-        if(piece_to_replace instanceof Earth){
-            if(piece_to_replace.isMountain() || piece_to_replace.isRange()){
-                return false;
-            }
-            return true;
-        } else if (piece_to_replace instanceof Wind){
-            return !this.isMaxWhirlwind()
-        }
-        return false;
-    }
-
-    public reaction(grid: Grid, cell: Position): void {
-        /*const piece: Piece = grid.getGridCellByPosition(cell);
-        if(grid.isWindCell(cell)){
-            if(this.ruleOfReplacement(piece as Wind)){
-                (piece as Wind).increaseStackedWinds();
-                grid.updateGridCell(piece)
-            }
-        } else if (grid.isEarthCell(cell)){
-            if(this.ruleOfReplacement(piece as Earth)){
-                const wind: Wind = new Wind();
-                wind.updatePosition(cell);
-                grid.updateGridCell(wind);
-            }
-        }*/
-        return;
+        return wind 
     }
 }

@@ -1,9 +1,13 @@
-import { Position } from "./grid";
 
 export type AxisIncrement = {
     x: number,
     y: number
 }
+
+export type Position = {
+    row: number,
+    column: number
+};
 
 export class PositionUtils {
 
@@ -45,7 +49,7 @@ export class PositionUtils {
     ])
 
     static all_direction_increment_map: Map<string, AxisIncrement> = new Map([
-        ...this.orthogonal_increment_map.entries(), 
+        ...this.orthogonal_increment_map.entries(),
         ...this.diagonal_increment_map.entries()
     ])
 
@@ -64,7 +68,7 @@ export class PositionUtils {
         const distance_x: number = Math.abs(current_position.column - new_position.column);
         const distance_y: number = Math.abs(current_position.row - new_position.row);
 
-        if((distance_x > 1) || (distance_y > 1)){
+        if ((distance_x > 1) || (distance_y > 1)) {
             return false;
         }
         return true;
@@ -75,12 +79,12 @@ export class PositionUtils {
      */
     public static isOrthogonalPosition(current_position: Position, new_position: Position): boolean {
 
-        if(( current_position.row != new_position.row ) && (current_position.column == new_position.column)){
+        if ((current_position.row != new_position.row) && (current_position.column == new_position.column)) {
             /** Horizontally Orthogonal */
             return true;
         }
-        
-        if((current_position.column != new_position.column) && (current_position.row == new_position.row)){
+
+        if ((current_position.column != new_position.column) && (current_position.row == new_position.row)) {
             /** Vertically Orthogonal */
             return true;
         }
@@ -98,7 +102,7 @@ export class PositionUtils {
      * return: true if diagonal, false otherwise
      */
     public static isDiagonalPosition(current_position: Position, new_position: Position): boolean {
-        if((Math.abs(current_position.row - new_position.row) == 1) && (Math.abs(current_position.column - new_position.column) == 1)){
+        if ((Math.abs(current_position.row - new_position.row) == 1) && (Math.abs(current_position.column - new_position.column) == 1)) {
             /** Diagonal move */
             return true;
         }

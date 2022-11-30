@@ -1,6 +1,6 @@
-import { GameType } from "./game_utils";
-import { Position } from "./grid";
 import {v4 as uuidv4} from 'uuid';
+import { Position } from '../utils/position_utils';
+import { GameType } from './game';
 
 export abstract class Piece {
     position: Position = {
