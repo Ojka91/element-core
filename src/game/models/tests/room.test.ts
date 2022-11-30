@@ -24,7 +24,7 @@ describe('RoomModelMap', () => {
         room_controller.addUser(user3);
         room_controller.addUser(user4);
 
-        expect(room_controller.gameStart()).toBe(true);
+        expect(await room_controller.gameStart()).toBe(true);
 
         const game_controller: GameController = new GameController(room.game);
         game_controller.drawingElements([ElementTypes.Fire, ElementTypes.Water, ElementTypes.Earth]);
