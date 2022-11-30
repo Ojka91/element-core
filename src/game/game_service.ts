@@ -1,9 +1,13 @@
+import { Reaction } from "@/schemas/player_actions";
 import { PublicServerResponse } from "@/schemas/server_response";
 import { JoinQueue } from "@/socket";
 import { GameController } from "./controllers/game_controller";
 import RoomController from "./controllers/room_controller";
+import { ElementTypes } from "./models/elements/elements";
+import { IPlayerModel } from "./models/player";
 import { RoomModel } from "./models/room";
 import { UserModel } from "./models/user";
+import { Position } from "./utils/position_utils";
 
 export class GameService {
     private roomController: RoomController = new RoomController(new RoomModel(0));
@@ -52,6 +56,61 @@ export class GameService {
 
         return this.preparePublicResponse(this.roomController);
 
+    }
+
+    public async drawElements(roomId: string, elements: Array<ElementTypes>, socketId: string): Promise<PublicServerResponse> {
+        await this.roomController.loadRoomById(roomId);
+
+        this.gameController.loadGame(this.roomController.getGame())
+
+        if(!this.isPlayerTurn(socketId)) {
+            throw new Error('Its not your turn')
+        }
+
+        this.gameController.drawingElements(elements);
+
+        await this.roomController.save();
+
+        return this.preparePublicResponse(this.roomController);
+
+    }
+
+    public async placeElement(roomId: string, socketId: string, element: ElementTypes, position: Position, reaction?: Reaction): Promise<PublicServerResponse> {
+        await this.roomController.loadRoomById(roomId);
+
+        this.gameController.loadGame(this.roomController.getGame())
+
+        if(!this.isPlayerTurn(socketId)) {
+            throw new Error('Its not your turn')
+        }
+
+        this.gameController.placeElement(element, position, reaction);
+
+        await this.roomController.save();
+
+        return this.preparePublicResponse(this.roomController);
+
+    }
+
+    public async moveSage(roomId: string, socketId: string, player: IPlayerModel, position: Position): Promise<PublicServerResponse> {
+        await this.roomController.loadRoomById(roomId);
+
+        this.gameController.loadGame(this.roomController.getGame())
+
+        if(!this.isPlayerTurn(socketId)) {
+            throw new Error('Its not your turn')
+        }
+
+        this.gameController.movePlayerSage(player, position);
+
+        await this.roomController.save();
+
+        return this.preparePublicResponse(this.roomController);
+
+    }
+
+    public isPlayerTurn(socketId: string): boolean {
+       return socketId === this.gameController.getTurnPlayer().uuid
     }
 
 

@@ -4,6 +4,11 @@ import { GameService } from "./game/game_service";
 import { RoomModel } from "./game/models/room";
 import { QueueController } from "./game/queue_controller";
 import { PublicServerResponse } from "./schemas/server_response";
+import { ElementTypes } from "./game/models/elements/elements";
+import { Position } from "./game/utils/position_utils";
+import { Reaction } from "./schemas/player_actions";
+import { IPlayerModel } from "./game/models/player";
+
 interface ServerToClientEvents {
   noArg: () => void;
   basicEmit: (a: number, b: string, c: Buffer) => void;
@@ -38,6 +43,21 @@ export type JoinGame = {
 export type EndTurn = {
   roomId: string,
   room: RoomModel
+}
+export type DrawElements = {
+  roomId: string
+  elements: Array<ElementTypes>
+}
+export type PlaceElement = {
+  roomId: string
+  element: ElementTypes
+  position: Position
+  reaction?: Reaction
+}
+export type MoveSage = {
+  roomId: string
+  player: IPlayerModel
+  position: Position
 }
 
 /**
@@ -123,6 +143,60 @@ class Socket {
         console.log(data.roomId)
 
         const response: PublicServerResponse = await gameService.endTurn(data.roomId)
+        this.io.to(data.roomId).emit('gameUpdate', response)
+
+      })
+
+      /**
+       * drawElements: Client which turn is playing should draw elements
+       */
+      socket.on("drawElements", async (data: DrawElements) => {
+        console.log(data.elements)
+
+        let response: PublicServerResponse | null = null;
+        try {
+          
+          response = await gameService.drawElements(data.roomId, data.elements, socket.id);
+        } catch (error) {
+          // If there is any error we will notify only to the client who generate the error
+          socket.emit('gameUpdate', error)
+        }
+        this.io.to(data.roomId).emit('gameUpdate', response)
+
+      })
+
+      /**
+       * placeElement: Client which turn is playing should place element
+       */
+      socket.on("placeElement", async (data: PlaceElement) => {
+        console.log(data.element)
+
+        let response: PublicServerResponse | null = null;
+        try {
+          
+          response = await gameService.placeElement(data.roomId, socket.id, data.element, data.position, data.reaction);
+        } catch (error) {
+          // If there is any error we will notify only to the client who generate the error
+          socket.emit('gameUpdate', error)
+        }
+        this.io.to(data.roomId).emit('gameUpdate', response)
+
+      })
+
+      /**
+       * moveSage: Client which turn is playing should move sage
+       */
+      socket.on("moveSage", async (data: MoveSage) => {
+        console.log(data.player)
+
+        let response: PublicServerResponse | null = null;
+        try {
+          
+          response = await gameService.moveSage(data.roomId, socket.id, data.player, data.position);
+        } catch (error) {
+          // If there is any error we will notify only to the client who generate the error
+          socket.emit('gameUpdate', error)
+        }
         this.io.to(data.roomId).emit('gameUpdate', response)
 
       })
