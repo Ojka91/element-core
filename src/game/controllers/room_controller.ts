@@ -4,7 +4,7 @@ import { UserController } from './user_controller'
 
 import { UserModel } from '../models/user'
 import { IGameModel } from '../models/game'
-import { IRoomModel } from '../models/room'
+import { IRoomModel, RoomModel } from '../models/room'
 import { PlayerModel } from '../models/player'
 import PlayerController from './player_controller'
 
@@ -83,7 +83,8 @@ class RoomController implements IRoomController {
     * loadRoomById
     */
     public async loadRoomById(room_id: string): Promise<void> {
-        this.model = await GameCache.loadRoom(room_id);
+        const room: RoomModel = await GameCache.loadRoom(room_id);
+        Object.assign(this.model, room);
 
     }
 

@@ -8,7 +8,7 @@ export class GameCache {
     }
 
     public static async loadRoom(room_id: string): Promise<IRoomModel> {
-       return new RoomModelMap().toDomain(await RedisSingleton.getInstance().get(room_id));
+        return new RoomModelMap().toDomain(await RedisSingleton.getInstance().get(room_id));
     }
 }
 
