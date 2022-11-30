@@ -5,7 +5,7 @@ import { UserController } from './user_controller'
 import { UserModel } from '../models/user'
 import { IGameModel } from '../models/game'
 import { IRoomModel, RoomModel } from '../models/room'
-import { PlayerModel } from '../models/player'
+import { IPlayerModel, PlayerModel } from '../models/player'
 import PlayerController from './player_controller'
 
 interface IRoomController {
@@ -58,6 +58,18 @@ class RoomController implements IRoomController {
     /** Return the user list */
     public getUserList(): Array<UserModel> {
         return this.model.user_list;
+    }
+
+    /**
+     * getPlayerByUserId
+     */
+    public getPlayerByUserId(user_id: string): IPlayerModel {
+        for(let user of this.model.user_to_player_map){
+            if(user_id === user.user_uuid){
+                return this.game_controller.getPlayerById(user.player_uuid);
+            }
+        }
+        throw new Error("User ID not found")
     }
 
     /** Checks whether the room is full of players 

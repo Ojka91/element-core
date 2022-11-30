@@ -1,3 +1,4 @@
+import { PlayerModel } from "@/game/models/player";
 import { RoomModel } from "@/game/models/room";
 import { UserModel } from "@/game/models/user";
 import GameCache from "../game_cache";
@@ -126,6 +127,21 @@ describe('RoomController', () => {
         expect(await room_controller.loadRoomById("") == null).toBe(true)
         jest.restoreAllMocks();
     })
+
+    it('getPlayerIdByUserId: should return an array of the user added to the room ', async () => {
+        const room: RoomModel = new RoomModel(2);
+        room.size = 2;
+        const room_controller: RoomController = new RoomController(room);
+
+        const user1: UserModel = new UserModel();
+        const user2: UserModel = new UserModel();
+        user1.name = "Test1";
+        user2.name = "Test2";
+
+        expect(() => room_controller.getPlayerByUserId(user1.uuid)).toThrow("User ID not found");
+        expect(room_controller.addUser(user1)).toBe(true);
+        expect( room_controller.getPlayerByUserId(user1.uuid) instanceof PlayerModel).toBe(true);
+    });
 
 
 })

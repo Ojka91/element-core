@@ -234,4 +234,15 @@ describe('GameController', () => {
         game.loser_uuid = player0.sage.uuid;
         expect(game_controller.getWinner()).toStrictEqual(player0.player_number);
     })
+
+    it('getPlayerById: shall return a player model of the Id or throw error if do not exist', async () => {
+        const game: GameModel = new GameModel();
+        const game_controller: GameController = new GameController(game);
+
+        const player: PlayerModel = new PlayerModel(0);
+
+        expect(() => game_controller.getPlayerById(player.uuid)).toThrow("Player Id not found")
+        game_controller.addPlayer(player);
+        expect(game_controller.getPlayerById(player.uuid)).toStrictEqual(player);
+    })
 })
