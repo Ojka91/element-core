@@ -121,19 +121,9 @@ class Socket {
         // 1. Join game/roomId socket
         socket.join(data.roomId)
         // 1. Join user into the game room
-        const roomController: RoomController = await gameService.joinGame(data.roomId, socket.id);
+        const response: PublicServerResponse | null = await gameService.joinGame(data.roomId, socket.id);
 
-
-        // 2. Checking if room is full so game can start
-        if (roomController.isRoomFull()) {
-          // 2.1 Starting game
-          await roomController.gameStart();
-          const response: PublicServerResponse = gameService.preparePublicResponse(roomController);
-
-          // 2.1 We emit a game update for the clients to start playing
-          this.io.to(data.roomId).emit('gameUpdate', response); //My proposal is to use the event "gameUpdate" each time a player does something. So client...
-          //... will have to listen to 'gameUpdate' and react accordingly
-        }
+        if (response) this.io.to(data.roomId).emit('gameUpdate', response);
 
       })
 

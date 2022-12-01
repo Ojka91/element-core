@@ -1,6 +1,7 @@
 import { Reaction } from "@/schemas/player_actions";
 import { PublicServerResponse } from "@/schemas/server_response";
 import { JoinQueue } from "@/socket";
+import { Model } from "mongoose";
 import { GameController } from "./controllers/game_controller";
 import RoomController from "./controllers/room_controller";
 import { ElementTypes } from "./models/elements/elements";
@@ -12,7 +13,8 @@ import { Position } from "./utils/position_utils";
 export class GameService {
 
     public async createRoom(data: JoinQueue): Promise<string> {
-        const [roomController, _gameController] = this.createControllers()
+        const roomController: RoomController = new RoomController(new RoomModel(0));
+
         const roomModel = new RoomModel(this.getSizeRoom(data));
         roomController.loadRoom(roomModel);
 
@@ -21,9 +23,11 @@ export class GameService {
         return roomController.getUuid();
     }
 
-    public async joinGame(roomId: string, userId: string): Promise<RoomController> {
-        const [roomController, _gameController] = this.createControllers()
+    public async joinGame(roomId: string, userId: string): Promise<PublicServerResponse | null> {
+        const roomController: RoomController = new RoomController(new RoomModel(0));
         await roomController.loadRoomById(roomId);
+
+        const gameController: GameController = new GameController(roomController.getGame())
 
         const user: UserModel = new UserModel()
         user.name = userId;
@@ -31,29 +35,31 @@ export class GameService {
 
         roomController.addUser(user);
         await roomController.save();
-        return roomController;
+        if (roomController.isRoomFull()) {
+            await roomController.gameStart();
+            return this.preparePublicResponse(roomController, gameController)
+        }
+        return null;
     }
 
     public async endTurn(roomId: string): Promise<PublicServerResponse> {
-        const [roomController, gameController] = this.createControllers()
+        const roomController: RoomController = new RoomController(new RoomModel(0));
         await roomController.loadRoomById(roomId);
 
-        gameController.loadGame(roomController.getGame())
-
+        const gameController: GameController = new GameController(roomController.getGame())
         gameController.endOfPlayerTurn();
 
         await roomController.save();
 
-        return this.preparePublicResponse(roomController);
+        return this.preparePublicResponse(roomController, gameController);
 
     }
 
     public async drawElements(roomId: string, elements: Array<ElementTypes>, socketId: string): Promise<PublicServerResponse> {
-        const [roomController, gameController] = this.createControllers()
+        const roomController: RoomController = new RoomController(new RoomModel(0));
         await roomController.loadRoomById(roomId);
 
-        gameController.loadGame(roomController.getGame())
-
+        const gameController: GameController = new GameController(roomController.getGame())
         if(!this.isPlayerTurn(socketId, gameController)) {
             throw new Error('Its not your turn')
         }
@@ -62,15 +68,15 @@ export class GameService {
 
         await roomController.save();
 
-        return this.preparePublicResponse(roomController);
+        return this.preparePublicResponse(roomController, gameController);
 
     }
 
     public async placeElement(roomId: string, socketId: string, element: ElementTypes, position: Position, reaction?: Reaction): Promise<PublicServerResponse> {
-        const [roomController, gameController] = this.createControllers()
+        const roomController: RoomController = new RoomController(new RoomModel(0));
         await roomController.loadRoomById(roomId);
 
-        gameController.loadGame(roomController.getGame())
+        const gameController: GameController = new GameController(roomController.getGame())
 
         if(!this.isPlayerTurn(socketId, gameController)) {
             throw new Error('Its not your turn')
@@ -80,15 +86,15 @@ export class GameService {
 
         await roomController.save();
 
-        return this.preparePublicResponse(roomController);
+        return this.preparePublicResponse(roomController, gameController);
 
     }
 
     public async moveSage(roomId: string, socketId: string, player: IPlayerModel, position: Position): Promise<PublicServerResponse> {
-        const [roomController, gameController] = this.createControllers()
+        const roomController: RoomController = new RoomController(new RoomModel(0));
         await roomController.loadRoomById(roomId);
 
-        gameController.loadGame(roomController.getGame())
+        const gameController: GameController = new GameController(roomController.getGame())
 
         if(!this.isPlayerTurn(socketId, gameController)) {
             throw new Error('Its not your turn')
@@ -98,7 +104,7 @@ export class GameService {
 
         await roomController.save();
 
-        return this.preparePublicResponse(roomController);
+        return this.preparePublicResponse(roomController, gameController);
 
     }
 
@@ -106,16 +112,7 @@ export class GameService {
        return socketId === gameController.getTurnPlayer().uuid
     }
 
-    private createControllers(): [RoomController, GameController] {
-        const roomController: RoomController = new RoomController(new RoomModel(0));
-        const gameController: GameController = new GameController(roomController.getGame())
-        return [roomController, gameController]
-    }
-
-    public preparePublicResponse(roomController: RoomController): PublicServerResponse {
-        const [_roomController, gameController] = this.createControllers()
-
-        gameController.loadGame(roomController.getGame());
+    public preparePublicResponse(roomController: RoomController, gameController: GameController): PublicServerResponse {
 
         return {
             room_uuid: roomController.getUuid(),
