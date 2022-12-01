@@ -60,7 +60,7 @@ export class GameService {
         await roomController.loadRoomById(roomId);
 
         const gameController: GameController = new GameController(roomController.getGame())
-        if(!this.isPlayerTurn(socketId, gameController)) {
+        if(!this.isPlayerTurn(socketId, gameController, roomController)) {
             throw new Error('Its not your turn')
         }
 
@@ -78,7 +78,7 @@ export class GameService {
 
         const gameController: GameController = new GameController(roomController.getGame())
 
-        if(!this.isPlayerTurn(socketId, gameController)) {
+        if(!this.isPlayerTurn(socketId, gameController, roomController)) {
             throw new Error('Its not your turn')
         }
 
@@ -96,7 +96,7 @@ export class GameService {
 
         const gameController: GameController = new GameController(roomController.getGame())
 
-        if(!this.isPlayerTurn(socketId, gameController)) {
+        if(!this.isPlayerTurn(socketId, gameController, roomController)) {
             throw new Error('Its not your turn')
         }
         
@@ -108,8 +108,9 @@ export class GameService {
 
     }
 
-    public isPlayerTurn(socketId: string, gameController: GameController): boolean {
-       return socketId === gameController.getTurnPlayer().uuid
+    public isPlayerTurn(socketId: string, gameController: GameController, roomController: RoomController): boolean {
+        const player: IPlayerModel = roomController.getPlayerByUserId(socketId);
+        return player.uuid === gameController.getTurnPlayer().uuid
     }
 
     public preparePublicResponse(roomController: RoomController, gameController: GameController): PublicServerResponse {
