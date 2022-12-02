@@ -1,5 +1,4 @@
 import { Server, Socket } from "socket.io";
-import RoomController from "./game/controllers/room_controller";
 import { GameService } from "./game/game_service";
 import { RoomModel } from "./game/models/room";
 import { QueueController } from "./game/queue_controller";
