@@ -1,64 +1,9 @@
 import { Server, Socket } from "socket.io";
 import { GameService } from "./game/game_service";
-import { RoomModel } from "./game/models/room";
 import { QueueController } from "./game/queue_controller";
 import { PrivateServerResponse, PublicServerResponse } from "./schemas/server_response";
-import { ElementTypes } from "./game/models/elements/elements";
-import { Position } from "./game/utils/position_utils";
-import { Reaction } from "./schemas/player_actions";
-import { IPlayerModel } from "./game/models/player";
 import { logger } from "./utils/logger";
-
-interface ServerToClientEvents {
-  error: (response: PrivateServerResponse) => void;
-  gameUpdate: (response: PublicServerResponse) => void;
-}
-
-interface ClientToServerEvents {
-  onQueue: (queue: Queue) => void;
-  joinGame: (data: JoinGame) => void;
-  endTurn: (data: EndTurn) => void;
-  drawElements: (data: DrawElements) => void;
-  placeElement: (data: PlaceElement) => void;
-  moveSage: (data: MoveSage) => void;
-}
-
-interface InterServerEvents {
-  ping: () => void;
-}
-
-interface SocketData {
-
-}
-
-export enum Queue {
-  queue2 = 'queue2',
-  queue3 = 'queue3',
-  queue4 = 'queue4'
-}
-
-export type JoinGame = {
-  roomId: string
-}
-export type EndTurn = {
-  roomId: string,
-  room: RoomModel
-}
-export type DrawElements = {
-  roomId: string
-  elements: Array<ElementTypes>
-}
-export type PlaceElement = {
-  roomId: string
-  element: ElementTypes
-  position: Position
-  reaction?: Reaction
-}
-export type MoveSage = {
-  roomId: string
-  player: IPlayerModel
-  position: Position
-}
+import { ClientToServerEvents, DrawElements, EndTurn, InterServerEvents, JoinGame, MoveSage, PlaceElement, Queue, ServerToClientEvents, SocketData } from "./utils/socketUtils";
 
 /**
  * This class is reponsible to mantain socket connection and logic between players and server when game begins

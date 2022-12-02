@@ -1,4 +1,4 @@
-import { Queue } from "@/socket";
+import { Queue } from "@/utils/socketUtils";
 import { GameController } from "../controllers/game_controller";
 import RoomController from "../controllers/room_controller";
 import { GameService } from "../game_service";
@@ -6,7 +6,6 @@ import { BoardModel } from "../models/board";
 import { ElementTypes } from "../models/elements/elements";
 import { GameModel } from "../models/game";
 import { PlayerModel } from "../models/player";
-import { RoomModel } from "../models/room";
 
 jest.mock('../controllers/room_controller')
 jest.mock('../controllers/game_controller')

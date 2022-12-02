@@ -1,4 +1,4 @@
-import { Queue } from "@/socket";
+import { Queue } from "@/utils/socketUtils";
 import { QueueController } from "../queue_controller";
 
 describe('QueueController', () => {

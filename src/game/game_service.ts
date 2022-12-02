@@ -1,6 +1,6 @@
 import { Reaction } from "@/schemas/player_actions";
 import { PublicServerResponse } from "@/schemas/server_response";
-import { Queue } from "@/socket";
+import { Queue } from "@/utils/socketUtils";
 import { GameController } from "./controllers/game_controller";
 import RoomController from "./controllers/room_controller";
 import { ElementTypes } from "./models/elements/elements";

@@ -1,4 +1,4 @@
-import { Queue } from "@/socket";
+import { Queue } from "@/utils/socketUtils";
 
 export class QueueController {
     private number_players_queue2: number = 0;
