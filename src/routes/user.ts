@@ -1,4 +1,3 @@
-import { socket } from '@/app';
 import { User } from '@/controllers/user';
 import express, { Request, Response, Router } from 'express';
 
@@ -36,9 +35,4 @@ user.get('/user', async (req: Request, res: Response) => {
     return res.send(await userController.getUserData());
 })
 
-user.get('/room', async (req: Request, res: Response) => {
-    // Testing porpouses TODO DELETE!!
-   socket.emmitRoom()
-   return res.send('emmited to room 1')
-})
 

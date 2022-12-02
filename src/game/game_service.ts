@@ -1,6 +1,6 @@
 import { Reaction } from "@/schemas/player_actions";
 import { PublicServerResponse } from "@/schemas/server_response";
-import { JoinQueue } from "@/socket";
+import { Queue } from "@/socket";
 import { Model } from "mongoose";
 import { GameController } from "./controllers/game_controller";
 import RoomController from "./controllers/room_controller";
@@ -12,7 +12,7 @@ import { Position } from "./utils/position_utils";
 
 export class GameService {
 
-    public async createRoom(data: JoinQueue): Promise<string> {
+    public async createRoom(data: Queue): Promise<string> {
         const roomController: RoomController = new RoomController(new RoomModel(0));
 
         const roomModel = new RoomModel(this.getSizeRoom(data));
@@ -122,8 +122,8 @@ export class GameService {
         }
 
     }
-    private getSizeRoom(queue: JoinQueue): number {
-        switch (queue.queue) {
+    private getSizeRoom(queue: Queue): number {
+        switch (queue) {
           case 'queue2': {
             return 2
           }

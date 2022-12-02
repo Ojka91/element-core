@@ -10,9 +10,9 @@ type MessageHeader = {
 }
 
 export type PrivateServerResponse = MessageHeader & {
-    status: PrivateServerResponse;
+    status: string;
     message: string | null;
-    board: IBoardModel;
+    board?: IBoardModel;
 }
 
 export type PublicServerResponse = MessageHeader & {
