@@ -171,7 +171,6 @@ describe('GameService', () => {
         }).rejects.toThrow(new Error('Its not your turn'))
 
     });
-
   
 })
   

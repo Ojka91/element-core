@@ -3,6 +3,7 @@ import { PublicServerResponse } from "@/schemas/server_response";
 import { Queue } from "@/utils/socketUtils";
 import { GameController } from "./controllers/game_controller";
 import RoomController from "./controllers/room_controller";
+import { BoardModel } from "./models/board";
 import { ElementTypes } from "./models/elements/elements";
 import { IPlayerModel } from "./models/player";
 import { RoomModel } from "./models/room";
@@ -137,6 +138,68 @@ export class GameService {
         }
     }
 
+    public async forceLoser(roomId: string, socketId: string): Promise<PublicServerResponse> {
+        try {
+            
+            const roomController: RoomController = new RoomController(new RoomModel(0));
+            await roomController.loadRoomById(roomId);
+            
+            const gameController: GameController = new GameController(roomController.getGame())
+            
+            gameController.forceLoser(socketId);
+            const winner = gameController.getWinner();
+            let publicResponse = this.preparePublicResponse(roomController, gameController);
+
+            await roomController.save();
+
+            publicResponse.winner = winner;
+            return publicResponse;
+            
+        } catch (error) {
+            throw new Error((error as Error).message)
+        }
+    }
+
+    public async playerDisconnect(roomsIds: string[], socketId: string): Promise<[PublicServerResponse, string]> {
+        let response: PublicServerResponse = {
+            room_uuid: '',
+            board: new BoardModel(),
+            player_turn_uuid: ''
+        };
+        let roomId: string = '';
+        // Looping through array of rooms
+        roomsIds.every(async id => {
+          // Getting users for every roomId
+          let userList: Array<UserModel> = await this.getUserList(id)
+          
+          //Looping through array of users for certain room
+          userList.every(async user => {
+            // If user match, we update room and response
+            if (user.socket_id === socketId) {
+               response = await this.forceLoser(id, socketId);
+               roomId = id;
+               return false;
+            }
+            return true;
+          })
+          return true;
+        });
+        return [response, roomId]
+    }
+
+    public async getUserList(roomId: string): Promise<Array<UserModel>> {
+        try {
+            
+            const roomController: RoomController = new RoomController(new RoomModel(0));
+            await roomController.loadRoomById(roomId);
+            
+            return roomController.getUserList();
+            
+        } catch (error) {
+            throw new Error((error as Error).message)
+        }
+    }
+
     public isPlayerTurn(socketId: string, gameController: GameController, roomController: RoomController): boolean {
         const player: IPlayerModel = roomController.getPlayerByUserId(socketId);
         return player.uuid === gameController.getTurnPlayer().uuid
@@ -147,7 +210,7 @@ export class GameService {
         return {
             room_uuid: roomController.getUuid(),
             board: gameController.getBoard(),
-            player_turn_uuid: gameController.getTurnPlayer().uuid
+            player_turn_uuid: gameController.getTurnPlayer().uuid,
         }
 
     }

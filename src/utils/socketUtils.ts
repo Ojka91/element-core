@@ -17,6 +17,11 @@ export interface ClientToServerEvents {
   drawElements: (data: DrawElements) => void;
   placeElement: (data: PlaceElement) => void;
   moveSage: (data: MoveSage) => void;
+
+  // Testing porpouses
+  joinRoom: (data: any) => void;
+  triggerFromClient: (data: any) => void;
+  forceGameUpdate: (data: any) => void;
 }
 
 export interface InterServerEvents {

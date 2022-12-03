@@ -3,7 +3,6 @@ import { BoardModel, IBoardModel } from "../models/board";
 import { ElementTypes } from "../models/elements/elements";
 import { GameModel, GameStates, IGameModel } from "../models/game";
 import { IPlayerModel } from "../models/player";
-import { TurnModel } from "../models/turn";
 import { Position } from "../utils/position_utils";
 import BoardController from "./board_controller";
 import PlayerController from "./player_controller";
@@ -176,5 +175,13 @@ export class GameController implements IGameController {
             }
         }
         throw new Error("Player Id not found");
+    }
+
+    /**
+     * Force loser (e.g when someone disconnect)
+     * @param player_id 
+     */
+    public forceLoser(player_id: string) {
+        this.model.loser_uuid = player_id;
     }
 }

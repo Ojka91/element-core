@@ -18,4 +18,5 @@ export type PrivateServerResponse = MessageHeader & {
 export type PublicServerResponse = MessageHeader & {
     board: IBoardModel;
     player_turn_uuid: string;
+    winner?: number | null;
 }
