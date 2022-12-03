@@ -6,8 +6,13 @@ import { Reaction } from "@/schemas/player_actions";
 import { PrivateServerResponse, PublicServerResponse } from "../schemas/server_response";
 
 export interface ServerToClientEvents {
-  error: (response: PrivateServerResponse) => void;
-  gameUpdate: (response: PublicServerResponse) => void;
+  error: (response: PrivateServerResponse | null) => void;
+  gameUpdate: (response: PublicServerResponse | null) => void;
+  gameFound: (response: GameFound) => void;
+  
+  // Testing porpouses
+  boardMovement: (response: {}) => void;
+  testUpdate: (response: {}) => void;
 }
 
 export interface ClientToServerEvents {
@@ -36,6 +41,10 @@ export enum Queue {
   queue2 = 'queue2',
   queue3 = 'queue3',
   queue4 = 'queue4'
+}
+
+export type GameFound = {
+  roomId: string
 }
 
 export type JoinGame = {

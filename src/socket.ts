@@ -11,7 +11,12 @@ import { ClientToServerEvents, DrawElements, EndTurn, InterServerEvents, JoinGam
  * This class is reponsible to mantain socket connection and logic between players and server when game begins
  */
 class SocketController {
-  private io: any;
+  private io: Server<
+  ClientToServerEvents,
+  ServerToClientEvents,
+  InterServerEvents,
+  SocketData
+>;
 
   private roomsIds: string[] = [];
 
@@ -185,6 +190,9 @@ class SocketController {
         
       })
 
+
+
+
       // From here below, testing only
       socket.on("joinRoom", (data: any) => {
         /**
@@ -213,7 +221,7 @@ class SocketController {
         const room_controller: RoomController = new RoomController(room);
         await room_controller.loadRoomById(data.roomId);
 
-        this.io.to("room1").emit('gameUpdate', { room: room });
+        this.io.to("room1").emit('testUpdate', { room: room });
       })
 
     })
