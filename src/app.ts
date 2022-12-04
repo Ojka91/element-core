@@ -5,7 +5,7 @@ import { routes } from '@/routes';
 import * as dotenv from 'dotenv'
 import Database from './database';
 import Swagger from './utils/swagger';
-import Socket from './socket';
+import SocketController from './socket';
 export const app: Express = express();
 import { RedisSingleton } from './redis';
 import { GameController } from './game/controllers/game_controller';
@@ -99,5 +99,5 @@ app.get('/get', async (_req: Request, res: Response) => {
 
 if (process.env.ENV != 'development') RedisSingleton.getInstance().connect()
 
-export const socket = new Socket(server);
+export const socket = new SocketController(server);
 socket.init()

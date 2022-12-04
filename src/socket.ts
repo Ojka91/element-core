@@ -1,51 +1,24 @@
-import { Server } from "socket.io";
-import { GameController } from "./game/controllers/game_controller";
+import { Server, Socket } from "socket.io";
 import RoomController from "./game/controllers/room_controller";
+import { GameService } from "./game/game_service";
 import { RoomModel } from "./game/models/room";
-import { UserModel } from "./game/models/user";
 import { QueueController } from "./game/queue_controller";
-import { PublicServerResponse } from "./schemas/server_response";
-interface ServerToClientEvents {
-  noArg: () => void;
-  basicEmit: (a: number, b: string, c: Buffer) => void;
-  withAck: (d: string, callback: (e: number) => void) => void;
-}
-
-interface ClientToServerEvents {
-  hello: () => void;
-}
-
-interface InterServerEvents {
-  ping: () => void;
-}
-
-interface SocketData {
-  name: string;
-  age: number;
-}
-
-export enum queue {
-  queue2 = 'queue2',
-  queue3 = 'queue3',
-  queue4 = 'queue4'
-}
-
-export type JoinQueue = {
-  queue: queue
-}
-export type JoinGame = {
-  roomId: string
-}
-export type EndTurn = {
-  roomId: string,
-  room: RoomModel
-}
+import { PrivateServerResponse, PublicServerResponse } from "./schemas/server_response";
+import { logger } from "./utils/logger";
+import { ClientToServerEvents, DrawElements, EndTurn, InterServerEvents, JoinGame, MoveSage, PlaceElement, Queue, ServerToClientEvents, SocketData } from "./utils/socketUtils";
 
 /**
  * This class is reponsible to mantain socket connection and logic between players and server when game begins
  */
-class Socket {
-  private io: any;
+class SocketController {
+  private io: Server<
+  ClientToServerEvents,
+  ServerToClientEvents,
+  InterServerEvents,
+  SocketData
+>;
+
+  private roomsIds: string[] = [];
 
   constructor(server: any) {
     this.io = new Server<
@@ -58,8 +31,10 @@ class Socket {
   public init() {
 
     const queueController = new QueueController();
+    const gameService = new GameService()
 
-    this.io.on("connection", (socket: any) => {
+    this.io.on("connection", (socket: Socket<ClientToServerEvents,
+      ServerToClientEvents>) => {
 
       console.log("user connected")
 
@@ -69,24 +44,26 @@ class Socket {
        * 2. We should check if there are enough players on queue room to start a game
        * 2.1 If so, we should make those players join new room (roomId), and kick them from queue room
        */
-      socket.on("onQueue", async (data: JoinQueue) => {
-        console.log(data.queue)
+      socket.on("onQueue", async (data: Queue) => {
+        console.log(data)
 
         // 1. Client join queue room
-        socket.join(data.queue)
+        socket.join(data)
+
+        // Add to the queue
+        queueController.addToQueue(data);
 
         // 2. Checking if that queue have enough players
         if (queueController.isQueueFull(data)) {
           // 2.1 Creating and saving new room
-          const roomModel = new RoomModel(this.getSizeRoom(data));
-          const roomController = new RoomController(roomModel);
-
-          await roomController.save();
-          //let roomId: string = await game_controller.createRoom();
+          const roomId = await gameService.createRoom(data);
+          // Adding roomID to our array that controls rooms
+          this.roomsIds.push(roomId);
           // 2.1 Sending roomId to client for them to join
-          this.io.to(data.queue).emit('gameFound', { roomId: roomController.getUuid() });
-          // 2.1 Cleaning queue room from those players that found the game !! This system may fail if we have a lot of concurrency, we may change it in the future
-          this.io.socketsLeave(data.queue);
+          this.io.to(data).emit('gameFound', { roomId: roomId });
+          // 2.1 Cleaning queue room. Kick all clients on the room !! This system may fail if we have a lot of concurrency, we may change it in the future
+          queueController.resetQueue(data);
+          this.io.socketsLeave(data);
         }
 
       })
@@ -102,29 +79,10 @@ class Socket {
 
         // 1. Join game/roomId socket
         socket.join(data.roomId)
-        // 1. Join user into the game room
-        const room: RoomModel = new RoomModel(0);
-        const room_controller: RoomController = new RoomController(room);
-        await room_controller.loadRoomById(data.roomId);
+        // 1. Join user into the game room and starts the game WHEN all users have joined
+        const response: PublicServerResponse | null = await gameService.joinGame(data.roomId, socket.id);
 
-        const user: UserModel = new UserModel()
-        user.name = socket.id;
-        user.socket_id = socket.id;
-
-        room_controller.addUser(user)
-
-
-        // 2. Checking if room is full so game can start
-        if (room_controller.isRoomFull()) { // TBD TODO !!! we have no way to check if the room is created for 2, 3 or 4 players yet! should we implement it??!
-          // 2.1 Starting game
-          await room_controller.gameStart();
-          /* MLG: Commented due to removing the old game controller this method was removed too. */
-          //const response: PublicServerResponse = game_controller.preparePublicResponse(room);
-
-          // 2.1 We emit a game update for the clients to start playing
-          //this.io.to(data.roomId).emit('gameUpdate', response); // TODO TBD My proposal is to use the event "gameUpdate" each time a player does something. So client...
-          //... will have to listen to 'gameUpdate' and react accordingly
-        }
+        if (response) this.io.to(data.roomId).emit('gameUpdate', response);
 
       })
 
@@ -134,16 +92,103 @@ class Socket {
       socket.on("endTurn", async (data: EndTurn) => {
         console.log(data.roomId)
 
-        const room: RoomModel = new RoomModel(0);
-        const room_controller: RoomController = new RoomController(room);
-        await room_controller.loadRoomById(data.roomId);
+        // A client may decide to force ending turn
+        const response: PublicServerResponse = await gameService.endTurn(data.roomId)
+        this.io.to(data.roomId).emit('gameUpdate', response)
 
-        const game_controller: GameController = new GameController(room.game);
+      })
 
-        game_controller.endOfPlayerTurn();
+      /**
+       * drawElements: Client which turn is playing should draw elements
+       */
+      socket.on("drawElements", async (data: DrawElements) => {
+        console.log(data.elements)
 
-        this.io.to(data.roomId).emit('gameUpdate', room)
+        let response: PublicServerResponse | null = null;
+        try {
+          
+          response = await gameService.drawElements(data.roomId, data.elements, socket.id);
+        } catch (error) {
+          // If there is any error we will notify only to the client who generate the error
+          logger.warn(error)
+          let response: PrivateServerResponse = {
+            room_uuid: data.roomId,
+            status: 'Error',
+            message: JSON.stringify(error),
+          }
+          socket.emit('error', response)
+        }
+        this.io.to(data.roomId).emit('gameUpdate', response)
 
+      })
+
+      /**
+       * placeElement: Client which turn is playing should place element
+       */
+      socket.on("placeElement", async (data: PlaceElement) => {
+        console.log(data.element)
+
+        let response: PublicServerResponse | null = null;
+        try {
+          
+          response = await gameService.placeElement(data.roomId, socket.id, data.element, data.position, data.reaction);
+        } catch (error) {
+          // If there is any error we will notify only to the client who generate the error
+          logger.warn(error)
+          let response: PrivateServerResponse = {
+            room_uuid: data.roomId,
+            status: 'Error',
+            message: JSON.stringify(error),
+          }
+          socket.emit('error', response)
+        }
+        this.io.to(data.roomId).emit('gameUpdate', response)
+
+      })
+
+      /**
+       * moveSage: Client which turn is playing should move sage
+       */
+      socket.on("moveSage", async (data: MoveSage) => {
+        console.log(data.player)
+
+        let response: PublicServerResponse | null = null;
+        try {
+          
+          // TODO TBD !!! We should check if game ended => delete roomId from array
+          
+          response = await gameService.moveSage(data.roomId, socket.id, data.player, data.position);
+          
+        } catch (error) {
+          // If there is any error we will notify only to the client who generate the error
+          logger.warn(error)
+          let response: PrivateServerResponse = {
+            room_uuid: data.roomId,
+            status: 'Error',
+            message: JSON.stringify(error),
+          }
+          socket.emit('error', response)
+        }
+        this.io.to(data.roomId).emit('gameUpdate', response)
+
+      })
+
+      /**
+       * When player disconnect we only have socket id.
+       * We loop through roomId array and get userLists for every room
+       * When a user match the socketId it's disconnected we force that player as a loser and emit response
+       */
+      socket.on("disconnect", async () => {
+        
+        let [response, roomId]: [PublicServerResponse, string] = await gameService.playerDisconnect(this.roomsIds, socket.id);
+        
+        // Deleting the roomId of the ended game
+        this.roomsIds.filter(id => {
+          return id != roomId
+        })
+
+        this.io.to(roomId).emit('gameUpdate', response)
+        
       })
 
 
@@ -177,37 +222,14 @@ class Socket {
         const room_controller: RoomController = new RoomController(room);
         await room_controller.loadRoomById(data.roomId);
 
-        this.io.to("room1").emit('gameUpdate', { room: room });
-      })
-
-      socket.on("disconnect", (socket: any) => {
-        console.log("client disconnected")
-
+        this.io.to("room1").emit('testUpdate', { room: room });
       })
 
     })
 
   }
 
-  private getSizeRoom(queue: JoinQueue): number {
-    switch (queue.queue) {
-      case 'queue2': {
-        return 2
-      }
-      case 'queue3': {
-        return 3
-      }
-      case 'queue4': {
-        return 4
-      }
-    }
-    return 5;
-  }
-
-  public emmitRoom() {
-    this.io.to("room1").emit('something', { some: 'data' });
-  }
 }
 
-export default Socket;
+export default SocketController;
 
