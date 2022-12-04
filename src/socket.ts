@@ -62,6 +62,7 @@ class SocketController {
           // 2.1 Sending roomId to client for them to join
           this.io.to(data).emit('gameFound', { roomId: roomId });
           // 2.1 Cleaning queue room. Kick all clients on the room !! This system may fail if we have a lot of concurrency, we may change it in the future
+          queueController.resetQueue(data);
           this.io.socketsLeave(data);
         }
 

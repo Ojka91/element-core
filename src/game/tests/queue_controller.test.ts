@@ -56,6 +56,9 @@ describe('QueueController', () => {
         queue4 = queueController.isQueueFull(Queue.queue4);
         expect(queue4).toBe(false);
 
+        queueController.resetQueue(Queue.queue2);
+        expect(queue2).toBe(false)
+
     });
 
   
