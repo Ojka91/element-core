@@ -3,7 +3,7 @@ import RoomController from "./game/controllers/room_controller";
 import { GameService } from "./game/game_service";
 import { RoomModel } from "./game/models/room";
 import { QueueController } from "./game/queue_controller";
-import { PrivateServerResponse, PublicServerResponse } from "./schemas/server_response";
+import { PrivateServerResponse, PrivateServerResponseStatus, PublicServerResponse } from "./schemas/server_response";
 import { logger } from "./utils/logger";
 import { ClientToServerEvents, DrawElements, EndTurn, InterServerEvents, JoinGame, MoveSage, PlaceElement, Queue, ServerToClientEvents, SocketData } from "./utils/socketUtils";
 
@@ -113,7 +113,7 @@ class SocketController {
           logger.warn(error)
           let response: PrivateServerResponse = {
             room_uuid: data.roomId,
-            status: 'Error',
+            status: PrivateServerResponseStatus.ERROR,
             message: JSON.stringify(error),
           }
           socket.emit('error', response)
@@ -137,7 +137,7 @@ class SocketController {
           logger.warn(error)
           let response: PrivateServerResponse = {
             room_uuid: data.roomId,
-            status: 'Error',
+            status: PrivateServerResponseStatus.ERROR,
             message: JSON.stringify(error),
           }
           socket.emit('error', response)
@@ -164,7 +164,7 @@ class SocketController {
           logger.warn(error)
           let response: PrivateServerResponse = {
             room_uuid: data.roomId,
-            status: 'Error',
+            status: PrivateServerResponseStatus.ERROR,
             message: JSON.stringify(error),
           }
           socket.emit('error', response)

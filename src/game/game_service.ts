@@ -3,10 +3,10 @@ import { PublicServerResponse } from "@/schemas/server_response";
 import { Queue } from "@/utils/socketUtils";
 import { GameController } from "./controllers/game_controller";
 import RoomController from "./controllers/room_controller";
-import { BoardModel } from "./models/board";
 import { ElementTypes } from "./models/elements/elements";
+import { GameModel } from "./models/game";
 import { IPlayerModel } from "./models/player";
-import { RoomModel } from "./models/room";
+import { IRoomModel, RoomModel } from "./models/room";
 import { UserModel } from "./models/user";
 import { Position } from "./utils/position_utils";
 
@@ -29,11 +29,9 @@ export class GameService {
 
     public async joinGame(roomId: string, userId: string): Promise<PublicServerResponse | null> {
         try {
-            
-            const roomController: RoomController = new RoomController(new RoomModel(0));
+            const roomModel: RoomModel = new RoomModel(0);
+            const roomController: RoomController = new RoomController(roomModel);
             await roomController.loadRoomById(roomId);
-            
-            const gameController: GameController = new GameController(roomController.getGame())
             
             const user: UserModel = new UserModel()
             user.name = userId;
@@ -43,7 +41,7 @@ export class GameService {
             await roomController.save();
             if (roomController.isRoomFull()) {
                 await roomController.gameStart();
-                return this.preparePublicResponse(roomController, gameController)
+                return this.preparePublicResponse(roomModel);
             }
             return null;
         } catch (error) {
@@ -54,7 +52,8 @@ export class GameService {
     public async endTurn(roomId: string): Promise<PublicServerResponse> {
         try {
             
-            const roomController: RoomController = new RoomController(new RoomModel(0));
+            const roomModel: RoomModel = new RoomModel(0);
+            const roomController: RoomController = new RoomController(roomModel);
             await roomController.loadRoomById(roomId);
             
             const gameController: GameController = new GameController(roomController.getGame())
@@ -62,7 +61,7 @@ export class GameService {
             
             await roomController.save();
             
-            return this.preparePublicResponse(roomController, gameController);
+            return this.preparePublicResponse(roomModel);
             
         } catch (error) {
             throw new Error((error as Error).message)
@@ -72,7 +71,8 @@ export class GameService {
     public async drawElements(roomId: string, elements: Array<ElementTypes>, socketId: string): Promise<PublicServerResponse> {
         try {
             
-            const roomController: RoomController = new RoomController(new RoomModel(0));
+            const roomModel: RoomModel = new RoomModel(0);
+            const roomController: RoomController = new RoomController(roomModel);
             await roomController.loadRoomById(roomId);
             
             const gameController: GameController = new GameController(roomController.getGame())
@@ -84,7 +84,7 @@ export class GameService {
             
             await roomController.save();
             
-            return this.preparePublicResponse(roomController, gameController);
+            return this.preparePublicResponse(roomModel);
             
         } catch (error) {
             throw new Error((error as Error).message)
@@ -95,7 +95,8 @@ export class GameService {
     public async placeElement(roomId: string, socketId: string, element: ElementTypes, position: Position, reaction?: Reaction): Promise<PublicServerResponse> {
         try {
             
-            const roomController: RoomController = new RoomController(new RoomModel(0));
+            const roomModel: RoomModel = new RoomModel(0);
+            const roomController: RoomController = new RoomController(roomModel);
             await roomController.loadRoomById(roomId);
             
             const gameController: GameController = new GameController(roomController.getGame())
@@ -108,7 +109,7 @@ export class GameService {
             
             await roomController.save();
             
-            return this.preparePublicResponse(roomController, gameController);
+            return this.preparePublicResponse(roomModel);
             
         } catch (error) {
             throw new Error((error as Error).message)
@@ -118,7 +119,8 @@ export class GameService {
     public async moveSage(roomId: string, socketId: string, player: IPlayerModel, position: Position): Promise<PublicServerResponse> {
         try {
             
-            const roomController: RoomController = new RoomController(new RoomModel(0));
+            const roomModel: RoomModel = new RoomModel(0);
+            const roomController: RoomController = new RoomController(roomModel);
             await roomController.loadRoomById(roomId);
             
             const gameController: GameController = new GameController(roomController.getGame())
@@ -131,7 +133,7 @@ export class GameService {
             
             await roomController.save();
             
-            return this.preparePublicResponse(roomController, gameController);
+            return this.preparePublicResponse(roomModel);
             
         } catch (error) {
             throw new Error((error as Error).message)
@@ -140,15 +142,15 @@ export class GameService {
 
     public async forceLoser(roomId: string, socketId: string): Promise<PublicServerResponse> {
         try {
-            
-            const roomController: RoomController = new RoomController(new RoomModel(0));
+            const roomModel: RoomModel = new RoomModel(0);
+            const roomController: RoomController = new RoomController(roomModel);
             await roomController.loadRoomById(roomId);
             
             const gameController: GameController = new GameController(roomController.getGame())
             
             gameController.forceLoser(socketId);
             const winner = gameController.getWinner();
-            let publicResponse = this.preparePublicResponse(roomController, gameController);
+            let publicResponse = this.preparePublicResponse(roomModel);
 
             await roomController.save();
 
@@ -163,7 +165,7 @@ export class GameService {
     public async playerDisconnect(roomsIds: string[], socketId: string): Promise<[PublicServerResponse, string]> {
         let response: PublicServerResponse = {
             room_uuid: '',
-            board: new BoardModel(),
+            game: new GameModel(),
             player_turn_uuid: ''
         };
         let roomId: string = '';
@@ -205,11 +207,12 @@ export class GameService {
         return player.uuid === gameController.getTurnPlayer().uuid
     }
 
-    public preparePublicResponse(roomController: RoomController, gameController: GameController): PublicServerResponse {
+    public preparePublicResponse(roomModel: IRoomModel): PublicServerResponse {
 
+        const gameController: GameController = new GameController(roomModel.game);
         return {
-            room_uuid: roomController.getUuid(),
-            board: gameController.getBoard(),
+            room_uuid: roomModel.uuid,
+            game: roomModel.game,
             player_turn_uuid: gameController.getTurnPlayer().uuid,
         }
 
