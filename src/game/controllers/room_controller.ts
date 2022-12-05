@@ -22,11 +22,9 @@ interface IRoomController {
 
 class RoomController implements IRoomController {
     private model: IRoomModel;
-    private game_controller: GameController;
 
     constructor(model: IRoomModel) {
         this.model = model
-        this.game_controller = new GameController(this.model.game);
     }
 
     /** Returns the room uuid */
@@ -38,13 +36,14 @@ class RoomController implements IRoomController {
      * return: true if player added, false otherwise
     */
     public addUser(user: UserModel): boolean {
+        const game_controller: GameController = new GameController(this.model.game);
         let user_added = false;
         if (this.isRoomFull() == false) {
             if (this.model.user_list.includes(user)) {
                 throw new Error("The same user cannot be in the Room twice")
             }
             const player: PlayerModel = new PlayerModel(this.model.user_list.length)
-            this.game_controller.addPlayer(player);
+            game_controller.addPlayer(player);
             this.model.user_to_player_map.push({
                 user_uuid: new UserController(user).getUuid(),
                 player_uuid: new PlayerController(player).getUuid()
@@ -64,9 +63,10 @@ class RoomController implements IRoomController {
      * getPlayerByUserId
      */
     public getPlayerByUserId(user_id: string): IPlayerModel {
+        const game_controller: GameController = new GameController(this.model.game);
         for(let user of this.model.user_to_player_map){
             if(user_id === user.user_uuid){
-                return this.game_controller.getPlayerById(user.player_uuid);
+                return game_controller.getPlayerById(user.player_uuid);
             }
         }
         throw new Error("User ID not found")
@@ -81,11 +81,12 @@ class RoomController implements IRoomController {
 
     /** Starts the game */
     public async gameStart(): Promise<boolean> {
+        const game_controller: GameController = new GameController(this.model.game);
         if (this.isRoomFull() == false) {
             return false;
         }
 
-        this.game_controller.setupGame(this.model.size);
+        game_controller.setupGame(this.model.size);
         await GameCache.saveRoom(this.model);
 
         return true;
@@ -97,14 +98,6 @@ class RoomController implements IRoomController {
     public async loadRoomById(room_id: string): Promise<void> {
         const room: RoomModel = await GameCache.loadRoom(room_id);
         Object.assign(this.model, room);
-
-    }
-
-    /**
-    * loadRoom
-    */
-    public loadRoom(room: IRoomModel):void {
-        this.model = room;
 
     }
 
