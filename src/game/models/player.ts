@@ -1,21 +1,22 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Mapper } from '../utils/mapper';
-import { ISageModel, SageModelMap } from "./pieces/sage";
+import { ISageModel, SageModel, SageModelMap } from "./pieces/sage";
 
 export interface IPlayerModel {
     uuid: string;
     player_number: number;
-    sage?: ISageModel;
+    sage: ISageModel;
 }
 
 export class PlayerModel implements IPlayerModel {
     uuid: string;
     player_number: number;
-    sage?: ISageModel;
+    sage: ISageModel;
 
     constructor(player_number: number) {
 
         this.player_number = player_number;
+        this.sage = new SageModel();
         this.uuid = uuidv4();
     }
 }

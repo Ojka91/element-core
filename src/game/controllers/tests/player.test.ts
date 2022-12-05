@@ -7,7 +7,6 @@ describe('Player', () => {
     it('getSage: sage should be returned or throw an error ', async () => {
         const player = new PlayerModel(0);
         const player_controller: PlayerController = new PlayerController(player); 
-        expect(() => {player_controller.getSage();}).toThrow("Player has no assigned sage")
         
         const sage: SageModel = new SageModel();
         player_controller.setSage(sage);

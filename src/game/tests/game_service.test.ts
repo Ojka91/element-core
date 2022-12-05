@@ -20,7 +20,6 @@ describe('GameService', () => {
         const gameService = new GameService();
         const response = await gameService.createRoom(Queue.queue2);
         expect(response).toBe('uuid');
-        expect(RoomController.prototype.loadRoom).toHaveBeenCalledTimes(1)
         expect(RoomController.prototype.save).toHaveBeenCalledTimes(1)
         expect(RoomController.prototype.getUuid).toHaveBeenCalledTimes(1)
 
