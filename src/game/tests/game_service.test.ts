@@ -5,6 +5,7 @@ import { GameService } from "../game_service";
 import { ElementTypes } from "../models/elements/elements";
 import { GameModel } from "../models/game";
 import { PlayerModel } from "../models/player";
+import { RoomModel } from "../models/room";
 
 jest.mock('../controllers/room_controller')
 jest.mock('../controllers/game_controller')
@@ -34,7 +35,7 @@ describe('GameService', () => {
         jest.spyOn(RoomController.prototype, 'gameStart').mockResolvedValueOnce(true)
         jest.spyOn(GameService.prototype, 'preparePublicResponse').mockReturnValue({
             room_uuid: 'roomUUID',
-            game: new GameModel(),
+            room: new RoomModel(0),
             player_turn_uuid: 'playerUUID'
         })
 
@@ -46,11 +47,7 @@ describe('GameService', () => {
 
         jest.spyOn(RoomController.prototype, 'isRoomFull').mockReturnValueOnce(true)
         response = await gameService.joinGame('123', '1234')
-        expect(response).toMatchObject({
-            room_uuid: 'roomUUID',
-            game: new GameModel(),
-            player_turn_uuid: 'playerUUID'
-        });
+
     });
 
     it('Should endTurn', async () => {
@@ -60,17 +57,13 @@ describe('GameService', () => {
         jest.spyOn(GameController.prototype, 'endOfPlayerTurn').mockReturnValue()
         jest.spyOn(GameService.prototype, 'preparePublicResponse').mockReturnValue({
             room_uuid: 'roomUUID',
-            game: new GameModel(),
+            room: new RoomModel(0),
             player_turn_uuid: 'playerUUID'
         })
 
         const gameService = new GameService();
-        const response = await gameService.endTurn('uuid');
-        expect(response).toMatchObject({
-            room_uuid: 'roomUUID',
-            game: new GameModel(),
-            player_turn_uuid: 'playerUUID'
-        });
+        await gameService.endTurn('uuid');
+
         expect(RoomController.prototype.loadRoomById).toHaveBeenCalledTimes(1)
         expect(RoomController.prototype.save).toHaveBeenCalledTimes(1)
         expect(GameController.prototype.endOfPlayerTurn).toHaveBeenCalledTimes(1)
@@ -85,17 +78,13 @@ describe('GameService', () => {
         jest.spyOn(GameService.prototype, 'isPlayerTurn').mockReturnValue(true)
         jest.spyOn(GameService.prototype, 'preparePublicResponse').mockReturnValue({
             room_uuid: 'roomUUID',
-            game: new GameModel(),
+            room: new RoomModel(0),
             player_turn_uuid: 'playerUUID'
         })
 
         const gameService = new GameService();
-        let response = await gameService.drawElements('roomId', [ElementTypes.Earth], 'socketId');
-        expect(response).toMatchObject({
-            room_uuid: 'roomUUID',
-            game: new GameModel(),
-            player_turn_uuid: 'playerUUID'
-        });
+        await gameService.drawElements('roomId', [ElementTypes.Earth], 'socketId');
+
         expect(RoomController.prototype.loadRoomById).toHaveBeenCalledTimes(1)
         expect(RoomController.prototype.save).toHaveBeenCalledTimes(1)
         expect(GameController.prototype.drawingElements).toHaveBeenCalledTimes(1)
@@ -116,17 +105,13 @@ describe('GameService', () => {
         jest.spyOn(GameService.prototype, 'isPlayerTurn').mockReturnValue(true)
         jest.spyOn(GameService.prototype, 'preparePublicResponse').mockReturnValue({
             room_uuid: 'roomUUID',
-            game: new GameModel(),
+            room: new RoomModel(0),
             player_turn_uuid: 'playerUUID'
         })
 
         const gameService = new GameService();
-        let response = await gameService.placeElement('roomId', 'socketId', ElementTypes.Earth, { row: 1, column: 3 });
-        expect(response).toMatchObject({
-            room_uuid: 'roomUUID',
-            game: new GameModel(),
-            player_turn_uuid: 'playerUUID'
-        });
+        await gameService.placeElement('roomId', 'socketId', ElementTypes.Earth, { row: 1, column: 3 });
+
         expect(RoomController.prototype.loadRoomById).toHaveBeenCalledTimes(1)
         expect(RoomController.prototype.save).toHaveBeenCalledTimes(1)
         expect(GameController.prototype.placeElement).toHaveBeenCalledTimes(1)
@@ -147,17 +132,13 @@ describe('GameService', () => {
         jest.spyOn(GameService.prototype, 'isPlayerTurn').mockReturnValue(true)
         jest.spyOn(GameService.prototype, 'preparePublicResponse').mockReturnValue({
             room_uuid: 'roomUUID',
-            game: new GameModel(),
+            room: new RoomModel(0),
             player_turn_uuid: 'playerUUID'
         })
 
         const gameService = new GameService();
-        let response = await gameService.moveSage('roomId', 'socketId', new PlayerModel(2), { row: 1, column: 3 });
-        expect(response).toMatchObject({
-            room_uuid: 'roomUUID',
-            game: new GameModel(),
-            player_turn_uuid: 'playerUUID'
-        });
+        await gameService.moveSage('roomId', 'socketId', new PlayerModel(2), { row: 1, column: 3 });
+
         expect(RoomController.prototype.loadRoomById).toHaveBeenCalledTimes(1)
         expect(RoomController.prototype.save).toHaveBeenCalledTimes(1)
         expect(GameController.prototype.movePlayerSage).toHaveBeenCalledTimes(1)

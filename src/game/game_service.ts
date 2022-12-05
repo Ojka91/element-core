@@ -164,7 +164,7 @@ export class GameService {
     public async playerDisconnect(roomsIds: string[], socketId: string): Promise<[PublicServerResponse, string]> {
         let response: PublicServerResponse = {
             room_uuid: '',
-            game: new GameModel(),
+            room: new RoomModel(0),
             player_turn_uuid: ''
         };
         let roomId: string = '';
@@ -211,7 +211,7 @@ export class GameService {
         const gameController: GameController = new GameController(roomModel.game);
         return {
             room_uuid: roomModel.uuid,
-            game: roomModel.game,
+            room: roomModel,
             player_turn_uuid: gameController.getTurnPlayer().uuid,
         }
 
