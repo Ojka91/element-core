@@ -202,7 +202,7 @@ export class GameService {
     }
 
     public isPlayerTurn(socketId: string, gameController: GameController, roomController: RoomController): boolean {
-        const player: IPlayerModel = roomController.getPlayerByUserId(socketId);
+        const player: IPlayerModel = roomController.getPlayerBySocketId(socketId);
         return player.uuid === gameController.getTurnPlayer().uuid
     }
 

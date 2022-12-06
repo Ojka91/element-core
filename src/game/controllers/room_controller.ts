@@ -46,7 +46,8 @@ class RoomController implements IRoomController {
             game_controller.addPlayer(player);
             this.model.user_to_player_map.push({
                 user_uuid: new UserController(user).getUuid(),
-                player_uuid: new PlayerController(player).getUuid()
+                player_uuid: new PlayerController(player).getUuid(),
+                socket_uuid: user.socket_id
             });
             this.model.user_list.push(user);
             user_added = true;
@@ -60,12 +61,12 @@ class RoomController implements IRoomController {
     }
 
     /**
-     * getPlayerByUserId
+     * getPlayerBySocketId
      */
-    public getPlayerByUserId(user_id: string): IPlayerModel {
+    public getPlayerBySocketId(user_id: string): IPlayerModel {
         const game_controller: GameController = new GameController(this.model.game);
         for(let user of this.model.user_to_player_map){
-            if(user_id === user.user_uuid){
+            if(user_id === user.socket_uuid){
                 return game_controller.getPlayerById(user.player_uuid);
             }
         }

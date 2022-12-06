@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 export type UserToPlayerMap = {
     user_uuid: string;
     player_uuid: string;
+    socket_uuid: string;
 }
 
 export interface IRoomModel {
@@ -40,7 +41,8 @@ export class RoomModelMap extends Mapper {
         for (let user of raw.user_to_player_map) {
             room.user_to_player_map.push({
                 user_uuid: user.user_uuid,
-                player_uuid: user.player_uuid
+                player_uuid: user.player_uuid,
+                socket_uuid: user.socket_uuid,
             });
         }
         const user_mapper: UserModelMap = new UserModelMap();

@@ -102,7 +102,7 @@ class SocketController {
        * drawElements: Client which turn is playing should draw elements
        */
       socket.on("drawElements", async (data: DrawElements) => {
-        console.log(data.elements)
+        console.log(data)
 
         let response: PublicServerResponse | null = null;
         try {
@@ -111,12 +111,12 @@ class SocketController {
         } catch (error) {
           // If there is any error we will notify only to the client who generate the error
           logger.warn(error)
-          let response: PrivateServerResponse = {
+          const response_error: PrivateServerResponse = {
             room_uuid: data.roomId,
             status: PrivateServerResponseStatus.ERROR,
-            message: JSON.stringify(error),
+            message: (error as Error).message,
           }
-          socket.emit('error', response)
+          socket.emit('error', response_error)
         }
         this.io.to(data.roomId).emit('gameUpdate', response)
 
