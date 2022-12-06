@@ -22,6 +22,7 @@ export class UserModelMap extends Mapper {
         const user: UserModel = new UserModel();
         user.name = raw.name;
         user.uuid = raw.uuid;
+        user.socket_id = raw.socket_id;
         return user;
     }
 }
