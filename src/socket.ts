@@ -73,6 +73,7 @@ class SocketController {
        */
       socket.on("cancelQueue", async (data: Queue) => {
         console.log(data)
+        socket.leave(data);
         queueController.deleteUserFromArray(socket.id, data);
 
       })
