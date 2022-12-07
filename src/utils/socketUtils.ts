@@ -17,6 +17,7 @@ export interface ServerToClientEvents {
 
 export interface ClientToServerEvents {
   onQueue: (queue: Queue) => void;
+  cancelQueue: (queue: Queue) => void;
   joinGame: (data: JoinGame) => void;
   endTurn: (data: EndTurn) => void;
   drawElements: (data: DrawElements) => void;

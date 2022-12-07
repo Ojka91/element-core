@@ -36,7 +36,7 @@ class SocketController {
     this.io.on("connection", (socket: Socket<ClientToServerEvents,
       ServerToClientEvents>) => {
 
-      console.log("user connected")
+      console.log("user connected " + socket.id)
 
       /**
        * onQueue: Clients that want to play a game search for a game emitting to this event with the type of queue they join (2, 3 or 4 players)
@@ -51,7 +51,7 @@ class SocketController {
         socket.join(data)
 
         // Add to the queue
-        queueController.addToQueue(data);
+        queueController.addToQueue(data, socket.id);
 
         // 2. Checking if that queue have enough players
         if (queueController.isQueueFull(data)) {
@@ -65,6 +65,15 @@ class SocketController {
           queueController.resetQueue(data);
           this.io.socketsLeave(data);
         }
+
+      })
+
+      /**
+       * User in queue cancels being in queue
+       */
+      socket.on("cancelQueue", async (data: Queue) => {
+        console.log(data)
+        queueController.deleteUserFromArray(socket.id, data);
 
       })
 
@@ -179,7 +188,8 @@ class SocketController {
        * When a user match the socketId it's disconnected we force that player as a loser and emit response
        */
       socket.on("disconnect", async () => {
-        
+        console.log('disconnecting ' + socket.id)
+        queueController.deleteUserFromArray(socket.id);
         let [response, roomId]: [PublicServerResponse, string] = await gameService.playerDisconnect(this.roomsIds, socket.id);
         
         // Deleting the roomId of the ended game
