@@ -1,4 +1,17 @@
 import { Queue } from "@/utils/socketUtils";
+type QueueData =  {
+    number_players: number;
+    max_players_allowed: 2;
+    users: string[];
+} | {
+    number_players: number;
+    max_players_allowed: 3;
+    users: string[];
+} | {
+    number_players: number;
+    max_players_allowed: 4;
+    users: string[];
+}
 
 type QueueTypesController = {
     [Queue.queue2]: {number_players: number, max_players_allowed: 2, users: string[]} 
@@ -49,37 +62,26 @@ export class QueueController {
             this.queueTypes[queue].number_players--;
         } else {
             let index = this.queueTypes[Queue.queue2].users.indexOf(socketId);
-            if (index != -1) {
-                this.queueTypes[Queue.queue2].users.splice(index, 1);
-                this.queueTypes[Queue.queue2].number_players--;
-            }
+            this.deleteItemByIndexFromQueue(index, Queue.queue2);
+
             index = this.queueTypes[Queue.queue3].users.indexOf(socketId);
-            if (index != -1) {
-                this.queueTypes[Queue.queue3].users.splice(index, 1)
-                this.queueTypes[Queue.queue3].number_players--;
-            } 
+            this.deleteItemByIndexFromQueue(index, Queue.queue3);
+
             index = this.queueTypes[Queue.queue4].users.indexOf(socketId);
-            if (index != -1) {
-                this.queueTypes[Queue.queue4].users.splice(index, 1);
-                this.queueTypes[Queue.queue4].number_players--;
-            } 
+            this.deleteItemByIndexFromQueue(index, Queue.queue4);
+
         }
     }
 
-    public getQueueData(queue: Queue): {
-        number_players: number;
-        max_players_allowed: 2;
-        users: string[];
-    } | {
-        number_players: number;
-        max_players_allowed: 3;
-        users: string[];
-    } | {
-        number_players: number;
-        max_players_allowed: 4;
-        users: string[];
-    } {
+    public getQueueData(queue: Queue): QueueData {
         return this.queueTypes[queue];
+    }
+
+    public deleteItemByIndexFromQueue (index: number, queue: Queue): void {
+        if (index != -1) {
+            this.queueTypes[queue].users.splice(index, 1);
+            this.queueTypes[queue].number_players--;
+        }
     }
 }
 
