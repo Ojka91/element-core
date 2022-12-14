@@ -1,15 +1,8 @@
 import { Queue } from "@/utils/socketUtils";
+
 type QueueData =  {
     number_players: number;
-    max_players_allowed: 2;
-    users: string[];
-} | {
-    number_players: number;
-    max_players_allowed: 3;
-    users: string[];
-} | {
-    number_players: number;
-    max_players_allowed: 4;
+    max_players_allowed: 2 | 3 | 4;
     users: string[];
 }
 
@@ -58,17 +51,18 @@ export class QueueController {
 
     public deleteUserFromArray(socketId: string, queue?: Queue): void {
         if (queue) {
-            this.queueTypes[queue].users.splice(this.queueTypes[queue].users.indexOf(socketId), 1);
-            this.queueTypes[queue].number_players--;
+            let index = this.queueTypes[queue].users.indexOf(socketId)
+            this.deleteItemByIndexFromQueue(Queue.queue2, index);
+
         } else {
             let index = this.queueTypes[Queue.queue2].users.indexOf(socketId);
-            this.deleteItemByIndexFromQueue(index, Queue.queue2);
+            this.deleteItemByIndexFromQueue(Queue.queue2, index);
 
             index = this.queueTypes[Queue.queue3].users.indexOf(socketId);
-            this.deleteItemByIndexFromQueue(index, Queue.queue3);
+            this.deleteItemByIndexFromQueue(Queue.queue3, index);
 
             index = this.queueTypes[Queue.queue4].users.indexOf(socketId);
-            this.deleteItemByIndexFromQueue(index, Queue.queue4);
+            this.deleteItemByIndexFromQueue(Queue.queue4, index);
 
         }
     }
@@ -77,7 +71,7 @@ export class QueueController {
         return this.queueTypes[queue];
     }
 
-    public deleteItemByIndexFromQueue (index: number, queue: Queue): void {
+    public deleteItemByIndexFromQueue (queue: Queue, index: number): void {
         if (index != -1) {
             this.queueTypes[queue].users.splice(index, 1);
             this.queueTypes[queue].number_players--;
