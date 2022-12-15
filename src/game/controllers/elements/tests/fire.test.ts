@@ -45,6 +45,65 @@ describe('FireModelController: ruleOfReplacement', () => {
 })
 
 describe('FireModelController: reaction', () => {
+   it('Reaction: Placing fire without any fire close, should not trigger reaction', async () => {
+      /* Not propagation
+          PF: Place fire
+           0   1   2   3   4   5   6   7   8   9 
+         -----------------------------------------
+      0  |   |   |   |   |   |   |   |   |   |   |
+         -----------------------------------------
+      1  |   |   |   |   |   |   |   |   |   |   |
+         -----------------------------------------
+      2  |   |   |   |   |   |   |   |   |   |   |
+         -----------------------------------------
+      3  |   |   |   |   | PF|   |   |   |   |   |
+         -----------------------------------------
+      4  |   |   |   |   |   |   |   |   |   |   |
+         -----------------------------------------
+      5  |   |   |   |   |   |   |   |   |   |   |
+         -----------------------------------------
+      6  |   |   |   |   |   |   |   |   |   |   |
+         -----------------------------------------
+      7  |   |   |   |   |   |   |   |   |   |   |
+         -----------------------------------------
+      */
+      const grid: GridModel = new GridModel();
+      const grid_controller: GridController = new GridController(grid);
+      grid_controller.generateInitialGrid(10, 8);
+      const element_pool_manager: ElementPoolManagerModel = new ElementPoolManagerModel();
+      const pf_pos: Position = {
+         row: 3,
+         column: 4
+      }
+      const left: Position = {
+         row: 3,
+         column: 3
+      }
+      const top: Position = {
+         row: 2,
+         column: 4
+      }
+      const bottom: Position = {
+         row: 4,
+         column: 4
+      }
+      const right: Position = {
+         row: 3,
+         column: 5
+      }
+
+      const fire: FireModel = new FireModel();
+
+      new FireController(fire).place(grid, pf_pos);
+
+      new FireController(fire).reaction(grid, pf_pos, element_pool_manager);
+
+      expect(grid_controller.isPositionEmpty(bottom)).toBe(true);
+      expect(grid_controller.isPositionEmpty(top)).toBe(true);
+      expect(grid_controller.isPositionEmpty(right)).toBe(true);
+      expect(grid_controller.isPositionEmpty(left)).toBe(true);
+
+   })
    it('Reaction: Should propagate free fire orthogonally left', async () => {
       /* Orthogonally left propagation 
           PF: Place fire
@@ -89,6 +148,10 @@ describe('FireModelController: reaction', () => {
          row: 3,
          column: 1
       }
+      const top: Position = {
+         row: 2,
+         column: 4
+      }
 
       const placed_fire: FireModel = new FireModel();
       const fire: FireModel = new FireModel();
@@ -101,6 +164,7 @@ describe('FireModelController: reaction', () => {
       expect(grid_controller.isFireCell(ff_pos)).toBe(true);
 
       expect(grid_controller.isPositionEmpty(empty_pos)).toBe(true);
+      expect(grid_controller.isPositionEmpty(top)).toBe(true);
 
    })
 
@@ -207,6 +271,10 @@ describe('FireModelController: reaction', () => {
          row: 1,
          column: 3
       }
+      const bottom: Position = {
+         row: 5,
+         column: 3
+      }
 
       const placed_fire: FireModel = new FireModel();
       const fire_1: FireModel = new FireModel();
@@ -219,6 +287,7 @@ describe('FireModelController: reaction', () => {
       new FireController(placed_fire).reaction(grid, pf_pos, element_pool_manager);
 
       expect(grid_controller.isFireCell(ff_pos)).toBe(true);
+      expect(grid_controller.isPositionEmpty(bottom)).toBe(true);
 
    })
 

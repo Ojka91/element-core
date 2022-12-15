@@ -47,8 +47,19 @@ export class FireController extends ElementController implements IFireController
         if (element_pool_manager === undefined) {
             throw new Error("Element pool is required for Fire reaction")
         }
+        const grid_controller: GridController = new GridController(grid);
+
         propagation_map.forEach((value: AxisIncrement, key: string) => {
-            this.propagate(grid, cell, value, element_pool_manager);
+            const evaluation_cell: Position = {
+                row: cell.row + value.y,
+                column: cell.column + value.x
+            }
+
+            // Propagation only happens IF orthogonal positions contains another fire. So first we need to make sure surrounding positions are NOT empty
+            // If we dont do this, fire will propagate over itself (with no surrounding fires)
+            if (grid_controller.isPositionValid(evaluation_cell) && !grid_controller.isPositionEmpty(evaluation_cell)) {
+                 this.propagate(grid, cell, value, element_pool_manager);
+            }
         })
     }
 
