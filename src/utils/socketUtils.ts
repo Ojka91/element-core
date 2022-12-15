@@ -9,6 +9,7 @@ export interface ServerToClientEvents {
   error: (response: PrivateServerResponse | null) => void;
   gameUpdate: (response: PublicServerResponse | null) => void;
   gameFound: (response: GameFound) => void;
+  chat: (response: ChatServerToClient) => void;
   
   // Testing porpouses
   boardMovement: (response: {}) => void;
@@ -23,6 +24,7 @@ export interface ClientToServerEvents {
   drawElements: (data: DrawElements) => void;
   placeElement: (data: PlaceElement) => void;
   moveSage: (data: MoveSage) => void;
+  chat: (data: ChatClientToServer) => void;
 
   // Testing porpouses
   joinRoom: (data: any) => void;
@@ -73,4 +75,13 @@ export type MoveSage = {
   roomId: string
   player: IPlayerModel
   position: Position
+}
+
+export type ChatClientToServer = {
+  roomId: string,
+  message: string
+}
+
+export type ChatServerToClient = {
+  message: string
 }
