@@ -5,7 +5,6 @@ import { WindModel } from "@/game/models/elements/wind";
 import { ElementPoolManagerModel } from "@/game/models/element_pool";
 import { GridModel } from "@/game/models/grid";
 import { Position } from "@/game/utils/position_utils";
-import e from "express";
 import ElementPoolManager from "../../element_pool_controller";
 import GridController from "../../grid_controller";
 import { FireController } from "../fire_controller";
@@ -79,7 +78,8 @@ describe('FireModelController: reaction', () => {
       const grid: GridModel = new GridModel();
       const grid_controller: GridController = new GridController(grid);
       grid_controller.generateInitialGrid(10, 8);
-      const element_pool_manager: ElementPoolManagerModel = new ElementPoolManagerModel();
+      const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+      const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
       const pf_pos: Position = {
          row: 3,
          column: 4
@@ -108,11 +108,11 @@ describe('FireModelController: reaction', () => {
       const fire: FireModel = new FireModel();
       const wind: WindModel = new WindModel();
 
-      new WindController(wind).place(grid, wind_pos);
-      new FireController(fire).place(grid, pf_pos);
-      new FireController(fire).place(grid, pf_pos);
+      new WindController(wind).place(grid, wind_pos, element_pool_manager);
+      new FireController(fire).place(grid, pf_pos, element_pool_manager);
+      new FireController(fire).place(grid, pf_pos, element_pool_manager);
 
-      new FireController(fire).reaction(grid, pf_pos, element_pool_manager);
+      new FireController(fire).reaction(grid, pf_pos, element_pool_manager_model);
 
       expect(grid_controller.isPositionEmpty(bottom)).toBe(true);
       expect(grid_controller.isPositionEmpty(top)).toBe(true);
