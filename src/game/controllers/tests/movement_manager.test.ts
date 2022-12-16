@@ -10,6 +10,8 @@ import { EarthController } from "../elements/earth_controller";
 import { WindController } from "../elements/wind_controller";
 import GridController from "../grid_controller";
 import { SageController } from "../pieces/sage_controller";
+import { ElementPoolManagerModel } from "@/game/models/element_pool";
+import ElementPoolManager from "../element_pool_controller";
 
 const surroundingSageMoves: Position[] = [
    // Orthogonal moves
@@ -435,17 +437,20 @@ describe('movement_manager', () => {
       const grid: GridModel = new GridModel();
       const grid_controller: GridController = new GridController(grid);
       grid_controller.generateInitialGrid(11, 8);
+      const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+      const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
+      element_pool_manager.emptyPool(); // Empty pool so when replacement happens and element go back to pool, the pool is not full
 
       // Generate Whirlwind
       let wind: WindModel = new WindModel();
       new WindController(wind).increaseStackedWinds();
-      new WindController(wind).place(grid, wind_pos);
+      new WindController(wind).place(grid, wind_pos, element_pool_manager);
 
       let earth: EarthModel = new EarthModel();
-      new EarthController(earth).place(grid, earth_pos);
+      new EarthController(earth).place(grid, earth_pos, element_pool_manager);
 
       let earth_mountain_1 = new EarthModel();
-      new EarthController(earth_mountain_1).place(grid, mountain_pos);
+      new EarthController(earth_mountain_1).place(grid, mountain_pos, element_pool_manager);
 
       // No range -> Valid jump
       let result = MovementManager.isSageMoveValid(grid, cur_pos, new_pos);
@@ -453,7 +458,7 @@ describe('movement_manager', () => {
 
       // Add second earth to convert the earth into Mountain and range the surrounding earths
       let earth_mountain_2 = new EarthModel();
-      new EarthController(earth_mountain_2).place(grid, mountain_pos);
+      new EarthController(earth_mountain_2).place(grid, mountain_pos, element_pool_manager);
 
       expect(grid_controller.isRangeCell(earth_pos)).toBe(true);
 
@@ -489,6 +494,9 @@ describe('movement_manager', () => {
       const cur_pos: Position = { row: 3, column: 5 };
       const wind_pos: Position = { row: 2, column: 5 };
       const earth_pos: Position = { row: 1, column: 5 };
+      const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+      const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
+      element_pool_manager.emptyPool(); // Empty pool so when replacement happens and element go back to pool, the pool is not full
 
       const grid: GridModel = new GridModel();
       const grid_controller: GridController = new GridController(grid);
@@ -496,12 +504,12 @@ describe('movement_manager', () => {
 
       // Generate Whirlwind
       let wind: WindModel = new WindModel();
-      new WindController(wind).place(grid, wind_pos);
+      new WindController(wind).place(grid, wind_pos, element_pool_manager);
 
       expect(MovementManager.isWindBlocked(grid, cur_pos, wind)).toBe(false);
 
       let earth: EarthModel = new EarthModel();
-      new EarthController(earth).place(grid, earth_pos);
+      new EarthController(earth).place(grid, earth_pos, element_pool_manager);
 
       expect(MovementManager.isWindBlocked(grid, cur_pos, wind)).toBe(true);
    })
@@ -538,17 +546,20 @@ describe('movement_manager', () => {
       const grid: GridModel = new GridModel();
       const grid_controller: GridController = new GridController(grid);
       grid_controller.generateInitialGrid(11, 8);
+      const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+      const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
+      element_pool_manager.emptyPool(); // Empty pool so when replacement happens and element go back to pool, the pool is not full
 
       let wind: WindModel = new WindModel();
-      new WindController(wind).place(grid, wind_pos);
+      new WindController(wind).place(grid, wind_pos, element_pool_manager);
 
       let wind_2: WindModel = new WindModel();
-      new WindController(wind).place(grid, wind_pos_2);
+      new WindController(wind).place(grid, wind_pos_2, element_pool_manager);
 
       expect(MovementManager.isWindBlocked(grid, cur_pos, wind)).toBe(false);
 
       let earth: EarthModel = new EarthModel();
-      new EarthController(earth).place(grid, earth_pos);
+      new EarthController(earth).place(grid, earth_pos, element_pool_manager);
 
       expect(MovementManager.isWindBlocked(grid, cur_pos, wind)).toBe(true);
    })
@@ -584,12 +595,15 @@ describe('movement_manager', () => {
       const grid: GridModel = new GridModel();
       const grid_controller: GridController = new GridController(grid);
       grid_controller.generateInitialGrid(11, 8);
+      const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+      const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
+      element_pool_manager.emptyPool(); // Empty pool so when replacement happens and element go back to pool, the pool is not full
 
       let wind: WindModel = new WindModel();
-      new WindController(wind).place(grid, wind_pos);
+      new WindController(wind).place(grid, wind_pos, element_pool_manager);
 
       let wind_2: WindModel = new WindModel();
-      new WindController(wind).place(grid, wind_pos_2);
+      new WindController(wind).place(grid, wind_pos_2, element_pool_manager);
 
       expect(MovementManager.isWindBlocked(grid, cur_pos, wind)).toBe(false);
    })

@@ -2,9 +2,11 @@ import { EarthModel } from "@/game/models/elements/earth";
 import { FireModel } from "@/game/models/elements/fire";
 import { WaterModel } from "@/game/models/elements/water";
 import { WindModel } from "@/game/models/elements/wind";
+import { ElementPoolManagerModel } from "@/game/models/element_pool";
 import { GridModel } from "@/game/models/grid";
 import { SageModel } from "@/game/models/pieces/sage";
 import { Position } from "@/game/utils/position_utils";
+import ElementPoolManager from "../../element_pool_controller";
 import GridController from "../../grid_controller";
 import { SageController } from "../../pieces/sage_controller";
 import { EarthController } from "../earth_controller";
@@ -15,18 +17,25 @@ describe('WaterController: ruleOfReplacement', () => {
     let result;
     it('Rule of replacement: Should return true if replaces Fire', async () => {
         const water = new WaterModel()
-        result = new WaterController(water).ruleOfReplacement(new FireModel())
+        const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+        const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
+        element_pool_manager.emptyPool(); // Empty pool so when replacement happens and element go back to pool, the pool is not full
+
+        result = new WaterController(water).ruleOfReplacement(new FireModel(), element_pool_manager)
 
         expect(result).toBe(true)
     })
 
     it('Rule of replacement: Should return false if replaces anything else', async () => {
         const water = new WaterModel()
-        result = new WaterController(water).ruleOfReplacement(new EarthModel())
+        const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+        const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
+
+        result = new WaterController(water).ruleOfReplacement(new EarthModel(), element_pool_manager)
         expect(result).toBe(false)
-        result = new WaterController(water).ruleOfReplacement(new WindModel())
+        result = new WaterController(water).ruleOfReplacement(new WindModel(), element_pool_manager)
         expect(result).toBe(false)
-        result = new WaterController(water).ruleOfReplacement(new WaterModel())
+        result = new WaterController(water).ruleOfReplacement(new WaterModel(), element_pool_manager)
         expect(result).toBe(false)
 
     })
@@ -42,10 +51,12 @@ describe('WaterController: reaction', () => {
         const placed_water_pos: Position = {
             row: 3, column: 5
         }
+        const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+        const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
 
         // Place water
         const placed_water: WaterModel = new WaterModel();
-        new WaterController(placed_water).place(grid, placed_water_pos);
+        new WaterController(placed_water).place(grid, placed_water_pos, element_pool_manager);
 
         // Perform water reaction
         const result = new WaterController(placed_water).reaction(grid, placed_water_pos);
@@ -67,16 +78,18 @@ describe('WaterController: reaction', () => {
             { row: 3, column: 6 },
             { row: 3, column: 7 }
         ]
+        const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+        const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
 
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
             const water: WaterModel = new WaterModel();
-            new WaterController(water).place(grid, water_pos);
+            new WaterController(water).place(grid, water_pos, element_pool_manager);
         })
 
         // Place water
         const placed_water: WaterModel = new WaterModel();
-        new WaterController(placed_water).place(grid, placed_water_pos);
+        new WaterController(placed_water).place(grid, placed_water_pos, element_pool_manager);
 
         // Perform water reaction tests
         expect(() => {
@@ -111,16 +124,18 @@ describe('WaterController: reaction', () => {
         const new_water_sequence: Array<Position> = [
             { row: 3, column: 6 },
         ]
+        const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+        const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
 
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
             const water: WaterModel = new WaterModel();
-            new WaterController(water).place(grid, water_pos);
+            new WaterController(water).place(grid, water_pos, element_pool_manager);
         })
 
         // Place water
         const placed_water: WaterModel = new WaterModel();
-        new WaterController(placed_water).place(grid, placed_water_pos);
+        new WaterController(placed_water).place(grid, placed_water_pos, element_pool_manager);
 
         // Perform water reaction tests
         expect(() => {
@@ -145,16 +160,18 @@ describe('WaterController: reaction', () => {
             { row: 3, column: 7 },
             { row: 3, column: 8 },
         ]
+        const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+        const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
 
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
             const water: WaterModel = new WaterModel();
-            new WaterController(water).place(grid, water_pos);
+            new WaterController(water).place(grid, water_pos, element_pool_manager);
         })
 
         // Place water
         const placed_water: WaterModel = new WaterModel();
-        new WaterController(placed_water).place(grid, placed_water_pos);
+        new WaterController(placed_water).place(grid, placed_water_pos, element_pool_manager);
 
         // Perform water reaction tests
         expect(() => {
@@ -209,21 +226,25 @@ describe('WaterController: reaction', () => {
             { row: 3, column: 7 },
             { row: 3, column: 8 }
         ]
+        const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+        const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
+        element_pool_manager.emptyPool(); // Empty pool so when replacement happens and element go back to pool, the pool is not full
+
 
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
             const water: WaterModel = new WaterModel();
-            new WaterController(water).place(grid, water_pos);
+            new WaterController(water).place(grid, water_pos, element_pool_manager);
 
         })
 
         const earth: EarthModel = new EarthModel();
-        new EarthController(earth).place(grid, water_pos_list[1]);
+        new EarthController(earth).place(grid, water_pos_list[1], element_pool_manager);
 
 
         // Place water
         const placed_water: WaterModel = new WaterModel();
-        new WaterController(placed_water).place(grid, placed_water_pos);
+        new WaterController(placed_water).place(grid, placed_water_pos, element_pool_manager);
 
 
         // Perform water reaction
@@ -272,17 +293,19 @@ describe('WaterController: reaction', () => {
             { row: 3, column: 6 },
             { row: 3, column: 7 }
         ]
+        const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+        const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
 
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
             const water: WaterModel = new WaterModel();
-            new WaterController(water).place(grid, water_pos);
+            new WaterController(water).place(grid, water_pos, element_pool_manager);
 
         })
 
         // Place water
         const placed_water: WaterModel = new WaterModel();
-        new WaterController(placed_water).place(grid, placed_water_pos);
+        new WaterController(placed_water).place(grid, placed_water_pos, element_pool_manager);
 
 
         // Perform water reaction
@@ -340,17 +363,19 @@ describe('WaterController: reaction', () => {
             { row: 6, column: 4 },
             { row: 7, column: 4 }
         ]
+        const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+        const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
 
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
             const water: WaterModel = new WaterModel();
-            new WaterController(water).place(grid, water_pos);
+            new WaterController(water).place(grid, water_pos, element_pool_manager);
 
         })
 
         // Place water
         const placed_water: WaterModel = new WaterModel();
-        new WaterController(placed_water).place(grid, placed_water_pos);
+        new WaterController(placed_water).place(grid, placed_water_pos, element_pool_manager);
 
 
         // Perform water reaction
@@ -416,17 +441,19 @@ describe('WaterController: reaction', () => {
             { row: 5, column: 5 },
             { row: 4, column: 5 },
         ]
+        const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+        const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
 
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
             const water: WaterModel = new WaterModel();
-            new WaterController(water).place(grid, water_pos);
+            new WaterController(water).place(grid, water_pos, element_pool_manager);
 
         })
 
         // Place water
         const placed_water: WaterModel = new WaterModel();
-        new WaterController(placed_water).place(grid, placed_water_pos);
+        new WaterController(placed_water).place(grid, placed_water_pos, element_pool_manager);
 
 
         // Perform water reaction
@@ -500,26 +527,29 @@ describe('WaterController: reaction', () => {
             { row: 5, column: 5 },
             { row: 4, column: 5 },
         ]
+        const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+        const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
+        element_pool_manager.emptyPool(); // Empty pool so when replacement happens and element go back to pool, the pool is not full
 
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
             const water: WaterModel = new WaterModel();
-            new WaterController(water).place(grid, water_pos);
+            new WaterController(water).place(grid, water_pos, element_pool_manager);
 
         })
 
         fire_pos_list.forEach((fire_pos) => {
             const fire: FireModel = new FireModel();
-            new WaterController(fire).place(grid, fire_pos);
+            new WaterController(fire).place(grid, fire_pos, element_pool_manager);
         })
 
         // Place water
         const placed_water: WaterModel = new WaterModel();
-        new WaterController(placed_water).place(grid, placed_water_pos);
+        new WaterController(placed_water).place(grid, placed_water_pos, element_pool_manager);
 
 
         // Perform water reaction
-        new WaterController(placed_water).reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
+        new WaterController(placed_water).reaction(grid, placed_water_pos, water_pos_list, new_water_sequence, element_pool_manager);
 
         for (let pos of new_water_sequence) {
             expect(grid_controller.isWaterCell(pos)).toBe(true);
@@ -586,24 +616,26 @@ describe('WaterController: reaction', () => {
         const other_element_pos: Position = {
             row: 7, column: 6
         }
+        const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+        const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
 
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
             const water: WaterModel = new WaterModel();
-            new WaterController(water).place(grid, water_pos);
+            new WaterController(water).place(grid, water_pos, element_pool_manager);
 
         })
 
         // Place water
         const placed_water: WaterModel = new WaterModel();
-        new WaterController(placed_water).place(grid, placed_water_pos);
+        new WaterController(placed_water).place(grid, placed_water_pos, element_pool_manager);
 
 
         /* 
         TEST WITH other element: Earth
         */
         const earth: EarthModel = new EarthModel();
-        new WaterController(earth).place(grid, other_element_pos);
+        new WaterController(earth).place(grid, other_element_pos, element_pool_manager);
 
 
         expect(() => {
@@ -614,7 +646,7 @@ describe('WaterController: reaction', () => {
         TEST WITH other element: Water
         */
         const water: WaterModel = new WaterModel();
-        new WaterController(water).place(grid, other_element_pos);
+        new WaterController(water).place(grid, other_element_pos, element_pool_manager);
 
 
         expect(() => {
@@ -625,7 +657,7 @@ describe('WaterController: reaction', () => {
         TEST WITH other element: Wind
         */
         const wind: WindModel = new WindModel();
-        new WaterController(wind).place(grid, other_element_pos);
+        new WaterController(wind).place(grid, other_element_pos, element_pool_manager);
 
 
         expect(() => {
@@ -689,17 +721,19 @@ describe('WaterController: reaction', () => {
             { row: 6, column: 9 },
             { row: 6, column: 10 }
         ]
+        const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+        const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
 
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
             const water: WaterModel = new WaterModel();
-            new WaterController(water).place(grid, water_pos);
+            new WaterController(water).place(grid, water_pos, element_pool_manager);
 
         })
 
         // Place water
         const placed_water: WaterModel = new WaterModel();
-        new WaterController(placed_water).place(grid, placed_water_pos);
+        new WaterController(placed_water).place(grid, placed_water_pos, element_pool_manager);
 
 
         // Perform water reaction
@@ -750,17 +784,19 @@ describe('WaterController: reaction', () => {
             { row: 4, column: 7 },
             { row: 4, column: 5 }
         ]
+        const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+        const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
 
         // Prepare grid
         water_pos_list.forEach((water_pos) => {
             const water: WaterModel = new WaterModel();
-            new WaterController(water).place(grid, water_pos);
+            new WaterController(water).place(grid, water_pos, element_pool_manager);
 
         })
 
         // Place water
         const placed_water: WaterModel = new WaterModel();
-        new WaterController(placed_water).place(grid, placed_water_pos);
+        new WaterController(placed_water).place(grid, placed_water_pos, element_pool_manager);
 
 
         // Perform water reaction

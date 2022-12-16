@@ -5,6 +5,8 @@ import { IPieceModel, PieceModel } from "@/game/models/pieces/pieces";
 import { IGridModel } from "@/game/models/grid";
 import { WaterModel } from "@/game/models/elements/water";
 import { ElementController, IElementController } from "./elements_controller";
+import ElementPoolManager from "../element_pool_controller";
+import { ElementTypes } from "@/game/models/elements/elements";
 
 
 const all_direction_map: Map<string, AxisIncrement> = PositionUtils.all_direction_increment_map;
@@ -20,12 +22,12 @@ const all_direction_map: Map<string, AxisIncrement> = PositionUtils.all_directio
  *          A Range blocks the Sage to move diagonally.
  */
 export interface IEarthController extends IElementController {
-    place(grid: IGridModel, cell: Position): boolean;
+    place(grid: IGridModel, cell: Position, element_pool_manager: ElementPoolManager): boolean;
     isMountain(): boolean;
     isRange(): boolean;
     promoteToRange(): void;
     promoteToMountain(): void;
-    ruleOfReplacement(piece_to_replace: IPieceModel): boolean;
+    ruleOfReplacement(piece_to_replace: IPieceModel, element_pool_manager: ElementPoolManager): boolean;
     reaction(grid: IGridModel, cell: Position): void;
 }
 
@@ -38,7 +40,7 @@ export class EarthController extends ElementController implements IEarthControll
     }
 
     // Override parent method
-    public place(grid: IGridModel, cell: Position): boolean {
+    public place(grid: IGridModel, cell: Position, element_pool_manager: ElementPoolManager): boolean {
         const grid_controller: GridController = new GridController(grid);
         const piece: PieceModel = grid_controller.getGridCellByPosition(cell);
         this.model.position = cell;
@@ -52,7 +54,7 @@ export class EarthController extends ElementController implements IEarthControll
                 return false;
             }
         }
-        if (grid_controller.isPositionEmpty(cell) || (this.ruleOfReplacement(piece))) {
+        if (grid_controller.isPositionEmpty(cell) || (this.ruleOfReplacement(piece, element_pool_manager))) {
             grid_controller.updateGridCell(this.model)
 
             return true;
@@ -77,8 +79,9 @@ export class EarthController extends ElementController implements IEarthControll
         this.promoteToRange();
     }
 
-    public ruleOfReplacement(piece_to_replace: IPieceModel): boolean {
+    public ruleOfReplacement(piece_to_replace: IPieceModel, element_pool_manager: ElementPoolManager): boolean {
         if (piece_to_replace instanceof WaterModel) {
+            element_pool_manager.addElement(ElementTypes.Water);
             return true;
         }
         if (piece_to_replace instanceof EarthModel) {

@@ -2,6 +2,7 @@ import { BoardModel } from "@/game/models/board";
 import { EarthModel } from "@/game/models/elements/earth";
 import { ElementTypes } from "@/game/models/elements/elements";
 import { WindModel } from "@/game/models/elements/wind";
+import { ElementPoolManagerModel } from "@/game/models/element_pool";
 import { GameType } from "@/game/models/game";
 import { GridModel } from "@/game/models/grid";
 import { PlayerModel } from "@/game/models/player";
@@ -10,6 +11,7 @@ import { WaterReaction } from "@/schemas/player_actions";
 import BoardController from "../board_controller";
 import { EarthController } from "../elements/earth_controller";
 import { WindController } from "../elements/wind_controller";
+import ElementPoolManager from "../element_pool_controller";
 import GridController from "../grid_controller";
 import PlayerController from "../player_controller";
 
@@ -84,7 +86,10 @@ describe('BoardController', () => {
         const board_controller: BoardController = new BoardController(board);
         const grid_controller: GridController = new GridController(board.grid);
         grid_controller.generateInitialGrid(5, 5)
-
+        board_controller.getElementFromPool(ElementTypes.Fire)
+        board_controller.getElementFromPool(ElementTypes.Water)
+        board_controller.getElementFromPool(ElementTypes.Earth)
+        board_controller.getElementFromPool(ElementTypes.Wind)
         const pos: Position = {
             row: 0,
             column: 0
@@ -251,6 +256,9 @@ describe('BoardController', () => {
 
         const grid_controller: GridController = new GridController(board.grid);
         grid_controller.generateInitialGrid(5, 5);
+        const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+        const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
+        element_pool_manager.emptyPool(); // Empty pool so when replacement happens and element go back to pool, the pool is not full
 
         board_controller.createSageByPlayerAndGameType(player, GameType.FourPlayersGame);
 
@@ -261,18 +269,18 @@ describe('BoardController', () => {
         // Fill grid with earths
         for (let row = 1; row < 4; row++) {
             for (let col = 1; col < 4; col++) {
-                new EarthController(new EarthModel()).place(board.grid, { row: row, column: col })
+                new EarthController(new EarthModel()).place(board.grid, { row: row, column: col }, element_pool_manager)
             }
         }
 
         let result: string = board_controller.winningCondition(placed_piece);
         expect(result).toStrictEqual(player_controller.getSage().uuid);
 
-        new WindController(new WindModel()).place(board.grid, wind_position);
+        new WindController(new WindModel()).place(board.grid, wind_position, element_pool_manager);
         result = board_controller.winningCondition(placed_piece);
         expect(result).toStrictEqual("");
 
-        new EarthController(new EarthModel()).place(board.grid, blocking_wind);
+        new EarthController(new EarthModel()).place(board.grid, blocking_wind, element_pool_manager);
         result = board_controller.winningCondition(placed_piece);
         expect(result).toStrictEqual(player_controller.getSage().uuid);
 

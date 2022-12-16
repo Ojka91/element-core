@@ -2,8 +2,10 @@ import { EarthModel } from "@/game/models/elements/earth"
 import { FireModel } from "@/game/models/elements/fire"
 import { WaterModel } from "@/game/models/elements/water"
 import { WindModel } from "@/game/models/elements/wind"
+import { ElementPoolManagerModel } from "@/game/models/element_pool"
 import { GridModel } from "@/game/models/grid"
 import { Position } from "@/game/utils/position_utils"
+import ElementPoolManager from "../../element_pool_controller"
 import GridController from "../../grid_controller"
 import { EarthController } from "../earth_controller"
 import { FireController } from "../fire_controller"
@@ -14,25 +16,30 @@ describe('EarthController: ruleOfReplacement', () => {
     it('Rule of replacement: Should return true if replaces water or earth', () => {
         const earth: EarthModel = new EarthModel()
         const earth_controller: EarthController = new EarthController(earth);
+        const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+        const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
+        element_pool_manager.emptyPool(); // Empty pool so when replacement happens and element go back to pool, the pool is not full
 
-        expect(earth_controller.ruleOfReplacement(new WaterModel())).toBe(true)
-        expect(earth_controller.ruleOfReplacement(new EarthModel())).toBe(true)
+        expect(earth_controller.ruleOfReplacement(new WaterModel(), element_pool_manager)).toBe(true)
+        expect(earth_controller.ruleOfReplacement(new EarthModel(), element_pool_manager)).toBe(true)
     })
 
     it('Rule of replacement: Should return false if replaces a Mountain', () => {
         const earth: EarthModel = new EarthModel()
         const earth_controller: EarthController = new EarthController(earth);
-
+        const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+        const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
         earth_controller.promoteToMountain();
-        expect(earth_controller.ruleOfReplacement(new EarthModel())).toBe(false);
+        expect(earth_controller.ruleOfReplacement(new EarthModel(), element_pool_manager)).toBe(false);
     })
 
     it('Rule of replacement: Should return false if replaces fire or wind', () => {
         const earth: EarthModel = new EarthModel()
         const earth_controller: EarthController = new EarthController(earth);
-
-        const fire = earth_controller.ruleOfReplacement(new FireModel())
-        const wind = earth_controller.ruleOfReplacement(new WindModel())
+        const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+        const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
+        const fire = earth_controller.ruleOfReplacement(new FireModel(), element_pool_manager)
+        const wind = earth_controller.ruleOfReplacement(new WindModel(), element_pool_manager)
 
         expect(fire).toBe(false)
         expect(wind).toBe(false)
@@ -144,9 +151,12 @@ describe('EarthModel: reaction', () => {
 
         const earth = new EarthModel()
         const earth_controller = new EarthController(earth);
-
+        const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+        const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
+        element_pool_manager.emptyPool(); // Empty pool so when replacement happens and element go back to pool, the pool is not full
+        
         expect(grid_controller.isWaterCell(piece_pos)).toBe(true);
-        expect(earth_controller.place(grid, piece_pos)).toBe(true);
+        expect(earth_controller.place(grid, piece_pos, element_pool_manager)).toBe(true);
 
         expect(grid_controller.isEarthCell(piece_pos)).toBe(true);
 
@@ -154,12 +164,12 @@ describe('EarthModel: reaction', () => {
         const wind = new WindModel();
         new WindController(wind).updatePosition(piece_pos);
         grid_controller.updateGridCell(wind);
-        expect(earth_controller.place(grid, piece_pos)).toBe(false);
+        expect(earth_controller.place(grid, piece_pos, element_pool_manager)).toBe(false);
 
         const fire = new FireModel();
         new FireController(fire).updatePosition(piece_pos);
         grid_controller.updateGridCell(fire);
-        expect(earth_controller.place(grid, piece_pos)).toBe(false);
+        expect(earth_controller.place(grid, piece_pos, element_pool_manager)).toBe(false);
     })
 
     it('place: earth must be promoted to mountain', () => {
@@ -204,14 +214,15 @@ describe('EarthModel: reaction', () => {
         const earth_pos: Position = { row: 1, column: 1 };
         const earth = new EarthModel()
         const new_earth: EarthModel = new EarthModel();
-
-        expect(new EarthController(earth).place(grid, earth_pos)).toBe(true);
+        const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+        const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
+        expect(new EarthController(earth).place(grid, earth_pos, element_pool_manager)).toBe(true);
         expect(grid_controller.isEarthCell(earth_pos)).toBe(true);
-        expect(new EarthController(new_earth).place(grid, earth_pos)).toBe(true);
+        expect(new EarthController(new_earth).place(grid, earth_pos, element_pool_manager)).toBe(true);
         expect(grid_controller.isMountainCell(earth_pos)).toBe(true);
 
         // Check it cannot be promoted twice
-        expect(new EarthController(new_earth).place(grid, earth_pos)).toBe(false);
+        expect(new EarthController(new_earth).place(grid, earth_pos, element_pool_manager)).toBe(false);
         expect(grid_controller.isMountainCell(earth_pos)).toBe(true);
     })
 
@@ -250,7 +261,9 @@ describe('EarthModel: reaction', () => {
 
         const place_earth_pos: Position = { row: 1, column: 2 };
         const new_earth: EarthModel = new EarthModel();
-        new EarthController(new_earth).place(grid, place_earth_pos);
+        const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+        const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
+        new EarthController(new_earth).place(grid, place_earth_pos, element_pool_manager);
 
         for (let pos of rangeable_earth_positions) {
             expect(grid_controller.isRangeCell(pos)).toBe(true);

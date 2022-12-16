@@ -1,10 +1,12 @@
 import { EarthModel } from "@/game/models/elements/earth";
+import { ElementTypes } from "@/game/models/elements/elements";
 import { FireModel } from "@/game/models/elements/fire";
 import { WaterModel } from "@/game/models/elements/water";
 import { WindModel } from "@/game/models/elements/wind";
 import { ElementPoolManagerModel } from "@/game/models/element_pool";
 import { GridModel } from "@/game/models/grid";
 import { Position } from "@/game/utils/position_utils";
+import ElementPoolManager from "../../element_pool_controller";
 import GridController from "../../grid_controller";
 import { FireController } from "../fire_controller";
 import { WindController } from "../wind_controller";
@@ -15,7 +17,11 @@ describe('FireModelController: ruleOfReplacement', () => {
       const fire = new FireModel()
 
       const wind = new WindModel();
-      result = new FireController(fire).ruleOfReplacement(wind);
+      const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+      const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
+      element_pool_manager.emptyPool(); // Empty pool so when replacement happens and element go back to pool, the pool is not full
+
+      result = new FireController(fire).ruleOfReplacement(wind, element_pool_manager);
 
       expect(result).toBe(true)
    })
@@ -27,18 +33,20 @@ describe('FireModelController: ruleOfReplacement', () => {
       const fire_2 = new FireModel();
       const whirlwind = new WindModel();
       new WindController(whirlwind).increaseStackedWinds();
+      const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+      const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
 
       // Shouldn't replace earth
-      result = new FireController(fire).ruleOfReplacement(earth)
+      result = new FireController(fire).ruleOfReplacement(earth, element_pool_manager)
       expect(result).toBe(false);
       // Shoudln't replace water
-      result = new FireController(fire).ruleOfReplacement(water)
+      result = new FireController(fire).ruleOfReplacement(water, element_pool_manager)
       expect(result).toBe(false);
       // Cannot stack neither replace fire over fire
-      result = new FireController(fire).ruleOfReplacement(fire_2);
+      result = new FireController(fire).ruleOfReplacement(fire_2, element_pool_manager);
       expect(result).toBe(false);
       // shouldn't replace whirlwind
-      result = new FireController(fire).ruleOfReplacement(whirlwind);
+      result = new FireController(fire).ruleOfReplacement(whirlwind, element_pool_manager);
       expect(result).toBe(false);
 
    })
@@ -71,7 +79,8 @@ describe('FireModelController: reaction', () => {
       const grid: GridModel = new GridModel();
       const grid_controller: GridController = new GridController(grid);
       grid_controller.generateInitialGrid(10, 8);
-      const element_pool_manager: ElementPoolManagerModel = new ElementPoolManagerModel();
+      const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+      const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
       const pf_pos: Position = {
          row: 3,
          column: 4
@@ -100,11 +109,11 @@ describe('FireModelController: reaction', () => {
       const fire: FireModel = new FireModel();
       const wind: WindModel = new WindModel();
 
-      new WindController(wind).place(grid, wind_pos);
-      new FireController(fire).place(grid, pf_pos);
-      new FireController(fire).place(grid, pf_pos);
+      new WindController(wind).place(grid, wind_pos, element_pool_manager);
+      new FireController(fire).place(grid, pf_pos, element_pool_manager);
+      new FireController(fire).place(grid, pf_pos, element_pool_manager);
 
-      new FireController(fire).reaction(grid, pf_pos, element_pool_manager);
+      new FireController(fire).reaction(grid, pf_pos, element_pool_manager_model);
 
       expect(grid_controller.isPositionEmpty(bottom)).toBe(true);
       expect(grid_controller.isPositionEmpty(top)).toBe(true);
@@ -140,7 +149,9 @@ describe('FireModelController: reaction', () => {
       const grid: GridModel = new GridModel();
       const grid_controller: GridController = new GridController(grid);
       grid_controller.generateInitialGrid(10, 8);
-      const element_pool_manager: ElementPoolManagerModel = new ElementPoolManagerModel();
+      const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+      const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
+      
       const pf_pos: Position = {
          row: 3,
          column: 4
@@ -165,10 +176,10 @@ describe('FireModelController: reaction', () => {
       const placed_fire: FireModel = new FireModel();
       const fire: FireModel = new FireModel();
 
-      new FireController(placed_fire).place(grid, pf_pos);
-      new FireController(fire).place(grid, f_pos);
+      new FireController(placed_fire).place(grid, pf_pos, element_pool_manager);
+      new FireController(fire).place(grid, f_pos, element_pool_manager);
 
-      new FireController(placed_fire).reaction(grid, pf_pos, element_pool_manager);
+      new FireController(placed_fire).reaction(grid, pf_pos, element_pool_manager_model);
 
       expect(grid_controller.isFireCell(ff_pos)).toBe(true);
 
@@ -204,7 +215,8 @@ describe('FireModelController: reaction', () => {
       const grid: GridModel = new GridModel();
       const grid_controller: GridController = new GridController(grid);
       grid_controller.generateInitialGrid(10, 8);
-      const element_pool_manager: ElementPoolManagerModel = new ElementPoolManagerModel();
+      const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+      const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
       const pf_pos: Position = {
          row: 3,
          column: 2
@@ -226,11 +238,11 @@ describe('FireModelController: reaction', () => {
       const fire_1: FireModel = new FireModel();
       const fire_2: FireModel = new FireModel();
 
-      new FireController(placed_fire).place(grid, pf_pos);
-      new FireController(fire_1).place(grid, f_pos_1);
-      new FireController(fire_2).place(grid, f_pos_2);
+      new FireController(placed_fire).place(grid, pf_pos, element_pool_manager);
+      new FireController(fire_1).place(grid, f_pos_1, element_pool_manager);
+      new FireController(fire_2).place(grid, f_pos_2, element_pool_manager);
 
-      new FireController(placed_fire).reaction(grid, pf_pos, element_pool_manager);
+      new FireController(placed_fire).reaction(grid, pf_pos, element_pool_manager_model);
 
       expect(grid_controller.isFireCell(ff_pos)).toBe(true);
 
@@ -263,7 +275,8 @@ describe('FireModelController: reaction', () => {
       const grid: GridModel = new GridModel();
       const grid_controller: GridController = new GridController(grid);
       grid_controller.generateInitialGrid(10, 8);
-      const element_pool_manager: ElementPoolManagerModel = new ElementPoolManagerModel();
+      const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+      const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
       const pf_pos: Position = {
          row: 4,
          column: 3
@@ -289,11 +302,11 @@ describe('FireModelController: reaction', () => {
       const fire_1: FireModel = new FireModel();
       const fire_2: FireModel = new FireModel();
 
-      new FireController(placed_fire).place(grid, pf_pos);
-      new FireController(fire_1).place(grid, f_pos_1);
-      new FireController(fire_2).place(grid, f_pos_2);
+      new FireController(placed_fire).place(grid, pf_pos, element_pool_manager);
+      new FireController(fire_1).place(grid, f_pos_1, element_pool_manager);
+      new FireController(fire_2).place(grid, f_pos_2, element_pool_manager);
 
-      new FireController(placed_fire).reaction(grid, pf_pos, element_pool_manager);
+      new FireController(placed_fire).reaction(grid, pf_pos, element_pool_manager_model);
 
       expect(grid_controller.isFireCell(ff_pos)).toBe(true);
       expect(grid_controller.isPositionEmpty(bottom)).toBe(true);
@@ -327,7 +340,8 @@ describe('FireModelController: reaction', () => {
       const grid: GridModel = new GridModel();
       const grid_controller: GridController = new GridController(grid);
       grid_controller.generateInitialGrid(10, 8);
-      const element_pool_manager: ElementPoolManagerModel = new ElementPoolManagerModel();
+      const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+      const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
       const pf_pos: Position = {
          row: 1,
          column: 3
@@ -349,11 +363,11 @@ describe('FireModelController: reaction', () => {
       const fire_1: FireModel = new FireModel();
       const fire_2: FireModel = new FireModel();
 
-      new FireController(placed_fire).place(grid, pf_pos);
-      new FireController(fire_1).place(grid, f_pos_1);
-      new FireController(fire_2).place(grid, f_pos_2);
+      new FireController(placed_fire).place(grid, pf_pos, element_pool_manager);
+      new FireController(fire_1).place(grid, f_pos_1, element_pool_manager);
+      new FireController(fire_2).place(grid, f_pos_2, element_pool_manager);
 
-      new FireController(placed_fire).reaction(grid, pf_pos, element_pool_manager);
+      new FireController(placed_fire).reaction(grid, pf_pos, element_pool_manager_model);
 
       expect(grid_controller.isFireCell(ff_pos)).toBe(true);
    })
@@ -385,7 +399,8 @@ describe('FireModelController: reaction', () => {
       const grid: GridModel = new GridModel();
       const grid_controller: GridController = new GridController(grid);
       grid_controller.generateInitialGrid(10, 8);
-      const element_pool_manager: ElementPoolManagerModel = new ElementPoolManagerModel();
+      const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+      const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
       const pf_pos: Position = {
          row: 1,
          column: 3
@@ -407,12 +422,12 @@ describe('FireModelController: reaction', () => {
       const fire_1: FireModel = new FireModel();
       const fire_2: FireModel = new FireModel();
 
-      new FireController(placed_fire).place(grid, pf_pos);
-      new FireController(fire_1).place(grid, f_pos_1);
-      new FireController(fire_2).place(grid, f_pos_2);
+      new FireController(placed_fire).place(grid, pf_pos, element_pool_manager);
+      new FireController(fire_1).place(grid, f_pos_1, element_pool_manager);
+      new FireController(fire_2).place(grid, f_pos_2, element_pool_manager);
 
 
-      new FireController(placed_fire).reaction(grid, pf_pos, element_pool_manager);
+      new FireController(placed_fire).reaction(grid, pf_pos, element_pool_manager_model);
 
       expect(grid_controller.isFireCell(ff_pos)).toBe(false);
    })
@@ -444,7 +459,8 @@ describe('FireModelController: reaction', () => {
       const grid: GridModel = new GridModel();
       const grid_controller: GridController = new GridController(grid);
       grid_controller.generateInitialGrid(10, 8);
-      const element_pool_manager: ElementPoolManagerModel = new ElementPoolManagerModel();
+      const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+      const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
       const pf_pos: Position = {
          row: 3,
          column: 7
@@ -466,12 +482,12 @@ describe('FireModelController: reaction', () => {
       const fire_1: FireModel = new FireModel();
       const fire_2: FireModel = new FireModel();
 
-      new FireController(placed_fire).place(grid, pf_pos);
-      new FireController(fire_1).place(grid, f_pos_1);
-      new FireController(fire_2).place(grid, f_pos_2);
+      new FireController(placed_fire).place(grid, pf_pos, element_pool_manager);
+      new FireController(fire_1).place(grid, f_pos_1, element_pool_manager);
+      new FireController(fire_2).place(grid, f_pos_2, element_pool_manager);
 
 
-      new FireController(placed_fire).reaction(grid, pf_pos, element_pool_manager);
+      new FireController(placed_fire).reaction(grid, pf_pos, element_pool_manager_model);
 
       expect(grid_controller.isFireCell(ff_pos)).toBe(false);
 
@@ -504,7 +520,8 @@ describe('FireModelController: reaction', () => {
       const grid: GridModel = new GridModel();
       const grid_controller: GridController = new GridController(grid);
       grid_controller.generateInitialGrid(10, 8);
-      const element_pool_manager: ElementPoolManagerModel = new ElementPoolManagerModel();
+      const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+      const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
       const pf_pos: Position = {
          row: 3,
          column: 3
@@ -553,15 +570,15 @@ describe('FireModelController: reaction', () => {
       const fire_4: FireModel = new FireModel();
       const fire_5: FireModel = new FireModel();
 
-      new FireController(placed_fire).place(grid, pf_pos);
-      new FireController(fire_1).place(grid, f_pos_1);
-      new FireController(fire_2).place(grid, f_pos_2);
-      new FireController(fire_3).place(grid, f_pos_3);
-      new FireController(fire_4).place(grid, f_pos_4);
-      new FireController(fire_5).place(grid, f_pos_5);
+      new FireController(placed_fire).place(grid, pf_pos, element_pool_manager);
+      new FireController(fire_1).place(grid, f_pos_1, element_pool_manager);
+      new FireController(fire_2).place(grid, f_pos_2, element_pool_manager);
+      new FireController(fire_3).place(grid, f_pos_3, element_pool_manager);
+      new FireController(fire_4).place(grid, f_pos_4, element_pool_manager);
+      new FireController(fire_5).place(grid, f_pos_5, element_pool_manager);
 
 
-      new FireController(placed_fire).reaction(grid, pf_pos, element_pool_manager);
+      new FireController(placed_fire).reaction(grid, pf_pos, element_pool_manager_model);
 
       expect(grid_controller.isFireCell(ff_pos_1)).toBe(true);
       expect(grid_controller.isFireCell(ff_pos_2)).toBe(true);
@@ -598,7 +615,17 @@ describe('FireModelController: reaction', () => {
       const grid: GridModel = new GridModel();
       const grid_controller: GridController = new GridController(grid);
       grid_controller.generateInitialGrid(10, 8);
-      const element_pool_manager: ElementPoolManagerModel = new ElementPoolManagerModel();
+      const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+      const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
+
+      // We remove some elements so we can test adding new elements when replacing
+      element_pool_manager.removeElement(ElementTypes.Fire)
+      element_pool_manager.removeElement(ElementTypes.Fire)
+      element_pool_manager.removeElement(ElementTypes.Fire)
+      element_pool_manager.removeElement(ElementTypes.Wind)
+      element_pool_manager.removeElement(ElementTypes.Wind)
+      element_pool_manager.removeElement(ElementTypes.Wind)
+
       const pf_pos: Position = {
          row: 4,
          column: 3
@@ -617,9 +644,9 @@ describe('FireModelController: reaction', () => {
       const fire: FireModel = new FireModel();
       const wind: WindModel = new WindModel();
 
-      new FireController(placed_fire).place(grid, pf_pos);
-      new FireController(fire).place(grid, f_pos);
-      new WindController(wind).place(grid, w_pos);
+      new FireController(placed_fire).place(grid, pf_pos, element_pool_manager);
+      new FireController(fire).place(grid, f_pos, element_pool_manager);
+      new WindController(wind).place(grid, w_pos, element_pool_manager);
 
 
 
@@ -627,7 +654,7 @@ describe('FireModelController: reaction', () => {
       expect(grid_controller.isWindCell(w_pos)).toBe(true);
 
 
-      new FireController(placed_fire).reaction(grid, pf_pos, element_pool_manager);
+      new FireController(placed_fire).reaction(grid, pf_pos, element_pool_manager_model);
 
       expect(grid_controller.isFireCell(ff_pos)).toBe(true);
       expect(grid_controller.isFireCell(w_pos)).toBe(true);
@@ -662,7 +689,8 @@ describe('FireModelController: reaction', () => {
       const grid: GridModel = new GridModel();
       const grid_controller: GridController = new GridController(grid);
       grid_controller.generateInitialGrid(10, 8);
-      const element_pool_manager: ElementPoolManagerModel = new ElementPoolManagerModel();
+      const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+      const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
       const pf_pos: Position = {
          row: 4,
          column: 3
@@ -682,12 +710,12 @@ describe('FireModelController: reaction', () => {
       const wind: WindModel = new WindModel();
       new WindController(wind).increaseStackedWinds();
 
-      new FireController(placed_fire).place(grid, pf_pos);
-      new FireController(fire).place(grid, f_pos);
-      new WindController(wind).place(grid, w_pos);
+      new FireController(placed_fire).place(grid, pf_pos, element_pool_manager);
+      new FireController(fire).place(grid, f_pos, element_pool_manager);
+      new WindController(wind).place(grid, w_pos, element_pool_manager);
 
 
-      new FireController(placed_fire).reaction(grid, pf_pos, element_pool_manager);
+      new FireController(placed_fire).reaction(grid, pf_pos, element_pool_manager_model);
 
       expect(grid_controller.isFireCell(ff_pos)).toBe(false);
 
@@ -721,7 +749,8 @@ describe('FireModelController: reaction', () => {
       const grid: GridModel = new GridModel();
       const grid_controller: GridController = new GridController(grid);
       grid_controller.generateInitialGrid(10, 8);
-      const element_pool_manager: ElementPoolManagerModel = new ElementPoolManagerModel();
+      const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+      const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
       const pf_pos: Position = {
          row: 4,
          column: 3
@@ -741,13 +770,13 @@ describe('FireModelController: reaction', () => {
       const wind: WindModel = new WindModel();
       new WindController(wind).increaseStackedWinds();
 
-      new FireController(placed_fire).place(grid, pf_pos);
-      new FireController(fire).place(grid, f_pos);
-      new WindController(wind).place(grid, w_pos);
+      new FireController(placed_fire).place(grid, pf_pos, element_pool_manager);
+      new FireController(fire).place(grid, f_pos, element_pool_manager);
+      new WindController(wind).place(grid, w_pos, element_pool_manager);
 
-      element_pool_manager.fire.amount = 0;
+      element_pool_manager_model.fire.amount = 0;
 
-      new FireController(placed_fire).reaction(grid, pf_pos, element_pool_manager);
+      new FireController(placed_fire).reaction(grid, pf_pos, element_pool_manager_model);
 
       expect(grid_controller.isFireCell(ff_pos)).toBe(false);
 
