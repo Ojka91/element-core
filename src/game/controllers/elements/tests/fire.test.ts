@@ -56,6 +56,7 @@ describe('FireModelController: reaction', () => {
    it('Reaction: Placing fire without any fire close, should not trigger reaction', async () => {
       /* Not propagation
           PF: Place fire
+          W: Wind piece
            0   1   2   3   4   5   6   7   8   9 
          -----------------------------------------
       0  |   |   |   |   |   |   |   |   |   |   |
@@ -64,7 +65,7 @@ describe('FireModelController: reaction', () => {
          -----------------------------------------
       2  |   |   |   |   |   |   |   |   |   |   |
          -----------------------------------------
-      3  |   |   |   |   | PF|   |   |   |   |   |
+      3  |   |   |   |   | PF| W  |   |   |   |   |
          -----------------------------------------
       4  |   |   |   |   |   |   |   |   |   |   |
          -----------------------------------------
@@ -82,6 +83,10 @@ describe('FireModelController: reaction', () => {
       const pf_pos: Position = {
          row: 3,
          column: 4
+      }
+      const wind_pos: Position = {
+         row: 3,
+         column: 5
       }
       const left: Position = {
          row: 3,
@@ -101,15 +106,19 @@ describe('FireModelController: reaction', () => {
       }
 
       const fire: FireModel = new FireModel();
+      const wind: WindModel = new WindModel();
 
+      new WindController(wind).place(grid, wind_pos);
+      new FireController(fire).place(grid, pf_pos);
       new FireController(fire).place(grid, pf_pos);
 
       new FireController(fire).reaction(grid, pf_pos, element_pool_manager);
 
       expect(grid_controller.isPositionEmpty(bottom)).toBe(true);
       expect(grid_controller.isPositionEmpty(top)).toBe(true);
-      expect(grid_controller.isPositionEmpty(right)).toBe(true);
+      expect(grid_controller.isPositionEmpty(right)).toBe(false);
       expect(grid_controller.isPositionEmpty(left)).toBe(true);
+      expect(grid_controller.isWindCell(wind_pos)).toBe(true);
 
    })
    it('Reaction: Should propagate free fire orthogonally left', async () => {
@@ -633,11 +642,14 @@ describe('FireModelController: reaction', () => {
 
 
 
+      expect(grid_controller.isFireCell(w_pos)).toBe(false);
+      expect(grid_controller.isWindCell(w_pos)).toBe(true);
 
 
       new FireController(placed_fire).reaction(grid, pf_pos, element_pool_manager_model);
 
       expect(grid_controller.isFireCell(ff_pos)).toBe(true);
+      expect(grid_controller.isFireCell(w_pos)).toBe(true);
 
    })
 
