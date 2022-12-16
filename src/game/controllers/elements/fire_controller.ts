@@ -20,7 +20,7 @@ const propagation_map: Map<string, AxisIncrement> = PositionUtils.orthogonal_inc
  *          Extra Fire elements do not generate extra Fire elements.
  */
 export interface IFireController extends IElementController {
-    ruleOfReplacement(piece_to_replace: IPieceModel): boolean;
+    ruleOfReplacement(piece_to_replace: IPieceModel, element_pool_manager: ElementPoolManager): boolean;
     reaction(grid: IGridModel, cell: Position, element_pool_manager?: ElementPoolManagerModel): void;
 }
 
@@ -33,9 +33,10 @@ export class FireController extends ElementController implements IFireController
         this.model = model
     }
 
-    public ruleOfReplacement(piece_to_replace: IPieceModel): boolean {
+    public ruleOfReplacement(piece_to_replace: IPieceModel, element_pool_manager: ElementPoolManager): boolean {
         if (piece_to_replace instanceof WindModel) {
             if (new WindController(piece_to_replace).getNumberOfStackedWinds() == 1) {
+                element_pool_manager.addElement(ElementTypes.Wind);
                 return true;
             }
         }
@@ -77,7 +78,7 @@ export class FireController extends ElementController implements IFireController
 
                 if (grid_controller.isPositionEmpty(evaluation_cell)) {
                     grid_controller.updateGridCell(free_fire);
-                } else if (this.ruleOfReplacement(grid_controller.getGridCellByPosition(evaluation_cell))) {
+                } else if (this.ruleOfReplacement(grid_controller.getGridCellByPosition(evaluation_cell), new ElementPoolManager(element_pool_manager))) {
                     grid_controller.updateGridCell(free_fire);
                 }
             }

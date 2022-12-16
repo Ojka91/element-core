@@ -1,8 +1,10 @@
+import { ElementTypes } from "@/game/models/elements/elements";
 import { FireModel } from "@/game/models/elements/fire";
 import { WaterModel } from "@/game/models/elements/water";
 import { IGridModel } from "@/game/models/grid";
 import { IPieceModel } from "@/game/models/pieces/pieces";
 import { AxisIncrement, Position, PositionUtils } from "@/game/utils/position_utils";
+import ElementPoolManager from "../element_pool_controller";
 import GridController from "../grid_controller";
 import { ElementController, IElementController } from "./elements_controller";
 
@@ -17,8 +19,8 @@ import { ElementController, IElementController } from "./elements_controller";
  *          Rivers can pass through Fire.
  */
 export interface IWaterController extends IElementController {
-    ruleOfReplacement(piece_to_replace: IPieceModel): boolean
-    reaction(grid: IGridModel, cell: Position, curr_river?: Array<Position>, new_river?: Array<Position>): void;
+    ruleOfReplacement(piece_to_replace: IPieceModel, element_pool_manager: ElementPoolManager): boolean
+    reaction(grid: IGridModel, cell: Position, curr_river?: Array<Position>, new_river?: Array<Position>, element_pool_manager?: ElementPoolManager): void;
 }
 
 export class WaterController extends ElementController implements IWaterController {
@@ -30,8 +32,9 @@ export class WaterController extends ElementController implements IWaterControll
         this.model = model
     }
 
-    public ruleOfReplacement(piece_to_replace: IPieceModel): boolean {
+    public ruleOfReplacement(piece_to_replace: IPieceModel, element_pool_manager: ElementPoolManager): boolean {
         if (piece_to_replace instanceof FireModel) {
+            element_pool_manager.addElement(ElementTypes.Fire);
             return true;
         }
 
@@ -49,7 +52,8 @@ export class WaterController extends ElementController implements IWaterControll
         grid: IGridModel,
         cell: Position,
         curr_river?: Array<Position>,  // must be sorted and head must be the first element
-        new_river?: Array<Position>        // must be sorted and head must be the first element
+        new_river?: Array<Position>,        // must be sorted and head must be the first element
+        element_pool_manager?: ElementPoolManager
     ): void {
 
         const surr_waters: Array<Position> = this.getSurroundingWaters(grid, cell);
@@ -83,7 +87,7 @@ export class WaterController extends ElementController implements IWaterControll
         selected_river_pos_list.unshift(cell);
 
         // New river data is provided, is it valid?
-        if (this.isNewRiverValid(grid, new_river_pos_list!) == false) {
+        if (this.isNewRiverValid(grid, new_river_pos_list!, element_pool_manager as ElementPoolManager) == false) {
             throw new Error("New river data provided is invalid");
         }
         // River data is provided, is it valid?
@@ -130,11 +134,11 @@ export class WaterController extends ElementController implements IWaterControll
         return this.isRiverOrthogonal(river_pos_list);
     }
 
-    private isNewRiverValid(grid: IGridModel, river_pos_list: Array<Position>): boolean {
+    private isNewRiverValid(grid: IGridModel, river_pos_list: Array<Position>, element_pool_manager: ElementPoolManager): boolean {
         const grid_controller: GridController = new GridController(grid);
         for (let pos of river_pos_list) {
             if (grid_controller.isPositionEmpty(pos) == false) {
-                if (this.ruleOfReplacement(grid_controller.getGridCellByPosition(pos)) == false) {
+                if (this.ruleOfReplacement(grid_controller.getGridCellByPosition(pos), element_pool_manager) == false) {
                     return false;
                 }
             }

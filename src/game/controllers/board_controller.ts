@@ -113,7 +113,7 @@ class BoardController {
 
         element_controller.updatePosition(position);
 
-        if (element_controller.place(this.model.grid, position) == false) {
+        if (element_controller.place(this.model.grid, position, this.element_pool_manager) == false) {
             throw new Error("Cannot replace the cell due to a rule of replacement")
         }
     }
@@ -126,7 +126,7 @@ class BoardController {
                 element_controller = new WaterController(element as IWaterModel);
                 if (reaction instanceof WaterReaction) {
                     const water_reaction: WaterReaction = reaction as WaterReaction
-                    element_controller.reaction(this.model.grid, position, water_reaction.initial_river, water_reaction.new_river);
+                    element_controller.reaction(this.model.grid, position, water_reaction.initial_river, water_reaction.new_river, this.element_pool_manager);
                 } else {
                     element_controller.reaction(this.model.grid, position);
                 }
