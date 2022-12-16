@@ -55,8 +55,7 @@ export type JoinGame = {
 }
 
 export type EndTurn = {
-  roomId: string,
-  room: RoomModel
+  roomId: string
 }
 
 export type DrawElements = {
