@@ -137,7 +137,7 @@ describe('GameService', () => {
         })
 
         const gameService = new GameService();
-        await gameService.moveSage('roomId', 'socketId', new PlayerModel(2), { row: 1, column: 3 });
+        await gameService.moveSage('roomId', 'socketId', new PlayerModel(2).uuid, { row: 1, column: 3 });
 
         expect(RoomController.prototype.loadRoomById).toHaveBeenCalledTimes(1)
         expect(RoomController.prototype.save).toHaveBeenCalledTimes(1)

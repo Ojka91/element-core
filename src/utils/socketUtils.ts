@@ -72,7 +72,7 @@ export type PlaceElement = {
 
 export type MoveSage = {
   roomId: string
-  player: IPlayerModel
+  playerId: string
   position: Position
 }
 

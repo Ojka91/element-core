@@ -115,7 +115,7 @@ export class GameService {
         }
     }
 
-    public async moveSage(roomId: string, socketId: string, player: IPlayerModel, position: Position): Promise<PublicServerResponse> {
+    public async moveSage(roomId: string, socketId: string, player: string, position: Position): Promise<PublicServerResponse> {
         try {
 
             const roomModel: RoomModel = new RoomModel(0);

@@ -77,4 +77,11 @@ export class TurnController implements ITurnController{
         Object.assign(this.model, new TurnModel(player_number));
     }
 
+    public decreaseSageMoves(): void {
+        if(this.model.available_sage_moves > 0){
+            this.model.available_sage_moves--;
+        }
+        this.endOfTurnCheck();
+    }
+
 }

@@ -14,7 +14,7 @@ export interface IGameController {
     setupGame(game_type: number): void;
     drawingElements(elements: Array<ElementTypes>): void;
     placeElement(element: ElementTypes, position: Position, reaction?: Reaction): void;
-    movePlayerSage(player: IPlayerModel, position: Position): void;
+    movePlayerSage(player: string, position: Position): void;
     endOfPlayerTurn(): void;
     getBoard(): IBoardModel;
     getTurnPlayer(): IPlayerModel;
@@ -111,7 +111,7 @@ export class GameController implements IGameController {
         turn_controller.changeTurn(player_number);
     }
 
-    public movePlayerSage(player: IPlayerModel, position: Position): void {
+    public movePlayerSage(player_id: string, position: Position): void {
 
         const turn_controller: TurnController = new TurnController(this.model.turn);
         const board_controller: BoardController = new BoardController(this.model.board);
@@ -122,7 +122,14 @@ export class GameController implements IGameController {
         if (turn_controller.isMovingSageAllowed() == false) {
             throw new Error("Cannot move sage, not available moves to spend");
         }
-        board_controller.placePlayerSage(player, position);
+        
+        try {
+            board_controller.placePlayerSage(this.getPlayerById(player_id), position);
+            turn_controller.decreaseSageMoves();
+        }
+        catch (error){
+            throw error;
+        }
 
         if (turn_controller.isEndOfTurn()) {
             this.nextPlayerTurn();

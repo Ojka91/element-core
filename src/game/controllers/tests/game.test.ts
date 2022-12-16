@@ -148,23 +148,23 @@ describe('GameController', () => {
         let sage_pos: Position = { row: 3, column: 5 };
 
         game.state = GameStates.EndGame;
-        expect(() => game_controller.movePlayerSage(player0, sage_pos)).toThrow("Moving sage is not allowed in the current game state");
+        expect(() => game_controller.movePlayerSage(player0.uuid, sage_pos)).toThrow("Moving sage is not allowed in the current game state");
         
         game.state = GameStates.GameRunning;
         game.turn.state = TurnStates.MovesAvailables;
         game.turn.available_sage_moves = 0;
-        expect(() => game_controller.movePlayerSage(player0, sage_pos)).toThrow("Cannot move sage, not available moves to spend");
+        expect(() => game_controller.movePlayerSage(player0.uuid, sage_pos)).toThrow("Cannot move sage, not available moves to spend");
 
-        game.turn.available_sage_moves = 1;
+        game.turn.available_sage_moves = 2;
         jest.spyOn(TurnController.prototype, 'isEndOfTurn').mockImplementation(() => false);
-        game_controller.movePlayerSage(player0, sage_pos);
+        game_controller.movePlayerSage(player0.uuid, sage_pos);
         expect(game.turn.player).toStrictEqual(0);
         jest.restoreAllMocks();
 
         sage_pos = { row: 4, column: 5 };
         game.turn.available_sage_moves = 1;
         jest.spyOn(TurnController.prototype, 'isEndOfTurn').mockImplementation(() => true);
-        game_controller.movePlayerSage(player0, sage_pos);
+        game_controller.movePlayerSage(player0.uuid, sage_pos);
         expect(game.turn.player).toStrictEqual(1);
         jest.restoreAllMocks();
 
