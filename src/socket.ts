@@ -5,7 +5,7 @@ import { RoomModel } from "./game/models/room";
 import { QueueController } from "./game/queue_controller";
 import { PrivateServerResponse, PrivateServerResponseStatus, PublicServerResponse } from "./schemas/server_response";
 import { logger } from "./utils/logger";
-import { ClientToServerEvents, DrawElements, EndTurn, InterServerEvents, JoinGame, MoveSage, PlaceElement, Queue, ServerToClientEvents, SocketData } from "./utils/socketUtils";
+import { ChatClientToServer, ChatServerToClient, ClientToServerEvents, DrawElements, EndTurn, InterServerEvents, JoinGame, MoveSage, PlaceElement, Queue, ServerToClientEvents, SocketData } from "./utils/socketUtils";
 
 /**
  * This class is reponsible to mantain socket connection and logic between players and server when game begins
@@ -200,6 +200,21 @@ class SocketController {
 
         this.io.to(roomId).emit('gameUpdate', response)
         
+      })
+
+      /**
+       * Chat event enables the possibility to have a chat with other players in your game.
+       * The event receives the roomID and the message a player wants to send to the chat, and broadcast it
+       * to all players within the room
+       */
+      socket.on("chat", (data: ChatClientToServer) => {
+        console.log(`Chat | RoomId: ${data.roomId}, message: ${data.message}`);
+        
+        const response: ChatServerToClient = {
+          message: data.message
+        };
+
+        this.io.to(data.roomId).emit('chat', response);
       })
 
 
