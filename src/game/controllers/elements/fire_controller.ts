@@ -56,7 +56,7 @@ export class FireController extends ElementController implements IFireController
                 column: cell.column + value.x
             }
 
-            // Propagation only happens IF orthogonal positions contains another fire. So first we need to make sure surrounding positions are NOT empty
+            // Propagation only happens IF orthogonal positions contains another fire. So first we need to make sure surrounding positions ARE Fires
             // If we dont do this, fire will propagate over itself (with no surrounding fires)
             if (grid_controller.isPositionValid(evaluation_cell) && grid_controller.isFireCell(evaluation_cell)) {
                  this.propagate(grid, cell, value, element_pool_manager);

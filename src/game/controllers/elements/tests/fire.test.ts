@@ -1,4 +1,5 @@
 import { EarthModel } from "@/game/models/elements/earth";
+import { ElementTypes } from "@/game/models/elements/elements";
 import { FireModel } from "@/game/models/elements/fire";
 import { WaterModel } from "@/game/models/elements/water";
 import { WindModel } from "@/game/models/elements/wind";
@@ -616,7 +617,14 @@ describe('FireModelController: reaction', () => {
       grid_controller.generateInitialGrid(10, 8);
       const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
       const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
-      element_pool_manager.emptyPool(); // Empty pool so when replacement happens and element go back to pool, the pool is not full
+
+      // We remove some elements so we can test adding new elements when replacing
+      element_pool_manager.removeElement(ElementTypes.Fire)
+      element_pool_manager.removeElement(ElementTypes.Fire)
+      element_pool_manager.removeElement(ElementTypes.Fire)
+      element_pool_manager.removeElement(ElementTypes.Wind)
+      element_pool_manager.removeElement(ElementTypes.Wind)
+      element_pool_manager.removeElement(ElementTypes.Wind)
 
       const pf_pos: Position = {
          row: 4,
