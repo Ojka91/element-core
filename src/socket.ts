@@ -160,14 +160,14 @@ class SocketController {
        * moveSage: Client which turn is playing should move sage
        */
       socket.on("moveSage", async (data: MoveSage) => {
-        console.log(data.player)
+        console.log(data.playerId)
 
         let response: PublicServerResponse | null = null;
         try {
           
           // TODO TBD !!! We should check if game ended => delete roomId from array
           
-          response = await gameService.moveSage(data.roomId, socket.id, data.player, data.position);
+          response = await gameService.moveSage(data.roomId, socket.id, data.playerId, data.position);
           
         } catch (error) {
           // If there is any error we will notify only to the client who generate the error
