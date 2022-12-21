@@ -467,6 +467,122 @@ describe('movement_manager', () => {
       expect(result).toBe(false);
    })
 
+   it('MovementManager.isSageMoveValid: should return false crossing through two ranges', async () => {
+      /* test wind jumps with grid boundaries
+         S: Sage
+         WL: Whirlwind
+         NS: New Sage Position
+         M: Mountain
+         E: Earth
+           0   1   2   3   4   5   6   7   8   9   10
+         ---------------------------------------------
+      0  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      1  |   |   |   |   |   | E | NS|   |   |   |   |
+         ---------------------------------------------
+      2  |   |   |   |   |   | S | M |   |   |   |   |
+         ---------------------------------------------
+      3  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      4  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      5  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      6  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      7  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      */
+      const cur_pos: Position = { row: 2, column: 5 };
+      const earth_pos: Position = { row: 1, column: 5 };
+      const mountain_pos: Position = { row: 2, column: 6 };
+      const new_pos: Position = { row: 1, column: 6 };
+      const grid: GridModel = new GridModel();
+      const grid_controller: GridController = new GridController(grid);
+      grid_controller.generateInitialGrid(11, 8);
+      const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+      const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
+      element_pool_manager.emptyPool(); // Empty pool so when replacement happens and element go back to pool, the pool is not full
+
+      let earth: EarthModel = new EarthModel();
+      new EarthController(earth).place(grid, earth_pos, element_pool_manager);
+
+      let earth_mountain_1 = new EarthModel();
+      new EarthController(earth_mountain_1).place(grid, mountain_pos, element_pool_manager);
+
+      // Add second earth to convert the earth into Mountain and range the surrounding earths
+      let earth_mountain_2 = new EarthModel();
+      new EarthController(earth_mountain_2).place(grid, mountain_pos, element_pool_manager);
+
+      expect(grid_controller.isRangeCell(earth_pos)).toBe(true);
+      expect(grid_controller.isRangeCell(mountain_pos)).toBe(true);
+
+      // Then jump shouldn't be allowed
+      const result = MovementManager.isSageMoveValid(grid, cur_pos, new_pos);
+      expect(result).toBe(false);
+   })
+   
+   it('MovementManager.isSageMoveValid: should return false jumping through two ranges', async () => {
+      /* test wind jumps with grid boundaries
+         S: Sage
+         WL: Whirlwind
+         NS: New Sage Position
+         M: Mountain
+         E: Earth
+           0   1   2   3   4   5   6   7   8   9   10
+         ---------------------------------------------
+      0  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      1  |   |   |   |   |   | E | NS|   |   |   |   |
+         ---------------------------------------------
+      2  |   |   |   |   |   | WL| M |   |   |   |   |
+         ---------------------------------------------
+      3  |   |   |   |   | S |   |   |   |   |   |   |
+         ---------------------------------------------
+      4  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      5  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      6  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      7  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      */
+      const cur_pos: Position = { row: 3, column: 4 };
+      const wind_pos: Position = { row: 2, column: 5 };
+      const earth_pos: Position = { row: 1, column: 5 };
+      const mountain_pos: Position = { row: 2, column: 6 };
+      const new_pos: Position = { row: 1, column: 6 };
+      const grid: GridModel = new GridModel();
+      const grid_controller: GridController = new GridController(grid);
+      grid_controller.generateInitialGrid(11, 8);
+      const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+      const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
+      element_pool_manager.emptyPool(); // Empty pool so when replacement happens and element go back to pool, the pool is not full
+
+      // Generate Whirlwind
+      let wind: WindModel = new WindModel();
+      new WindController(wind).increaseStackedWinds();
+      new WindController(wind).place(grid, wind_pos, element_pool_manager);
+
+      let earth: EarthModel = new EarthModel();
+      new EarthController(earth).place(grid, earth_pos, element_pool_manager);
+
+      let earth_mountain_1 = new EarthModel();
+      new EarthController(earth_mountain_1).place(grid, mountain_pos, element_pool_manager);
+
+      // Add second earth to convert the earth into Mountain and range the surrounding earths
+      let earth_mountain_2 = new EarthModel();
+      new EarthController(earth_mountain_2).place(grid, mountain_pos, element_pool_manager);
+
+      expect(grid_controller.isRangeCell(earth_pos)).toBe(true);
+      expect(grid_controller.isRangeCell(mountain_pos)).toBe(true);
+
+      // Then jump shouldn't be allowed
+      const result = MovementManager.isSageMoveValid(grid, cur_pos, new_pos);
+      expect(result).toBe(false);
+   })
+
    it('MovementManager.isWindBlocked: should return true if wind is blocked', async () => {
       /* test wind jumps with grid boundaries
          S: Sage

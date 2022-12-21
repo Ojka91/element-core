@@ -7,8 +7,8 @@ import { WindController } from "./elements/wind_controller";
 
 export class MovementManager {
 
-    public static isWindBlocked(grid: IGridModel, origin: Position, wind: WindModel) : boolean{
-        
+    public static isWindBlocked(grid: IGridModel, origin: Position, wind: WindModel): boolean {
+
         const grid_controller: GridController = new GridController(grid);
         const wind_controller: WindController = new WindController(wind);
         // Distance of each axis
@@ -26,13 +26,13 @@ export class MovementManager {
             column: wind.position.column + jump_distance * x_dir,
         }
 
-        if(grid_controller.isPositionValid(landing_position) == false){
+        if (grid_controller.isPositionValid(landing_position) == false) {
             return false;
         }
 
-        if(grid_controller.isPositionEmpty(landing_position)){
+        if (grid_controller.isPositionEmpty(landing_position)) {
             return false;
-        } else if(grid_controller.isWindCell(landing_position)){
+        } else if (grid_controller.isWindCell(landing_position)) {
             return this.isWindBlocked(grid, landing_position, grid_controller.getGridCellByPosition(landing_position) as WindModel);
         }
         return true
@@ -41,32 +41,37 @@ export class MovementManager {
 
     /** Performs all checkers for the sage movement */
     public static isSageMoveValid(grid: IGridModel, current_position: Position, new_position: Position): boolean {
-        
+
         const grid_controller: GridController = new GridController(grid);
         // check if there has been a movement
-        if(PositionUtils.isSamePosition(current_position, new_position)){
+        if (PositionUtils.isSamePosition(current_position, new_position)) {
             // Hadn't moved so it's not considered a movement
             return false;
         }
         // Check if the new position is valid
-        if (grid_controller.isPositionValid(new_position) == false){
+        if (grid_controller.isPositionValid(new_position) == false) {
             return false;
         }
 
         // Check if the movement is to an empty cell
-        if(grid_controller.isPositionEmpty(new_position) == false){
+        if (grid_controller.isPositionEmpty(new_position) == false) {
             // illegal move
             return false;
         }
 
         // Check if the move has been strict
-        if(PositionUtils.isStrictPosition(current_position, new_position) == false){
+        if (PositionUtils.isStrictPosition(current_position, new_position)) {
+            // Check if it's trying to cross a range
+            if (this.isCrossingRange(grid, current_position, new_position)) {
+                return false;
+            }
+        } else {
             // Check if it's a legal wind/whirlwind move
-            if(this.isWindJumpLegal(grid, current_position, new_position) == false){
+            if (this.isWindJumpLegal(grid, current_position, new_position) == false) {
                 // illegal move
                 return false;
             }
-        }    
+        }
         return true;
     }
 
@@ -85,14 +90,14 @@ export class MovementManager {
 
         let old_piece_position: Position;
         // Set position of the first cell in the sage move direction
-        let next_piece_pos: Position  = {
+        let next_piece_pos: Position = {
             row: current_position.row + y_dir,
             column: current_position.column + x_dir
         };
-        
-        while (PositionUtils.isSamePosition(next_piece_pos, new_position) == false ){
+
+        while (PositionUtils.isSamePosition(next_piece_pos, new_position) == false) {
             // Check if current cell is wind
-            if(grid_controller.isWindCell(next_piece_pos) == false){
+            if (grid_controller.isWindCell(next_piece_pos) == false) {
                 // if it's not a wind piece, then the movement it's not allowed
                 return false;
             }
@@ -101,28 +106,59 @@ export class MovementManager {
             // Get cell piece
             const jump_distance: number = wind_controller.getNumberOfStackedWinds();
 
-            for (let cell: number = 1; cell <= jump_distance; cell++){
+            for (let cell: number = 1; cell <= jump_distance; cell++) {
                 // Get cell piece
                 old_piece_position = next_piece_pos;
                 next_piece_pos = {
-                    row:    next_piece_pos.row + 1 * y_dir,
+                    row: next_piece_pos.row + 1 * y_dir,
                     column: next_piece_pos.column + 1 * x_dir
                 }
 
                 // Check if it's not a mountain 
                 // NOTE:    It's not necessary since all Mountains are ranges, so 
                 //          it's left like this in case other functionalities are added for mountains
-                if(grid_controller.isMountainCell(next_piece_pos)){
+                if (grid_controller.isMountainCell(next_piece_pos)) {
                     return false;
                 }
 
                 // Check there are no ranges in the middle of the jump
-                if(grid_controller.isRangeCell(next_piece_pos)){
+                if (grid_controller.isRangeCell(next_piece_pos)) {
+                    return false;
+                }
+
+                // Check it's not crossing a range
+                if (this.isCrossingRange(grid, old_piece_position, next_piece_pos)) {
                     return false;
                 }
             }
         }
-        
+
         return true;
+    }
+
+    private static isCrossingRange(grid: IGridModel, current_position: Position, new_position: Position): boolean {
+        const grid_controller: GridController = new GridController(grid);
+
+        if (PositionUtils.isStrictPosition(current_position, new_position) == false) {
+            throw new Error("Evaluating a range cross shall only be possible upon strict movements")
+        }
+
+        // Assuming the movement is strict
+        const surrounding_y: Position = {
+            row: current_position.row,
+            column: new_position.column
+        }
+
+        const surrounding_x: Position = {
+            row: new_position.row,
+            column: current_position.column
+        }
+
+        if (grid_controller.isRangeCell(surrounding_x) || grid_controller.isRangeCell(surrounding_y)) {
+            return true;
+        }
+
+        return false;
+
     }
 }
