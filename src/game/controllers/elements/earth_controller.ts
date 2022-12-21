@@ -54,9 +54,17 @@ export class EarthController extends ElementController implements IEarthControll
                 return false;
             }
         }
+        // Adding a simple earth
         if (grid_controller.isPositionEmpty(cell) || (this.ruleOfReplacement(piece, element_pool_manager))) {
-            grid_controller.updateGridCell(this.model)
+            // Check whether is surrounded by a range
+            if (this.isSurroundedByRange(grid, cell)) {
+                this.promoteToRange();
+                grid_controller.updateGridCell(this.model);
+                this.formRange(grid, cell);
 
+            } else {
+                grid_controller.updateGridCell(this.model);
+            }
             return true;
         }
         return false;
@@ -135,5 +143,35 @@ export class EarthController extends ElementController implements IEarthControll
         })
 
         return surrounding_earths;
+    }
+
+    private getSurroundingRange(grid: IGridModel, cell: Position): Array<Position> {
+        let surroundingRange: Array<Position> = [];
+        let evaluation_cell: Position;
+
+        const grid_controller: GridController = new GridController(grid);
+
+        all_direction_map.forEach((value: AxisIncrement, key: string) => {
+            evaluation_cell = {
+                row: cell.row + value.y,
+                column: cell.column + value.x
+            };
+            if (grid_controller.isPositionValid(evaluation_cell) && (grid_controller.isRangeCell(evaluation_cell))) {
+                surroundingRange.push(evaluation_cell);
+            }
+        })
+
+        return surroundingRange;
+    }
+
+    private isSurroundedByRange(grid: IGridModel, cell: Position): boolean {
+        const surroundingRange: Array<Position> = this.getSurroundingRange(grid, cell);
+        const grid_controller: GridController = new GridController(grid);
+        for (let earth of surroundingRange) {
+            if (grid_controller.isRangeCell(earth)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
