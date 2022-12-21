@@ -226,6 +226,100 @@ describe('EarthModel: reaction', () => {
         expect(grid_controller.isMountainCell(earth_pos)).toBe(true);
     })
 
+    it('place: earth must be attached to a range and form a new range from new position', () => {
+        /* 
+        PE: Place EarthModel
+        E: EarthModel
+        R: Range
+         0   1   2   3   4   5   6   7   8   9 
+        -----------------------------------------
+    0  | R | R | R | R | R | R | R | R | R | R |
+        -----------------------------------------
+    1  |   |   |   | PE|   |   |   |   |   |   |
+        -----------------------------------------
+    2  | E | E | E | E | E | E | E | E | E | E |
+        -----------------------------------------
+    3  |   |   |   |   |   |   |   |   |   |   |
+        -----------------------------------------
+    4  |   |   |   |   |   |   |   |   |   |   |
+        -----------------------------------------
+    5  |   |   |   |   |   |   |   |   |   |   |
+        -----------------------------------------
+    6  |   |   |   |   |   |   |   |   |   |   |
+        -----------------------------------------
+    7  |   |   |   |   |   |   |   |   |   |   |
+        -----------------------------------------
+    */
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
+
+        const range: Array<Position> = [];
+        for (let col = 0; col < 10; col++ ){
+            range.push({ row: 0, column: col})
+        }
+
+        const earths: Array<Position> = [];
+        for (let col = 0; col < 10; col++ ){
+            earths.push({ row: 2, column: col})
+        }
+
+        const newEarthPos: Position = {
+            row: 1, column: 3
+        }
+
+        for(let earth_pos of range) {
+            const earth = new EarthModel();
+            new EarthController(earth).updatePosition(earth_pos);
+            grid_controller.updateGridCell(earth);
+        };
+
+        for(let earth_pos of earths) {
+            const earth = new EarthModel();
+            new EarthController(earth).updatePosition(earth_pos);
+            grid_controller.updateGridCell(earth);
+        };
+        
+        const new_earth: EarthModel = new EarthModel();
+        const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+        const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
+        
+        // Check earths are not range yet
+        for( let _earth of range){
+            expect(grid_controller.isRangeCell(_earth)).toBe(false);
+        }
+
+        for( let _earth of earths){
+            expect(grid_controller.isRangeCell(_earth)).toBe(false);
+        }
+
+        expect(new EarthController(new_earth).place(grid, newEarthPos, element_pool_manager)).toBe(true);
+        expect(grid_controller.isEarthCell(newEarthPos)).toBe(true);
+        expect(grid_controller.isRangeCell(newEarthPos)).toBe(false);
+
+        // Check all row are still simple earths
+        for( let _earth of range){
+            expect(grid_controller.isRangeCell(_earth)).toBe(false);
+        }
+        grid_controller.clearCell(newEarthPos);
+
+        // Convert not yet range into range
+        expect(new EarthController(new_earth).place(grid, range[0], element_pool_manager)).toBe(true);
+        expect(grid_controller.isRangeCell(range[0])).toBe(true);
+
+        // Check all row of range became a range
+        for( let _earth of range){
+            expect(grid_controller.isRangeCell(_earth)).toBe(true);
+        }
+        expect(new EarthController(new_earth).place(grid, newEarthPos, element_pool_manager)).toBe(true);
+        expect(grid_controller.isRangeCell(newEarthPos)).toBe(true);
+
+        // Check all earth row became a range
+        for( let _earth of earths){
+            expect(grid_controller.isRangeCell(_earth)).toBe(true);
+        }
+    })
+
     it('formRange: range formation', () => {
         /* 
             PE: Place EarthModel
