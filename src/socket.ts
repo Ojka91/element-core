@@ -211,7 +211,7 @@ class SocketController {
         console.log(`Chat | RoomId: ${data.roomId}, message: ${data.message}`);
         
         const response: ChatServerToClient = {
-          message: data.message
+          message: socket.id.slice(0, 5) + ": " + data.message
         };
 
         this.io.to(data.roomId).emit('chat', response);
