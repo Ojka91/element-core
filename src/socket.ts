@@ -144,11 +144,11 @@ class SocketController {
           response = await gameService.placeElement(data.roomId, socket.id, data.element, data.position, data.reaction);
         } catch (error) {
           // If there is any error we will notify only to the client who generate the error
-          logger.warn(error)
+          logger.warn(error);
           let response: PrivateServerResponse = {
             room_uuid: data.roomId,
             status: PrivateServerResponseStatus.ERROR,
-            message: JSON.stringify(error),
+            message: (error as Error).message,
           }
           socket.emit('error', response)
         }
@@ -175,7 +175,7 @@ class SocketController {
           let response: PrivateServerResponse = {
             room_uuid: data.roomId,
             status: PrivateServerResponseStatus.ERROR,
-            message: JSON.stringify(error),
+            message: (error as Error).message,
           }
           socket.emit('error', response)
         }
