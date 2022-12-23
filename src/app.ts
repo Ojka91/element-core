@@ -5,7 +5,7 @@ import { routes } from '@/routes';
 import * as dotenv from 'dotenv'
 import Database from './database';
 import Swagger from './utils/swagger';
-import SocketController from './socket';
+import SocketController from './socket/socket';
 export const app: Express = express();
 import { RedisSingleton } from './redis';
 import { GameController } from './game/controllers/game_controller';

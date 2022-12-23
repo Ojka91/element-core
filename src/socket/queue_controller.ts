@@ -1,4 +1,4 @@
-import { Queue } from "@/utils/socketUtils";
+import { Queue } from "@/socket/socketUtils";
 
 type QueueData =  {
     number_players: number;

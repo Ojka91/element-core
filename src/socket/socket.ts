@@ -1,11 +1,11 @@
 import { Server, Socket } from "socket.io";
-import RoomController from "./game/controllers/room_controller";
-import { GameService } from "./game/game_service";
-import { RoomModel } from "./game/models/room";
-import { QueueController } from "./game/queue_controller";
-import { PrivateServerResponse, PrivateServerResponseStatus, PublicServerResponse } from "./schemas/server_response";
-import { logger } from "./utils/logger";
-import { ChatClientToServer, ChatServerToClient, ClientToServerEvents, DrawElements, EndTurn, InterServerEvents, JoinGame, MoveSage, PlaceElement, Queue, ServerToClientEvents, SocketData } from "./utils/socketUtils";
+import RoomController from "../game/controllers/room_controller";
+import { GameService } from "../service/game_service";
+import { RoomModel } from "../game/models/room";
+import { QueueController } from "../socket/queue_controller";
+import { PrivateServerResponse, PrivateServerResponseStatus, PublicServerResponse } from "../schemas/server_response";
+import { logger } from "../utils/logger";
+import { ChatClientToServer, ChatServerToClient, ClientToServerEvents, DrawElements, EndTurn, InterServerEvents, JoinGame, MoveSage, PlaceElement, Queue, ServerToClientEvents, SocketData } from "./socketUtils";
 
 /**
  * This class is reponsible to mantain socket connection and logic between players and server when game begins
