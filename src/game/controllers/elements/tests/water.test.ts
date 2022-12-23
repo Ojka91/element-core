@@ -10,6 +10,7 @@ import ElementPoolManager from "../../element_pool_controller";
 import GridController from "../../grid_controller";
 import { SageController } from "../../pieces/sage_controller";
 import { EarthController } from "../earth_controller";
+import { FireController } from "../fire_controller";
 import { WaterController } from "../water_controller";
 
 
@@ -813,7 +814,7 @@ describe('WaterController: reaction', () => {
 
     })
 
-    it('reaction: Should return rivers available', async () => {
+    it('getRivers: Should return rivers available when placing a water', async () => {
 
       /* 
         W: Water
@@ -827,7 +828,7 @@ describe('WaterController: reaction', () => {
          -----------------------------------------
       2  |   |   |   |   | W |   |   |   |   |   | 
          -----------------------------------------
-      3  |   |   |   |PW | W | W |   |   |   |   |  <- Horitzontal river 
+      3  |   |   |   |PW | W | W | F |   |   |   |  <- Horitzontal river 
          -----------------------------------------
       4  |   |   |   | W |   |   |   |   |   |   |
          -----------------------------------------
@@ -871,6 +872,11 @@ describe('WaterController: reaction', () => {
         { row: 6, column: 4 }
     ]
 
+    const firePosition: Position = {
+        row: 3,
+        column: 6
+    }
+
     const grid: GridModel = new GridModel();
     const grid_controller: GridController = new GridController(grid);
     grid_controller.generateInitialGrid(10, 8);
@@ -884,6 +890,9 @@ describe('WaterController: reaction', () => {
         new WaterController(water).place(grid, water_pos, element_pool_manager);
 
     })
+
+    const fire: FireModel = new FireModel();
+    new FireController(fire).place(grid, firePosition, element_pool_manager);
 
     // Place water
     const placed_water: WaterModel = new WaterModel();
