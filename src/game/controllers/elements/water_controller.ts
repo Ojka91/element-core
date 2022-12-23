@@ -175,4 +175,38 @@ export class WaterController extends ElementController implements IWaterControll
         }
         return false;
     }
+
+    public getRivers(grid: IGridModel, cell: Position): Array<Array<Position>> {
+        const grid_controller = new GridController(grid);
+        let rivers: Array<Array<Position>> = [];
+
+        // First we will check all 4 orthogonal directions
+        PositionUtils.orthogonal_increment_map.forEach((value: AxisIncrement) => {
+            let evaluate_pos: Position = {
+                row: cell.row + value.y,
+                column: cell.column + value.x
+            };
+
+            // New possible river starts with new placed water
+            let evaluating_river: Array<Position> = [{row: cell.row, column: cell.column}]
+
+            // We check if next piece on one direction is water. While it's water, it creates a river
+            while(grid_controller.isWaterCell(evaluate_pos)) {
+                if (grid_controller.isPositionValid(evaluate_pos)) {
+                    evaluating_river.push({row: evaluate_pos.row, column: evaluate_pos.column});
+                    evaluate_pos.column = evaluate_pos.column + value.x;
+                    evaluate_pos.row = evaluate_pos.row + value.y;
+                }
+            }
+            // If evaluating river contains only placed cell (lenght = 1) is not a river...
+            if (evaluating_river.length > 1) {
+                rivers.push(evaluating_river);
+                evaluating_river = []
+            }
+ 
+        });
+
+        return rivers;
+    
+    }
 }

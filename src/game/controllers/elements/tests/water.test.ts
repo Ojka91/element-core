@@ -813,4 +813,82 @@ describe('WaterController: reaction', () => {
 
     })
 
+    it('reaction: Should return rivers available', async () => {
+
+      /* 
+        W: Water
+        PW: Placed Water
+
+           0   1   2   3   4   5   6   7   8   9 
+         -----------------------------------------
+      0  |   |   |   |   |   |   |   |   |   |   |
+         -----------------------------------------
+      1  |   |   |   |   |   |   |   |   |   |   |
+         -----------------------------------------
+      2  |   |   |   |   | W |   |   |   |   |   | 
+         -----------------------------------------
+      3  |   |   |   |PW | W | W |   |   |   |   |  <- Horitzontal river 
+         -----------------------------------------
+      4  |   |   |   | W |   |   |   |   |   |   |
+         -----------------------------------------
+      5  |   |   |   | W |   |   |   |   |   |   |
+         -----------------------------------------
+      6  |   |   |   | W | W |   |   |   |   |   |
+         -----------------------------------------
+      7  |   |   |   |   |   |   |   |   |   |   |
+         -----------------------------------------
+                       ^
+                       | 
+                vertical river
+      
+         */
+    })
+
+    const placed_water_pos: Position = { row: 3, column: 3 }
+
+    const river_1: Array<Position> = [
+        { row: 3, column: 3 },
+        { row: 3, column: 4 },
+        { row: 3, column: 5 }
+    ]
+    
+    const river_2: Array<Position> = [
+        { row: 3, column: 3 },
+        { row: 4, column: 3 },
+        { row: 5, column: 3 },
+        { row: 6, column: 3 }
+    ]
+
+    const rivers: Array<Array<Position>> = [river_1, river_2];
+
+    const waterPositions: Array<Position> = [
+        { row: 2, column: 4 },
+        { row: 3, column: 4 },
+        { row: 3, column: 5 },
+        { row: 4, column: 3 },
+        { row: 5, column: 3 },
+        { row: 6, column: 3 },
+        { row: 6, column: 4 }
+    ]
+
+    const grid: GridModel = new GridModel();
+    const grid_controller: GridController = new GridController(grid);
+    grid_controller.generateInitialGrid(10, 8);
+
+    const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+    const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
+
+    // Prepare grid
+    waterPositions.forEach((water_pos) => {
+        const water: WaterModel = new WaterModel();
+        new WaterController(water).place(grid, water_pos, element_pool_manager);
+
+    })
+
+    // Place water
+    const placed_water: WaterModel = new WaterModel();
+    new WaterController(placed_water).place(grid, placed_water_pos, element_pool_manager);
+
+    expect(new WaterController(placed_water).getRivers(grid, placed_water_pos).sort()).toEqual(rivers.sort());
+
 })
