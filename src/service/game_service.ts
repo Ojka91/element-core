@@ -1,14 +1,14 @@
 import { Reaction } from "@/schemas/player_actions";
 import { PublicServerResponse } from "@/schemas/server_response";
-import { Queue } from "@/utils/socketUtils";
-import { GameController } from "./controllers/game_controller";
-import RoomController from "./controllers/room_controller";
-import { ElementTypes } from "./models/elements/elements";
-import { GameModel } from "./models/game";
-import { IPlayerModel } from "./models/player";
-import { IRoomModel, RoomModel } from "./models/room";
-import { UserModel } from "./models/user";
-import { Position } from "./utils/position_utils";
+import { Queue } from "@/socket/socketUtils";
+import { GameController } from "../game/controllers/game_controller";
+import RoomController from "../game/controllers/room_controller";
+import { ElementTypes } from "../game/models/elements/elements";
+import { GameModel } from "../game/models/game";
+import { IPlayerModel } from "../game/models/player";
+import { IRoomModel, RoomModel } from "../game/models/room";
+import { UserModel } from "../game/models/user";
+import { Position } from "../game/utils/position_utils";
 
 export class GameService {
 

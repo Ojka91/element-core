@@ -1,14 +1,14 @@
-import { Queue } from "@/utils/socketUtils";
-import { GameController } from "../controllers/game_controller";
-import RoomController from "../controllers/room_controller";
-import { GameService } from "../game_service";
-import { ElementTypes } from "../models/elements/elements";
-import { GameModel } from "../models/game";
-import { PlayerModel } from "../models/player";
-import { RoomModel } from "../models/room";
+import { Queue } from "@/socket/socketUtils";
+import { GameController } from "../../game/controllers/game_controller";
+import RoomController from "../../game/controllers/room_controller";
+import { GameService } from "../../service/game_service";
+import { ElementTypes } from "../../game/models/elements/elements";
+import { GameModel } from "../../game/models/game";
+import { PlayerModel } from "../../game/models/player";
+import { RoomModel } from "../../game/models/room";
 
-jest.mock('../controllers/room_controller')
-jest.mock('../controllers/game_controller')
+jest.mock('../../game/controllers/room_controller')
+jest.mock('../../game/controllers/game_controller')
 describe('GameService', () => {
     afterEach(() => {
         jest.clearAllMocks();
