@@ -9,13 +9,14 @@ import { IPlayerModel } from "../game/models/player";
 import { IRoomModel, RoomModel } from "../game/models/room";
 import { UserModel } from "../game/models/user";
 import { Position } from "../game/utils/position_utils";
+import GameCache from "./game_cache";
 
 export class GameService {
 
     public async createRoom(data: Queue): Promise<string> {
         try {
             const roomModel = new RoomModel(this.getSizeRoom(data));
-            const roomController: RoomController = new RoomController(roomModel);
+            const roomController: RoomController = new RoomController(roomModel, GameCache);
 
 
             await roomController.save();
@@ -29,7 +30,7 @@ export class GameService {
     public async joinGame(roomId: string, userId: string): Promise<PublicServerResponse | null> {
         try {
             const roomModel: RoomModel = new RoomModel(0);
-            const roomController: RoomController = new RoomController(roomModel);
+            const roomController: RoomController = new RoomController(roomModel, GameCache);
             await roomController.loadRoomById(roomId);
 
             const user: UserModel = new UserModel()
@@ -52,7 +53,7 @@ export class GameService {
         try {
 
             const roomModel: RoomModel = new RoomModel(0);
-            const roomController: RoomController = new RoomController(roomModel);
+            const roomController: RoomController = new RoomController(roomModel, GameCache);
             await roomController.loadRoomById(roomId);
 
             const gameController: GameController = new GameController(roomController.getGame())
@@ -71,7 +72,7 @@ export class GameService {
         try {
 
             const roomModel: RoomModel = new RoomModel(0);
-            const roomController: RoomController = new RoomController(roomModel);
+            const roomController: RoomController = new RoomController(roomModel, GameCache);
             await roomController.loadRoomById(roomId);
 
             const gameController: GameController = new GameController(roomController.getGame())
@@ -95,7 +96,7 @@ export class GameService {
         try {
 
             const roomModel: RoomModel = new RoomModel(0);
-            const roomController: RoomController = new RoomController(roomModel);
+            const roomController: RoomController = new RoomController(roomModel, GameCache);
             await roomController.loadRoomById(roomId);
 
             const gameController: GameController = new GameController(roomController.getGame())
@@ -119,7 +120,7 @@ export class GameService {
         try {
 
             const roomModel: RoomModel = new RoomModel(0);
-            const roomController: RoomController = new RoomController(roomModel);
+            const roomController: RoomController = new RoomController(roomModel, GameCache);
             await roomController.loadRoomById(roomId);
 
             const gameController: GameController = new GameController(roomController.getGame())
@@ -142,7 +143,7 @@ export class GameService {
     public async forceLoser(roomId: string, socketId: string): Promise<PublicServerResponse> {
         try {
             const roomModel: RoomModel = new RoomModel(0);
-            const roomController: RoomController = new RoomController(roomModel);
+            const roomController: RoomController = new RoomController(roomModel, GameCache);
             await roomController.loadRoomById(roomId);
 
             const gameController: GameController = new GameController(roomController.getGame())
@@ -191,7 +192,7 @@ export class GameService {
     public async getUserList(roomId: string): Promise<Array<UserModel>> {
         try {
 
-            const roomController: RoomController = new RoomController(new RoomModel(0));
+            const roomController: RoomController = new RoomController(new RoomModel(0), GameCache);
             await roomController.loadRoomById(roomId);
 
             return roomController.getUserList();
