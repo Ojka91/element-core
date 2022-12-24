@@ -29,7 +29,7 @@ export interface IGridController {
     isMountainCell(position: Position): boolean
     isRangeCell(position: Position): boolean
     getSurroundingPieces(position: Position): Array<IPieceModel>
-};
+}
 
 export class GridController implements IGridController {
 
@@ -56,8 +56,8 @@ export class GridController implements IGridController {
     }
 
     public displayGrid(): void {
-        for (var row of this.model.cells) {
-            for (var column of row) {
+        for (const row of this.model.cells) {
+            for (const column of row) {
                 console.log(column);
             }
         }
@@ -173,8 +173,8 @@ export class GridController implements IGridController {
      * return IPieceModel list
     */
     public getSurroundingPieces(position: Position): Array<IPieceModel> {
-        let piece_list: Array<IPieceModel> = []
-        for (let axis_inc of PositionUtils.all_direction_increment_map.values()) {
+        const piece_list: Array<IPieceModel> = []
+        for (const axis_inc of PositionUtils.all_direction_increment_map.values()) {
             const piece_pos: Position = {
                 row: position.row + axis_inc.y,
                 column: position.column + axis_inc.x,

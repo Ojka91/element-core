@@ -127,7 +127,7 @@ export class EarthController extends ElementController implements IEarthControll
     }
 
     private getSurroundingEarths(grid: IGridModel, cell: Position): Array<Position> {
-        let surrounding_earths: Array<Position> = [];
+        const surrounding_earths: Array<Position> = [];
         let evaluation_cell: Position;
 
         const grid_controller: GridController = new GridController(grid);
@@ -146,7 +146,7 @@ export class EarthController extends ElementController implements IEarthControll
     }
 
     private getSurroundingRange(grid: IGridModel, cell: Position): Array<Position> {
-        let surroundingRange: Array<Position> = [];
+        const surroundingRange: Array<Position> = [];
         let evaluation_cell: Position;
 
         const grid_controller: GridController = new GridController(grid);
@@ -167,7 +167,7 @@ export class EarthController extends ElementController implements IEarthControll
     private isSurroundedByRange(grid: IGridModel, cell: Position): boolean {
         const surroundingRange: Array<Position> = this.getSurroundingRange(grid, cell);
         const grid_controller: GridController = new GridController(grid);
-        for (let earth of surroundingRange) {
+        for (const earth of surroundingRange) {
             if (grid_controller.isRangeCell(earth)) {
                 return true;
             }
