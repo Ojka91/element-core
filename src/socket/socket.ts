@@ -6,6 +6,7 @@ import { QueueController } from "../socket/queue_controller";
 import { PrivateServerResponse, PrivateServerResponseStatus, PublicServerResponse } from "../schemas/server_response";
 import { logger } from "../utils/logger";
 import { ChatClientToServer, ChatServerToClient, ClientToServerEvents, DrawElements, EndTurn, InterServerEvents, JoinGame, MoveSage, PlaceElement, Queue, ServerToClientEvents, SocketData } from "./socketUtils";
+import GameCache from "@/service/game_cache";
 
 /**
  * This class is reponsible to mantain socket connection and logic between players and server when game begins
@@ -245,7 +246,7 @@ class SocketController {
          * When client triggers this event, an event is sent to the room1 under boardMovement event
          */
         const room: RoomModel = new RoomModel(0);
-        const room_controller: RoomController = new RoomController(room);
+        const room_controller: RoomController = new RoomController(room, GameCache);
         await room_controller.loadRoomById(data.roomId);
 
         this.io.to("room1").emit('testUpdate', { room: room });

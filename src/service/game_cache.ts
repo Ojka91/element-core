@@ -1,5 +1,5 @@
 import { RedisSingleton } from "@/redis";
-import { IRoomModel, RoomModelMap } from "../models/room";
+import { IRoomModel, RoomModelMap } from "../game/models/room";
 
 export class GameCache {
 

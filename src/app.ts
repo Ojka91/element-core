@@ -13,6 +13,7 @@ import { RoomModel } from './game/models/room';
 import RoomController from './game/controllers/room_controller';
 import { UserModel } from './game/models/user';
 import user from './database/models/user';
+import GameCache from './service/game_cache';
 //import { User } from './controllers/user';
 dotenv.config({ path: `.env${process.env.NODE_ENV}` });
 
@@ -36,7 +37,7 @@ var server = app.listen(process.env.PORT || 3000, () => {
 let room_id: string;
 app.get('/game', async (_req: Request, res: Response) => {
   const room: RoomModel = new RoomModel(2);
-  const room_controller: RoomController = new RoomController(room);
+  const room_controller: RoomController = new RoomController(room, GameCache);
   
   room_id = room_controller.getUuid()
 
@@ -57,7 +58,7 @@ app.get('/game', async (_req: Request, res: Response) => {
 app.get('/display_room', async (_req: Request, res: Response) => {
 
   let room: RoomModel = new RoomModel(0)
-  const room_controller: RoomController = new RoomController(room)
+  const room_controller: RoomController = new RoomController(room, GameCache);
   await room_controller.loadRoomById(room_id);
   console.log(room)
   return res.send(room);

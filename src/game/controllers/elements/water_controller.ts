@@ -97,12 +97,12 @@ export class WaterController extends ElementController implements IWaterControll
 
         const grid_controller: GridController = new GridController(grid);
         // Clear old river
-        for (let pos of selected_river_pos_list!) {
+        for (const pos of selected_river_pos_list!) {
             grid_controller.clearCell(pos);
         }
 
         // Add new river
-        for (let pos of new_river_pos_list!) {
+        for (const pos of new_river_pos_list!) {
             const water: WaterModel = new WaterModel();
             new WaterController(water).updatePosition(pos);
             grid_controller.updateGridCell(water);
@@ -112,7 +112,7 @@ export class WaterController extends ElementController implements IWaterControll
 
     private isRiverOrthogonal(river_pos_list: Array<Position>): boolean {
         let previous_pos: Position | null = null;
-        for (let pos of river_pos_list) {
+        for (const pos of river_pos_list) {
             if (previous_pos != null) {
                 if (PositionUtils.isStrictOrthogonalPosition(previous_pos, pos) == false) {
                     return false;
@@ -126,7 +126,7 @@ export class WaterController extends ElementController implements IWaterControll
 
     private isValidRiver(grid: IGridModel, river_pos_list: Array<Position>): boolean {
         const grid_controller: GridController = new GridController(grid);
-        for (let water_pos of river_pos_list) {
+        for (const water_pos of river_pos_list) {
             if (grid_controller.isWaterCell(water_pos) == false) {
                 return false;
             }
@@ -136,7 +136,7 @@ export class WaterController extends ElementController implements IWaterControll
 
     private isNewRiverValid(grid: IGridModel, river_pos_list: Array<Position>, element_pool_manager: ElementPoolManager): boolean {
         const grid_controller: GridController = new GridController(grid);
-        for (let pos of river_pos_list) {
+        for (const pos of river_pos_list) {
             if (grid_controller.isPositionEmpty(pos) == false) {
                 if (this.ruleOfReplacement(grid_controller.getGridCellByPosition(pos), element_pool_manager) == false) {
                     return false;
@@ -148,7 +148,7 @@ export class WaterController extends ElementController implements IWaterControll
 
     private getSurroundingWaters(grid: IGridModel, cell: Position): Array<Position> {
         const grid_controller: GridController = new GridController(grid);
-        let surr_waters_position: Array<Position> = [];
+        const surr_waters_position: Array<Position> = [];
         PositionUtils.orthogonal_increment_map.forEach((value: AxisIncrement, key: string) => {
             const evaluate_pos: Position = {
                 row: cell.row + value.y,
@@ -178,11 +178,11 @@ export class WaterController extends ElementController implements IWaterControll
 
     public getRivers(grid: IGridModel, cell: Position): Array<Array<Position>> {
         const grid_controller = new GridController(grid);
-        let rivers: Array<Array<Position>> = [];
+        const rivers: Array<Array<Position>> = [];
 
         // First we will check all 4 orthogonal directions
         PositionUtils.orthogonal_increment_map.forEach((value: AxisIncrement) => {
-            let evaluate_pos: Position = {
+            const evaluate_pos: Position = {
                 row: cell.row + value.y,
                 column: cell.column + value.x
             };

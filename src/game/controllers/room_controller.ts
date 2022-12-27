@@ -1,12 +1,15 @@
 import { GameController } from './game_controller'
-import { GameCache } from './game_cache'
 import { UserController } from './user_controller'
-
 import { UserModel } from '../models/user'
 import { IGameModel } from '../models/game'
 import { IRoomModel, RoomModel } from '../models/room'
 import { IPlayerModel, PlayerModel } from '../models/player'
 import PlayerController from './player_controller'
+
+interface IGameCache {
+    saveRoom(room: IRoomModel): Promise<void>;
+    loadRoom(room_id: string): Promise<IRoomModel>;
+}
 
 interface IRoomController {
     getUuid(): string;
@@ -22,9 +25,11 @@ interface IRoomController {
 
 class RoomController implements IRoomController {
     private model: IRoomModel;
+    private cache: IGameCache;
 
-    constructor(model: IRoomModel) {
+    constructor(model: IRoomModel, cacheService: IGameCache) {
         this.model = model
+        this.cache = cacheService;
     }
 
     /** Returns the room uuid */
@@ -65,8 +70,8 @@ class RoomController implements IRoomController {
      */
     public getPlayerBySocketId(user_id: string): IPlayerModel {
         const game_controller: GameController = new GameController(this.model.game);
-        for(let user of this.model.user_to_player_map){
-            if(user_id === user.socket_uuid){
+        for (let user of this.model.user_to_player_map) {
+            if (user_id === user.socket_uuid) {
                 return game_controller.getPlayerById(user.player_uuid);
             }
         }
@@ -88,7 +93,7 @@ class RoomController implements IRoomController {
         }
 
         game_controller.setupGame(this.model.size);
-        await GameCache.saveRoom(this.model);
+        await this.cache.saveRoom(this.model);
 
         return true;
     }
@@ -97,7 +102,7 @@ class RoomController implements IRoomController {
     * loadRoomById
     */
     public async loadRoomById(room_id: string): Promise<void> {
-        const room: RoomModel = await GameCache.loadRoom(room_id);
+        const room: RoomModel = await this.cache.loadRoom(room_id);
         Object.assign(this.model, room);
 
     }
@@ -108,7 +113,7 @@ class RoomController implements IRoomController {
     }
 
     public async save(): Promise<void> {
-        await GameCache.saveRoom(this.model);
+        await this.cache.saveRoom(this.model);
     }
 }
 

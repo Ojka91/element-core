@@ -1,5 +1,6 @@
 import { GameController } from "@/game/controllers/game_controller";
 import RoomController from "@/game/controllers/room_controller";
+import GameCache from "@/service/game_cache";
 import { ElementTypes } from "../elements/elements";
 import { RoomModel, RoomModelMap } from "../room";
 import { UserModel } from "../user";
@@ -8,7 +9,7 @@ import { UserModel } from "../user";
 describe('RoomModelMap', () => {
     it('toDomain: should return a Room model with all models mapped from a json string', async () => {
         const room: RoomModel = new RoomModel(4);
-        const room_controller: RoomController = new RoomController(room);
+        const room_controller: RoomController = new RoomController(room, GameCache);
 
         const user1: UserModel = new UserModel();
         const user2: UserModel = new UserModel();
