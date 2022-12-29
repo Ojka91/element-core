@@ -63,13 +63,13 @@ class ElementPoolManager {
     }
 
     public fillPool(): void {
-        for (let pool_item of this.mapper.values()){
+        for (const pool_item of this.mapper.values()){
             new this.controller(pool_item).fill();
         }
     }
 
     public emptyPool(): void {
-        for (let pool_item of this.mapper.values()){
+        for (const pool_item of this.mapper.values()){
             new this.controller(pool_item).empty();
         }
     }
@@ -83,7 +83,7 @@ class ElementPoolManager {
     }
 
     public checkElementListAvailability(elements: Array<ElementTypes>): boolean {
-        for(let element_type in ElementTypes){
+        for(const element_type in ElementTypes){
             const amount_requested: number = elements.filter(element => element === element_type ).length
             const amount: number = this.mapper.get(element_type as ElementTypes)!.amount
 
