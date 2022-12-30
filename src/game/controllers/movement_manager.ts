@@ -102,6 +102,11 @@ export class MovementManager {
                 return false;
             }
 
+            // Check there are no ranges between sage and wind
+            if (this.isCrossingRange(grid, current_position, next_piece_pos)) {
+                return false;
+            }
+
             const wind_controller: WindController = new WindController(grid_controller.getGridCellByPosition(next_piece_pos) as WindModel);
             // Get cell piece
             const jump_distance: number = wind_controller.getNumberOfStackedWinds();
@@ -138,10 +143,6 @@ export class MovementManager {
 
     private static isCrossingRange(grid: IGridModel, current_position: Position, new_position: Position): boolean {
         const grid_controller: GridController = new GridController(grid);
-
-        if (PositionUtils.isStrictPosition(current_position, new_position) == false) {
-            throw new Error("Evaluating a range cross shall only be possible upon strict movements")
-        }
 
         // Assuming the movement is strict
         const surrounding_y: Position = {
