@@ -124,7 +124,7 @@ class BoardController {
         switch (element_type) {
             case ElementTypes.Water:
                 element_controller = new WaterController(element as IWaterModel);
-                if (reaction instanceof WaterReaction) {
+                if (reaction != null) {
                     const water_reaction: WaterReaction = reaction as WaterReaction
                     element_controller.reaction(this.model.grid, position, water_reaction.initial_river, water_reaction.new_river, this.element_pool_manager);
                 } else {

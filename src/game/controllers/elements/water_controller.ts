@@ -188,7 +188,7 @@ export class WaterController extends ElementController implements IWaterControll
             };
 
             // New possible river starts with new placed water
-            let evaluating_river: Array<Position> = [{row: cell.row, column: cell.column}]
+            let evaluating_river: Array<Position> = []
 
             // We check if next piece on one direction is water. While it's water, it creates a river
             while(grid_controller.isWaterCell(evaluate_pos)) {
@@ -199,7 +199,7 @@ export class WaterController extends ElementController implements IWaterControll
                 }
             }
             // If evaluating river contains only placed cell (lenght = 1) is not a river...
-            if (evaluating_river.length > 1) {
+            if (evaluating_river.length > 0) {
                 rivers.push(evaluating_river);
                 evaluating_river = []
             }
