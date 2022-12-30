@@ -144,7 +144,6 @@ export class MovementManager {
     private static isCrossingRange(grid: IGridModel, current_position: Position, new_position: Position): boolean {
         const grid_controller: GridController = new GridController(grid);
 
-        // Assuming the movement is strict
         const surrounding_y: Position = {
             row: current_position.row,
             column: new_position.column
@@ -155,7 +154,7 @@ export class MovementManager {
             column: current_position.column
         }
 
-        if (grid_controller.isRangeCell(surrounding_x) || grid_controller.isRangeCell(surrounding_y)) {
+        if (grid_controller.isRangeCell(surrounding_x) && grid_controller.isRangeCell(surrounding_y)) {
             return true;
         }
 
