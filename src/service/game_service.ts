@@ -214,6 +214,7 @@ export class GameService {
             room_uuid: roomModel.uuid,
             room: roomModel,
             player_turn_uuid: gameController.getTurnPlayer().uuid,
+            winner: gameController.getWinner()
         }
 
     }
