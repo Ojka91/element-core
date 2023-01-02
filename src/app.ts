@@ -23,7 +23,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use('/', routes)
 Swagger.setup(app);
-Database.connect();
+//Database.connect();
 
 app.get('/health', async (_req: Request, res: Response) => {
   return res.send({ status: 'ok' });
