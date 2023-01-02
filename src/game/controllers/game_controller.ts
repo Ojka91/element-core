@@ -2,7 +2,7 @@ import { Reaction } from "@/schemas/player_actions";
 import { BoardModel, IBoardModel } from "../models/board";
 import { ElementTypes } from "../models/elements/elements";
 import { GameModel, GameStates, IGameModel } from "../models/game";
-import { IPlayerModel } from "../models/player";
+import { IPlayerModel, PlayerModel } from "../models/player";
 import { Position } from "../utils/position_utils";
 import BoardController from "./board_controller";
 import PlayerController from "./player_controller";
@@ -19,7 +19,7 @@ export interface IGameController {
     getBoard(): IBoardModel;
     getTurnPlayer(): IPlayerModel;
     getGameState(): GameStates;
-    getWinner(): number | null;
+    getWinner(): string | null;
 }
 
 export class GameController implements IGameController {
@@ -39,8 +39,10 @@ export class GameController implements IGameController {
 
         this.model.board = new BoardModel();
         const board_controller: BoardController = new BoardController(this.model.board);
-        board_controller.initBoard();
+        this.setPlayerTargets();
 
+        board_controller.initBoard();
+        
         this.model.player_list.forEach((player) => {
             board_controller.createSageByPlayerAndGameType(player, game_type);
         })
@@ -122,12 +124,12 @@ export class GameController implements IGameController {
         if (turn_controller.isMovingSageAllowed() == false) {
             throw new Error("Cannot move sage, not available moves to spend");
         }
-        
+
         try {
             board_controller.placePlayerSage(this.getPlayerById(player_id), position);
             turn_controller.decreaseSageMoves();
         }
-        catch (error){
+        catch (error) {
             throw error;
         }
 
@@ -162,12 +164,12 @@ export class GameController implements IGameController {
         return this.model.state;
     }
 
-    public getWinner(): number | null {
+    public getWinner(): string | null {
         if (this.model.loser_uuid != "") {
             for (let player of this.model.player_list) {
                 const player_controller: PlayerController = new PlayerController(player)
                 if (player_controller.getSage().uuid === this.model.loser_uuid) {
-                    return player_controller.getPlayerNumber();
+                    return this.model.player_list.filter(p => p.target == player_controller.getPlayerNumber())[0].uuid;
                 }
             }
         }
@@ -202,4 +204,16 @@ export class GameController implements IGameController {
     public forceLoser(player_id: string) {
         this.model.loser_uuid = player_id;
     }
+
+    private setPlayerTargets(): void {
+        const usedTargetList: Array<string> = [];
+        
+        for (const player of this.model.player_list){
+            let targetList: Array<PlayerModel> = this.model.player_list.filter(p => !usedTargetList.includes(p.uuid));
+            targetList = targetList.filter(p => p.uuid != player.uuid);
+            const targetPlayer: PlayerModel = targetList[Math.floor(Math.random() * targetList.length)];
+            this.model.player_list[this.model.player_list.indexOf(player)].target = targetPlayer.player_number;
+            usedTargetList.push(targetPlayer.uuid);
+        }
+    } 
 }

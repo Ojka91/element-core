@@ -6,12 +6,14 @@ export interface IPlayerModel {
     uuid: string;
     player_number: number;
     sage: ISageModel;
+    target: number;
 }
 
 export class PlayerModel implements IPlayerModel {
     uuid: string;
     player_number: number;
     sage: ISageModel;
+    target: number = 0;
 
     constructor(player_number: number) {
 
@@ -27,6 +29,7 @@ export class PlayerModelMap extends Mapper{
         player.player_number = raw.player_number;
         player.sage = new SageModelMap().toDomain(raw.sage);
         player.uuid = raw.uuid;
+        player.target = raw.target;
         return player;
     }
 }
