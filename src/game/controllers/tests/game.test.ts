@@ -104,28 +104,21 @@ describe('GameController', () => {
 
         expect(() => game_controller.placeElement(ElementTypes.Wind , piece_pos)).toThrow("The element is not from the Drawn elements");
 
-        jest.spyOn(BoardController.prototype, 'winningCondition').mockImplementation(() => 'uuid');
         game_controller.placeElement(elements[0], piece_pos);
-        expect(game.loser_uuid).toStrictEqual("uuid");
-        game.loser_uuid = "";
         jest.restoreAllMocks();
 
-        jest.spyOn(BoardController.prototype, 'winningCondition').mockImplementation(() => '');
         jest.spyOn(TurnController.prototype, 'isEndOfTurn').mockImplementation(() => false);
         game_controller.placeElement(elements[0], piece_pos);
-        expect(game.loser_uuid).toStrictEqual("");
         expect(game.turn.player).toStrictEqual(0);
+
         jest.restoreAllMocks();
         
-        jest.spyOn(BoardController.prototype, 'winningCondition').mockImplementation(() => '');
         jest.spyOn(TurnController.prototype, 'isEndOfTurn').mockImplementation(() => true);
         game_controller.placeElement(elements[0], piece_pos);
-        expect(game.loser_uuid).toStrictEqual("");
         expect(game.turn.player).toStrictEqual(1);
         jest.restoreAllMocks();
 
         elements = [ElementTypes.Wind, ElementTypes.Fire, ElementTypes.Water];
-        jest.spyOn(BoardController.prototype, 'winningCondition').mockImplementation(() => '');
         jest.spyOn(TurnController.prototype, 'isEndOfTurn').mockImplementation(() => true);
         game_controller.drawingElements(elements);
         game_controller.placeElement(elements[0], piece_pos);

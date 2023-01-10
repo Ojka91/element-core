@@ -146,14 +146,11 @@ class BoardController {
         }
     }
 
-    public winningCondition(position: Position): string {
-        for (let sage of this.model.sage_list) {
-            if (PositionUtils.isStrictPosition(sage.position, position)) {
-                if (this.isSageCaptured(sage)) {
-                    return sage.uuid;
-                }
-            }
+    public winningCondition(player: IPlayerModel): string {
+        if (this.isSageCaptured(player.sage)) {
+            return player.sage.uuid;
         }
+            
         return "";
     }
 
