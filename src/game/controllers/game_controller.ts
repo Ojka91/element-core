@@ -92,12 +92,6 @@ export class GameController implements IGameController {
         board_controller.placeElement(element, position);
         board_controller.performElementReaction(element, position, reaction);
 
-        const loser: string = board_controller.winningCondition(position);
-
-        if (loser !== "") {
-            this.model.loser_uuid = loser;
-        }
-
         if (turn_controller.isEndOfTurn()) {
             this.nextPlayerTurn();
         }
@@ -105,12 +99,19 @@ export class GameController implements IGameController {
 
     private nextPlayerTurn(): void {
         const turn_controller: TurnController = new TurnController(this.model.turn);
+        const board_controller: BoardController = new BoardController(this.model.board);
 
         let player_number: number = turn_controller.getPlayer() + 1
         if (player_number == this.model.game_type) {
             player_number = 0;
         }
         turn_controller.changeTurn(player_number);
+
+        const loser: string = board_controller.winningCondition(this.getTurnPlayer());
+
+        if (loser !== "") {
+            this.model.loser_uuid = loser;
+        }
     }
 
     public movePlayerSage(player_id: string, position: Position): void {

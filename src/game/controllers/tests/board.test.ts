@@ -273,20 +273,20 @@ describe('BoardController', () => {
             }
         }
 
-        let result: string = board_controller.winningCondition(placed_piece);
+        let result: string = board_controller.winningCondition(player);
         expect(result).toStrictEqual(player_controller.getSage().uuid);
 
         new WindController(new WindModel()).place(board.grid, wind_position, element_pool_manager);
-        result = board_controller.winningCondition(placed_piece);
+        result = board_controller.winningCondition(player);
         expect(result).toStrictEqual("");
 
         new EarthController(new EarthModel()).place(board.grid, blocking_wind, element_pool_manager);
-        result = board_controller.winningCondition(placed_piece);
+        result = board_controller.winningCondition(player);
         expect(result).toStrictEqual(player_controller.getSage().uuid);
 
         grid_controller.clearCell(placed_piece);
 
-        result = board_controller.winningCondition(placed_piece);
+        result = board_controller.winningCondition(player);
         expect(result).toStrictEqual("");
 
     })
