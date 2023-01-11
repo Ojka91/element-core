@@ -40,12 +40,12 @@ describe('GameController', () => {
 
     })
 
-    it('drawingElements: drawing elements action controlled', async () => {
+    it('drawingElements: drawing elements action controlled in selectable mode', async () => {
         const game: GameModel = new GameModel();
         const game_controller: GameController = new GameController(game);
 
         let elements: Array<ElementTypes> = [ElementTypes.Fire, ElementTypes.Water];
-
+        game.drawType = 'selectable';
         game.state = GameStates.NewGame;
         expect(() => game_controller.drawingElements(elements)).toThrow("Cannot draw elements if the game hadn't started or has ended");
 
@@ -76,6 +76,7 @@ describe('GameController', () => {
     it('placeElement: place element on the board', async () => {
     
         const game: GameModel = new GameModel();
+        game.drawType = 'selectable'
         const game_controller: GameController = new GameController(game);
 
         let elements: Array<ElementTypes> = [ElementTypes.Fire, ElementTypes.Water, ElementTypes.Earth];

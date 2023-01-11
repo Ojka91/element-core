@@ -28,6 +28,7 @@ describe('RoomModelMap', () => {
         expect(await room_controller.gameStart()).toBe(true);
 
         const game_controller: GameController = new GameController(room.game);
+        room.game.drawType = 'selectable'
         game_controller.drawingElements([ElementTypes.Fire, ElementTypes.Water, ElementTypes.Earth]);
         game_controller.placeElement(ElementTypes.Fire, {row: 0, column: 0})
         game_controller.placeElement(ElementTypes.Water, {row: 1, column: 0})

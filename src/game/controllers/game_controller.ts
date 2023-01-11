@@ -42,7 +42,7 @@ export class GameController implements IGameController {
         this.setPlayerTargets();
 
         board_controller.initBoard();
-        
+
         this.model.player_list.forEach((player) => {
             board_controller.createSageByPlayerAndGameType(player, game_type);
         })
@@ -51,6 +51,17 @@ export class GameController implements IGameController {
     }
 
     public drawingElements(elements: Array<ElementTypes>): void {
+        switch(this.model.drawType){
+            case 'random':
+                this.drawingRandomElements(elements.length);
+                break;
+            case 'selectable':
+                this.drawingSelectedElements(elements);
+                break;
+        }
+    }
+    
+    private drawingSelectedElements(elements: Array<ElementTypes>): void {
 
         const turn_controller: TurnController = new TurnController(this.model.turn);
         const board_controller: BoardController = new BoardController(this.model.board);
@@ -72,6 +83,36 @@ export class GameController implements IGameController {
         }
         turn_controller.setDrawnElements(elements);
     }
+
+    private drawingRandomElements(numberOfElements: number): void {
+
+        const turn_controller: TurnController = new TurnController(this.model.turn);
+        const board_controller: BoardController = new BoardController(this.model.board);
+
+        if (this.model.state != GameStates.GameRunning) {
+            throw new Error("Cannot draw elements if the game hadn't started or has ended");
+        }
+        if (turn_controller.isDrawingElementsAllowed() == false) {
+            throw new Error("Drawing elements is only allowed at the start of the turn")
+        }
+        if (turn_controller.isNumberOfDrawnElementsAllowed(numberOfElements) == false) {
+            throw new Error("Maximum number of allowed elements to be requested have been exceded")
+        }
+        const elements: Array<ElementTypes> = [];
+        for(let element=0; element< numberOfElements; element++){
+            let randIndex: number = Math.floor(Math.random()* Object.keys(ElementTypes).length);
+            let randElement: ElementTypes = Object.values(ElementTypes)[randIndex];
+            while(!board_controller.checkElementPoolAvailability([randElement])){
+                randIndex = Math.floor(Math.random()* Object.keys(ElementTypes).length);
+                randElement = Object.values(ElementTypes)[randIndex];
+            }
+            board_controller.getElementFromPool(randElement);
+            elements.push(randElement);
+        }
+        turn_controller.setDrawnElements(elements);
+    }
+
+
 
     public placeElement(element: ElementTypes, position: Position, reaction?: Reaction): void {
 
@@ -181,7 +222,7 @@ export class GameController implements IGameController {
     /**
     * loadGame
     */
-    public async loadGame(game: IGameModel): Promise<void> {
+    public async loadGame(game: GameModel): Promise<void> {
         this.model = game;
 
     }
@@ -208,13 +249,13 @@ export class GameController implements IGameController {
 
     private setPlayerTargets(): void {
         const usedTargetList: Array<string> = [];
-        
-        for (const player of this.model.player_list){
+
+        for (const player of this.model.player_list) {
             let targetList: Array<PlayerModel> = this.model.player_list.filter(p => !usedTargetList.includes(p.uuid));
             targetList = targetList.filter(p => p.uuid != player.uuid);
             const targetPlayer: PlayerModel = targetList[Math.floor(Math.random() * targetList.length)];
             this.model.player_list[this.model.player_list.indexOf(player)].target = targetPlayer.player_number;
             usedTargetList.push(targetPlayer.uuid);
         }
-    } 
+    }
 }

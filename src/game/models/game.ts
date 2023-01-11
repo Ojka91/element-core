@@ -3,6 +3,8 @@ import { Mapper } from "@/game/utils/mapper";
 import { PlayerModel, PlayerModelMap } from "./player";
 import { TurnModel, TurnModelMap } from "./turn";
 
+type DrawType = 'random' | 'selectable'
+
 export enum GameStates {
     NewGame,
     GameRunning,
@@ -22,6 +24,7 @@ export interface IGameModel {
     turn: TurnModel,
     game_type: GameType,
     loser_uuid: string,
+    drawType: DrawType,
 }
 
 export class GameModel implements IGameModel {
@@ -31,7 +34,8 @@ export class GameModel implements IGameModel {
     board: BoardModel = new BoardModel();
     turn: TurnModel = new TurnModel(0); // default overrided later
     game_type: GameType = GameType.TwoPlayersGame; // default overrided later
-    loser_uuid: string = ""
+    loser_uuid: string = "";
+    drawType: DrawType = 'random';
 
 }
 
@@ -43,6 +47,7 @@ export class GameModelMap extends Mapper {
         game.loser_uuid = raw.loser_uuid;
         game.board = new BoardModelMap().toDomain(raw.board);
         game.turn = new TurnModelMap().toDomain(raw.turn);
+        game.drawType = raw.drawType;
         const player_mapper: PlayerModelMap = new PlayerModelMap();
         for (let player of raw.player_list) {
             game.player_list.push(player_mapper.toDomain(player));

@@ -5,7 +5,7 @@ import { RoomModel } from "../game/models/room";
 import { QueueController } from "../socket/queue_controller";
 import { PrivateServerResponse, PrivateServerResponseStatus, PublicServerResponse } from "../schemas/server_response";
 import { logger } from "../utils/logger";
-import { ChatClientToServer, ChatServerToClient, ClientToServerEvents, DrawElements, EndTurn, InterServerEvents, JoinGame, MoveSage, PlaceElement, Queue, ServerToClientEvents, SocketData } from "./socketUtils";
+import { ChatClientToServer, ChatServerToClient, ClientToServerEvents, DrawElements, DrawType, EndTurn, InterServerEvents, JoinGame, MoveSage, PlaceElement, Queue, ServerToClientEvents, SocketData } from "./socketUtils";
 import GameCache from "@/service/game_cache";
 
 /**
@@ -45,26 +45,26 @@ class SocketController {
        * 2. We should check if there are enough players on queue room to start a game
        * 2.1 If so, we should make those players join new room (roomId), and kick them from queue room
        */
-      socket.on("onQueue", async (data: Queue) => {
-        console.log(data)
+      socket.on("onQueue", async (queue: Queue, draw: DrawType) => {
+        console.log(queue)
 
         // 1. Client join queue room
-        socket.join(data)
+        socket.join(queue)
 
         // Add to the queue
-        queueController.addToQueue(data, socket.id);
+        queueController.addToQueue(queue, socket.id, draw);
 
         // 2. Checking if that queue have enough players
-        if (queueController.isQueueFull(data)) {
+        if (queueController.isQueueFull(queue)) {
           // 2.1 Creating and saving new room
-          const roomId = await gameService.createRoom(data);
+          const roomId = await gameService.createRoom(queue);
           // Adding roomID to our array that controls rooms
           this.roomsIds.push(roomId);
           // 2.1 Sending roomId to client for them to join
-          this.io.to(data).emit('gameFound', { roomId: roomId });
+          this.io.to(queue).emit('gameFound', { roomId: roomId });
           // 2.1 Cleaning queue room. Kick all clients on the room !! This system may fail if we have a lot of concurrency, we may change it in the future
-          queueController.resetQueue(data);
-          this.io.socketsLeave(data);
+          queueController.resetQueue(queue);
+          this.io.socketsLeave(queue);
         }
 
       })

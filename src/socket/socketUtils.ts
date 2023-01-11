@@ -3,21 +3,21 @@ import { IPlayerModel } from "@/game/models/player";
 import { RoomModel } from "@/game/models/room";
 import { Position } from "@/game/utils/position_utils";
 import { Reaction } from "@/schemas/player_actions";
-import { PrivateServerResponse, PublicServerResponse } from "../schemas/server_response";
+import { PrivateServerResponse, PublicServerResponse } from "@/schemas/server_response";
 
 export interface ServerToClientEvents {
   error: (response: PrivateServerResponse | null) => void;
   gameUpdate: (response: PublicServerResponse | null) => void;
   gameFound: (response: GameFound) => void;
   chat: (response: ChatServerToClient) => void;
-  
+
   // Testing porpouses
   boardMovement: (response: {}) => void;
   testUpdate: (response: {}) => void;
 }
 
 export interface ClientToServerEvents {
-  onQueue: (queue: Queue) => void;
+  onQueue: (queue: Queue, draw: DrawType) => void;
   cancelQueue: (queue: Queue) => void;
   joinGame: (data: JoinGame) => void;
   endTurn: (data: EndTurn) => void;
@@ -39,6 +39,8 @@ export interface InterServerEvents {
 export interface SocketData {
 
 }
+
+export type DrawType = 'random' | 'selectable'
 
 export enum Queue {
   queue2 = 'queue2',
