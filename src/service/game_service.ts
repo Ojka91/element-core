@@ -11,6 +11,11 @@ import { UserModel } from "../game/models/user";
 import { Position } from "../game/utils/position_utils";
 import GameCache from "./game_cache";
 
+export type UserDataType = {
+    socketId: string;
+    username: string;
+}
+
 export class GameService {
 
     public async createRoom(data: Queue): Promise<string> {
@@ -27,15 +32,15 @@ export class GameService {
         }
     }
 
-    public async joinGame(roomId: string, userId: string): Promise<PublicServerResponse | null> {
+    public async joinGame(roomId: string, userData: UserDataType): Promise<PublicServerResponse | null> {
         try {
             const roomModel: RoomModel = new RoomModel(0);
             const roomController: RoomController = new RoomController(roomModel, GameCache);
             await roomController.loadRoomById(roomId);
 
             const user: UserModel = new UserModel()
-            user.name = userId;
-            user.socket_id = userId;
+            user.name = userData.username;
+            user.socket_id = userData.socketId;
 
             roomController.addUser(user);
             await roomController.save();

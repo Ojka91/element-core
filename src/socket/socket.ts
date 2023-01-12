@@ -7,6 +7,7 @@ import { PrivateServerResponse, PrivateServerResponseStatus, PublicServerRespons
 import { logger } from "../utils/logger";
 import { ChatClientToServer, ChatServerToClient, ClientToServerEvents, DrawElements, EndTurn, InterServerEvents, JoinGame, MoveSage, PlaceElement, Queue, ServerToClientEvents, SocketData } from "./socketUtils";
 import GameCache from "@/service/game_cache";
+import { UserModel } from "@/game/models/user";
 
 /**
  * This class is reponsible to mantain socket connection and logic between players and server when game begins
@@ -91,7 +92,10 @@ class SocketController {
         // 1. Join game/roomId socket
         socket.join(data.roomId)
         // 1. Join user into the game room and starts the game WHEN all users have joined
-        const response: PublicServerResponse | null = await gameService.joinGame(data.roomId, socket.id);
+        const response: PublicServerResponse | null = await gameService.joinGame(data.roomId, {
+          socketId: socket.id,
+          username: data.username
+        });
 
         if (response) this.io.to(data.roomId).emit('gameUpdate', response);
 
@@ -208,11 +212,15 @@ class SocketController {
        * The event receives the roomID and the message a player wants to send to the chat, and broadcast it
        * to all players within the room
        */
-      socket.on("chat", (data: ChatClientToServer) => {
+      socket.on("chat", async (data: ChatClientToServer) => {
         console.log(`Chat | RoomId: ${data.roomId}, message: ${data.message}`);
         
+        const userList: Array<UserModel> = await gameService.getUserList(data.roomId);
+        const userModel: UserModel = userList.filter(user => user.socket_id == socket.id)[0];
+        
         const response: ChatServerToClient = {
-          message: socket.id.slice(0, 5) + ": " + data.message
+          user: userModel,
+          message: data.message
         };
 
         this.io.to(data.roomId).emit('chat', response);

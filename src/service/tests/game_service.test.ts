@@ -40,13 +40,13 @@ describe('GameService', () => {
         })
 
         const gameService = new GameService();
-        let response = await gameService.joinGame('123', '1234')
+        let response = await gameService.joinGame('123', {socketId: '1234', username: '4321'})
         expect(RoomController.prototype.loadRoomById).toHaveBeenCalledTimes(1)
         expect(RoomController.prototype.save).toHaveBeenCalledTimes(1)
         expect(response).toBe(null);
 
         jest.spyOn(RoomController.prototype, 'isRoomFull').mockReturnValueOnce(true)
-        response = await gameService.joinGame('123', '1234')
+        response = await gameService.joinGame('123', {socketId: '1234', username: '4321'})
 
     });
 

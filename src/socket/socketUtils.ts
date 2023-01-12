@@ -1,4 +1,5 @@
 import { ElementTypes } from "@/game/models/elements/elements";
+import { UserModel } from "@/game/models/user";
 import { Position } from "@/game/utils/position_utils";
 import { Reaction } from "@/schemas/player_actions";
 import { PrivateServerResponse, PublicServerResponse } from "@/schemas/server_response";
@@ -50,6 +51,7 @@ export type GameFound = {
 
 export type JoinGame = {
   roomId: string
+  username: string
 }
 
 export type EndTurn = {
@@ -80,5 +82,6 @@ export type ChatClientToServer = {
 }
 
 export type ChatServerToClient = {
+  user: UserModel,
   message: string
 }
