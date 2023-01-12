@@ -1,16 +1,15 @@
 import { ElementTypes } from "@/game/models/elements/elements";
-import { IPlayerModel } from "@/game/models/player";
-import { RoomModel } from "@/game/models/room";
+import { UserModel } from "@/game/models/user";
 import { Position } from "@/game/utils/position_utils";
 import { Reaction } from "@/schemas/player_actions";
-import { PrivateServerResponse, PublicServerResponse } from "../schemas/server_response";
+import { PrivateServerResponse, PublicServerResponse } from "@/schemas/server_response";
 
 export interface ServerToClientEvents {
   error: (response: PrivateServerResponse | null) => void;
   gameUpdate: (response: PublicServerResponse | null) => void;
   gameFound: (response: GameFound) => void;
   chat: (response: ChatServerToClient) => void;
-  
+
   // Testing porpouses
   boardMovement: (response: {}) => void;
   testUpdate: (response: {}) => void;
@@ -52,6 +51,7 @@ export type GameFound = {
 
 export type JoinGame = {
   roomId: string
+  username: string
 }
 
 export type EndTurn = {
@@ -60,7 +60,7 @@ export type EndTurn = {
 
 export type DrawElements = {
   roomId: string
-  elements: Array<ElementTypes>
+  numOfElements: number
 }
 
 export type PlaceElement = {
@@ -82,5 +82,6 @@ export type ChatClientToServer = {
 }
 
 export type ChatServerToClient = {
+  user: UserModel,
   message: string
 }

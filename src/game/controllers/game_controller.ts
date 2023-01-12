@@ -12,7 +12,7 @@ import { TurnController } from "./turn_controller";
 export interface IGameController {
     addPlayer(player: IPlayerModel): void;
     setupGame(game_type: number): void;
-    drawingElements(elements: Array<ElementTypes>): void;
+    drawingElements(numberOfElements: number): void;
     placeElement(element: ElementTypes, position: Position, reaction?: Reaction): void;
     movePlayerSage(player: string, position: Position): void;
     endOfPlayerTurn(): void;
@@ -39,10 +39,10 @@ export class GameController implements IGameController {
 
         this.model.board = new BoardModel();
         const board_controller: BoardController = new BoardController(this.model.board);
-        this.setPlayerTargets();
+        while(this.setPlayerTargets()==false);
 
         board_controller.initBoard();
-        
+
         this.model.player_list.forEach((player) => {
             board_controller.createSageByPlayerAndGameType(player, game_type);
         })
@@ -50,8 +50,7 @@ export class GameController implements IGameController {
         this.model.state = GameStates.GameRunning;
     }
 
-    public drawingElements(elements: Array<ElementTypes>): void {
-
+    public drawingElements(numberOfElements: number): void {
         const turn_controller: TurnController = new TurnController(this.model.turn);
         const board_controller: BoardController = new BoardController(this.model.board);
 
@@ -61,14 +60,23 @@ export class GameController implements IGameController {
         if (turn_controller.isDrawingElementsAllowed() == false) {
             throw new Error("Drawing elements is only allowed at the start of the turn")
         }
-        if (turn_controller.isNumberOfDrawnElementsAllowed(elements.length) == false) {
+        if (turn_controller.isNumberOfDrawnElementsAllowed(numberOfElements) == false) {
             throw new Error("Maximum number of allowed elements to be requested have been exceded")
         }
-        if (board_controller.checkElementPoolAvailability(elements) == false) {
-            throw new Error("Requested elements cannot be taken from the pool");
+        if (board_controller.isDrawingElementsPossible(numberOfElements) == false) {
+            throw new Error("Cannot draw more elements than the amount remaining the pool")
         }
-        for (let element of elements) {
-            board_controller.getElementFromPool(element);
+        
+        const elements: Array<ElementTypes> = [];
+        for(let element=0; element< numberOfElements; element++){
+            let randIndex: number = Math.floor(Math.random()* Object.keys(ElementTypes).length);
+            let randElement: ElementTypes = Object.values(ElementTypes)[randIndex];
+            while(!board_controller.checkElementPoolAvailability([randElement])){
+                randIndex = Math.floor(Math.random()* Object.keys(ElementTypes).length);
+                randElement = Object.values(ElementTypes)[randIndex];
+            }
+            board_controller.getElementFromPool(randElement);
+            elements.push(randElement);
         }
         turn_controller.setDrawnElements(elements);
     }
@@ -181,7 +189,7 @@ export class GameController implements IGameController {
     /**
     * loadGame
     */
-    public async loadGame(game: IGameModel): Promise<void> {
+    public async loadGame(game: GameModel): Promise<void> {
         this.model = game;
 
     }
@@ -206,15 +214,18 @@ export class GameController implements IGameController {
         this.model.loser_uuid = player_id;
     }
 
-    private setPlayerTargets(): void {
+    private setPlayerTargets(): boolean {
         const usedTargetList: Array<string> = [];
-        
-        for (const player of this.model.player_list){
-            let targetList: Array<PlayerModel> = this.model.player_list.filter(p => !usedTargetList.includes(p.uuid));
-            targetList = targetList.filter(p => p.uuid != player.uuid);
+
+        for (const player of this.model.player_list) {
+            const targetList: Array<PlayerModel> = this.model.player_list.filter(p => (!usedTargetList.includes(p.uuid) && (p.uuid != player.uuid) ));
+            if(targetList.length == 0){
+                return false;
+            }
             const targetPlayer: PlayerModel = targetList[Math.floor(Math.random() * targetList.length)];
             this.model.player_list[this.model.player_list.indexOf(player)].target = targetPlayer.player_number;
             usedTargetList.push(targetPlayer.uuid);
         }
-    } 
+        return true;
+    }
 }

@@ -31,7 +31,7 @@ export class GameModel implements IGameModel {
     board: BoardModel = new BoardModel();
     turn: TurnModel = new TurnModel(0); // default overrided later
     game_type: GameType = GameType.TwoPlayersGame; // default overrided later
-    loser_uuid: string = ""
+    loser_uuid: string = "";
 
 }
 

@@ -7,6 +7,7 @@ import { PrivateServerResponse, PrivateServerResponseStatus, PublicServerRespons
 import { logger } from "../utils/logger";
 import { ChatClientToServer, ChatServerToClient, ClientToServerEvents, DrawElements, EndTurn, InterServerEvents, JoinGame, MoveSage, PlaceElement, Queue, ServerToClientEvents, SocketData } from "./socketUtils";
 import GameCache from "@/service/game_cache";
+import { UserModel } from "@/game/models/user";
 
 /**
  * This class is reponsible to mantain socket connection and logic between players and server when game begins
@@ -45,26 +46,26 @@ class SocketController {
        * 2. We should check if there are enough players on queue room to start a game
        * 2.1 If so, we should make those players join new room (roomId), and kick them from queue room
        */
-      socket.on("onQueue", async (data: Queue) => {
-        console.log(data)
+      socket.on("onQueue", async (queue: Queue) => {
+        console.log(queue)
 
         // 1. Client join queue room
-        socket.join(data)
+        socket.join(queue)
 
         // Add to the queue
-        queueController.addToQueue(data, socket.id);
+        queueController.addToQueue(queue, socket.id);
 
         // 2. Checking if that queue have enough players
-        if (queueController.isQueueFull(data)) {
+        if (queueController.isQueueFull(queue)) {
           // 2.1 Creating and saving new room
-          const roomId = await gameService.createRoom(data);
+          const roomId = await gameService.createRoom(queue);
           // Adding roomID to our array that controls rooms
           this.roomsIds.push(roomId);
           // 2.1 Sending roomId to client for them to join
-          this.io.to(data).emit('gameFound', { roomId: roomId });
+          this.io.to(queue).emit('gameFound', { roomId: roomId });
           // 2.1 Cleaning queue room. Kick all clients on the room !! This system may fail if we have a lot of concurrency, we may change it in the future
-          queueController.resetQueue(data);
-          this.io.socketsLeave(data);
+          queueController.resetQueue(queue);
+          this.io.socketsLeave(queue);
         }
 
       })
@@ -91,7 +92,10 @@ class SocketController {
         // 1. Join game/roomId socket
         socket.join(data.roomId)
         // 1. Join user into the game room and starts the game WHEN all users have joined
-        const response: PublicServerResponse | null = await gameService.joinGame(data.roomId, socket.id);
+        const response: PublicServerResponse | null = await gameService.joinGame(data.roomId, {
+          socketId: socket.id,
+          username: data.username
+        });
 
         if (response) this.io.to(data.roomId).emit('gameUpdate', response);
 
@@ -118,7 +122,7 @@ class SocketController {
         let response: PublicServerResponse | null = null;
         try {
           
-          response = await gameService.drawElements(data.roomId, data.elements, socket.id);
+          response = await gameService.drawElements(data.roomId, data.numOfElements, socket.id);
         } catch (error) {
           // If there is any error we will notify only to the client who generate the error
           logger.warn(error)
@@ -208,11 +212,15 @@ class SocketController {
        * The event receives the roomID and the message a player wants to send to the chat, and broadcast it
        * to all players within the room
        */
-      socket.on("chat", (data: ChatClientToServer) => {
+      socket.on("chat", async (data: ChatClientToServer) => {
         console.log(`Chat | RoomId: ${data.roomId}, message: ${data.message}`);
         
+        const userList: Array<UserModel> = await gameService.getUserList(data.roomId);
+        const userModel: UserModel = userList.filter(user => user.socket_id == socket.id)[0];
+        
         const response: ChatServerToClient = {
-          message: socket.id.slice(0, 5) + ": " + data.message
+          user: userModel,
+          message: data.message
         };
 
         this.io.to(data.roomId).emit('chat', response);

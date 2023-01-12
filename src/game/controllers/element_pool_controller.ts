@@ -93,6 +93,10 @@ class ElementPoolManager {
         }
         return true;
     }
+
+    public getRemainingElementAmount(): number {
+        return this.model.earth.amount + this.model.wind.amount + this.model.fire.amount + this.model.water.amount
+    }
     
 }
 
