@@ -38,7 +38,7 @@ class SocketController {
     this.io.on("connection", (socket: Socket<ClientToServerEvents,
       ServerToClientEvents>) => {
 
-      console.log("user connected " + socket.id)
+      console.log("user connected: " + socket.id)
 
       /**
        * onQueue: Clients that want to play a game search for a game emitting to this event with the type of queue they join (2, 3 or 4 players)
