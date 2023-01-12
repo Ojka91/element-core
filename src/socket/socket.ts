@@ -5,7 +5,7 @@ import { RoomModel } from "../game/models/room";
 import { QueueController } from "../socket/queue_controller";
 import { PrivateServerResponse, PrivateServerResponseStatus, PublicServerResponse } from "../schemas/server_response";
 import { logger } from "../utils/logger";
-import { ChatClientToServer, ChatServerToClient, ClientToServerEvents, DrawElements, DrawType, EndTurn, InterServerEvents, JoinGame, MoveSage, PlaceElement, Queue, ServerToClientEvents, SocketData } from "./socketUtils";
+import { ChatClientToServer, ChatServerToClient, ClientToServerEvents, DrawElements, EndTurn, InterServerEvents, JoinGame, MoveSage, PlaceElement, Queue, ServerToClientEvents, SocketData } from "./socketUtils";
 import GameCache from "@/service/game_cache";
 
 /**
@@ -45,14 +45,14 @@ class SocketController {
        * 2. We should check if there are enough players on queue room to start a game
        * 2.1 If so, we should make those players join new room (roomId), and kick them from queue room
        */
-      socket.on("onQueue", async (queue: Queue, draw: DrawType) => {
+      socket.on("onQueue", async (queue: Queue) => {
         console.log(queue)
 
         // 1. Client join queue room
         socket.join(queue)
 
         // Add to the queue
-        queueController.addToQueue(queue, socket.id, draw);
+        queueController.addToQueue(queue, socket.id);
 
         // 2. Checking if that queue have enough players
         if (queueController.isQueueFull(queue)) {
@@ -118,7 +118,7 @@ class SocketController {
         let response: PublicServerResponse | null = null;
         try {
           
-          response = await gameService.drawElements(data.roomId, data.elements, socket.id);
+          response = await gameService.drawElements(data.roomId, data.numOfElements, socket.id);
         } catch (error) {
           // If there is any error we will notify only to the client who generate the error
           logger.warn(error)

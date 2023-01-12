@@ -173,6 +173,10 @@ class BoardController {
         this.grid_controller.displayGrid();
     }
 
+    public isDrawingElementsPossible(numberOfElements: number): boolean {
+        return this.element_pool_manager.getRemainingElementAmount() >= numberOfElements;
+    }
+
 }
 
 export default BoardController;

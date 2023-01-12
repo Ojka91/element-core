@@ -68,7 +68,7 @@ export class GameService {
         }
     }
 
-    public async drawElements(roomId: string, elements: Array<ElementTypes>, socketId: string): Promise<PublicServerResponse> {
+    public async drawElements(roomId: string, numOfElements: number, socketId: string): Promise<PublicServerResponse> {
         try {
 
             const roomModel: RoomModel = new RoomModel(0);
@@ -80,7 +80,7 @@ export class GameService {
                 throw new Error('Its not your turn')
             }
 
-            gameController.drawingElements(elements);
+            gameController.drawingElements(numOfElements);
 
             await roomController.save();
 

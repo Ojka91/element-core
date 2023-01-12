@@ -83,7 +83,7 @@ describe('GameService', () => {
         })
 
         const gameService = new GameService();
-        await gameService.drawElements('roomId', [ElementTypes.Earth], 'socketId');
+        await gameService.drawElements('roomId', 1, 'socketId');
 
         expect(RoomController.prototype.loadRoomById).toHaveBeenCalledTimes(1)
         expect(RoomController.prototype.save).toHaveBeenCalledTimes(1)
@@ -92,7 +92,7 @@ describe('GameService', () => {
         jest.spyOn(GameService.prototype, 'isPlayerTurn').mockReturnValue(false)
 
         expect(async () => {
-            await gameService.drawElements('roomId', [ElementTypes.Earth], 'socketId')
+            await gameService.drawElements('roomId', 1, 'socketId')
         }).rejects.toThrow(new Error('Its not your turn'))
 
     });
@@ -119,7 +119,7 @@ describe('GameService', () => {
         jest.spyOn(GameService.prototype, 'isPlayerTurn').mockReturnValue(false)
 
         expect(async () => {
-            await gameService.drawElements('roomId', [ElementTypes.Earth], 'socketId')
+            await gameService.drawElements('roomId', 1, 'socketId')
         }).rejects.toThrow(new Error('Its not your turn'))
 
     });
@@ -146,7 +146,7 @@ describe('GameService', () => {
         jest.spyOn(GameService.prototype, 'isPlayerTurn').mockReturnValue(false)
 
         expect(async () => {
-            await gameService.drawElements('roomId', [ElementTypes.Earth], 'socketId')
+            await gameService.drawElements('roomId', 1, 'socketId')
         }).rejects.toThrow(new Error('Its not your turn'))
 
     });

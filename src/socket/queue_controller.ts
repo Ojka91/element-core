@@ -1,16 +1,15 @@
-import { DrawType, Queue } from "@/socket/socketUtils";
+import { Queue } from "@/socket/socketUtils";
 
-type QueueData =  {
+type QueueData = {
     number_players: number;
     max_players_allowed: 2 | 3 | 4;
     users: string[];
-    draw: 'random' | 'selectable';
 }
 
 type QueueTypesController = {
-    [Queue.queue2]: {number_players: number, max_players_allowed: 2, users: string[], draw: DrawType} 
-    [Queue.queue3]: {number_players: number, max_players_allowed: 3, users: string[], draw: DrawType} 
-    [Queue.queue4]: {number_players: number, max_players_allowed: 4, users: string[], draw: DrawType} 
+    [Queue.queue2]: { number_players: number, max_players_allowed: 2, users: string[]}
+    [Queue.queue3]: { number_players: number, max_players_allowed: 3, users: string[]}
+    [Queue.queue4]: { number_players: number, max_players_allowed: 4, users: string[]}
 }
 
 export class QueueController {
@@ -20,19 +19,18 @@ export class QueueController {
             number_players: 0,
             max_players_allowed: 2,
             users: [],
-            draw: 'random'
         },
         [Queue.queue3]: {
             number_players: 0,
             max_players_allowed: 3,
             users: [],
-            draw: 'random',
+
         },
         [Queue.queue4]: {
             number_players: 0,
             max_players_allowed: 4,
             users: [],
-            draw: 'random',
+
         }
     }
 
@@ -44,8 +42,7 @@ export class QueueController {
         return isQueueFull;
     }
 
-    public addToQueue(queue: Queue, socketId: string, draw: DrawType): void {
-        // TODO: distinct between draw type to add them to the queue.
+    public addToQueue(queue: Queue, socketId: string): void {
         this.queueTypes[queue].number_players++;
         this.queueTypes[queue].users.push(socketId);
     }
@@ -77,7 +74,7 @@ export class QueueController {
         return this.queueTypes[queue];
     }
 
-    public deleteItemByIndexFromQueue (queue: Queue, index: number): void {
+    public deleteItemByIndexFromQueue(queue: Queue, index: number): void {
         if (index != -1) {
             this.queueTypes[queue].users.splice(index, 1);
             this.queueTypes[queue].number_players--;

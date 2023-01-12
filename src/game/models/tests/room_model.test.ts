@@ -1,7 +1,6 @@
 import { GameController } from "@/game/controllers/game_controller";
 import RoomController from "@/game/controllers/room_controller";
 import GameCache from "@/service/game_cache";
-import { ElementTypes } from "../elements/elements";
 import { RoomModel, RoomModelMap } from "../room";
 import { UserModel } from "../user";
 
@@ -25,18 +24,20 @@ describe('RoomModelMap', () => {
         room_controller.addUser(user3);
         room_controller.addUser(user4);
 
-        expect(await room_controller.gameStart()).toBe(true);
+        for(let i: number = 0; i < 100; i++){
+            // Loop to deal with randomization of player targets
+            expect(await room_controller.gameStart()).toBe(true);
+        }
 
         const game_controller: GameController = new GameController(room.game);
-        room.game.drawType = 'selectable'
-        game_controller.drawingElements([ElementTypes.Fire, ElementTypes.Water, ElementTypes.Earth]);
-        game_controller.placeElement(ElementTypes.Fire, {row: 0, column: 0})
-        game_controller.placeElement(ElementTypes.Water, {row: 1, column: 0})
-        game_controller.placeElement(ElementTypes.Earth, {row: 2, column: 0})
+        game_controller.drawingElements(3);
+        game_controller.placeElement(room.game.turn.chosen_elements[0], {row: 0, column: 0})
+        game_controller.placeElement(room.game.turn.chosen_elements[0], {row: 1, column: 0})
+        game_controller.placeElement(room.game.turn.chosen_elements[0], {row: 2, column: 0})
         game_controller.endOfPlayerTurn();
 
-        game_controller.drawingElements([ElementTypes.Wind]);
-        game_controller.placeElement(ElementTypes.Wind, {row: 0, column: 3});
+        game_controller.drawingElements(1);
+        game_controller.placeElement(room.game.turn.chosen_elements[0], {row: 0, column: 3});
         game_controller.endOfPlayerTurn();
 
         const room_map: RoomModelMap = new RoomModelMap()
