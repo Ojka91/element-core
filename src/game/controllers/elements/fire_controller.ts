@@ -66,9 +66,9 @@ export class FireController extends ElementController implements IFireController
 
     /** Propagation shall be done by looking for Orthogonal lines of fire and adding one extra fire in the opposite side of the placed cell */
     private propagate(grid: IGridModel, cell: Position, direction: AxisIncrement, element_pool_manager: ElementPoolManagerModel): void {
-
         const grid_controller: GridController = new GridController(grid);
 
+        
         const evaluation_cell: Position = {
             row: cell.row + direction.y,
             column: cell.column + direction.x

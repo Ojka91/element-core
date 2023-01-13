@@ -6,9 +6,10 @@ import GridController from "./grid_controller";
 import { WindController } from "./elements/wind_controller";
 
 export class MovementManager {
-
-    public static isWindBlocked(grid: IGridModel, origin: Position, wind: WindModel): boolean {
-
+    
+    public static isWindBlocked(grid: IGridModel, origin: Position, wind: WindModel, counter: number = 1): boolean {
+        console.log("IswindBlocked counter: " + counter)
+        if (counter = 10) return false;
         const grid_controller: GridController = new GridController(grid);
         const wind_controller: WindController = new WindController(wind);
         // Distance of each axis
@@ -33,7 +34,7 @@ export class MovementManager {
         if (grid_controller.isPositionEmpty(landing_position)) {
             return false;
         } else if (grid_controller.isWindCell(landing_position)) {
-            return this.isWindBlocked(grid, landing_position, grid_controller.getGridCellByPosition(landing_position) as WindModel);
+            return this.isWindBlocked(grid, landing_position, grid_controller.getGridCellByPosition(landing_position) as WindModel, counter++);
         }
         return true
 
