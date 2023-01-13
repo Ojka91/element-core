@@ -9,7 +9,7 @@ export class MovementManager {
     
     public static isWindBlocked(grid: IGridModel, origin: Position, wind: WindModel, counter: number = 1): boolean {
         console.log("IswindBlocked counter: " + counter)
-        if (counter = 10) return false;
+        if (counter === 10) return true;
         const grid_controller: GridController = new GridController(grid);
         const wind_controller: WindController = new WindController(wind);
         // Distance of each axis
