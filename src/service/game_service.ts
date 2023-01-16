@@ -69,6 +69,13 @@ export class GameService {
         return roomModel;
     }
 
+    public async getGame(roomId: string): Promise<IRoomModel> {
+        const roomModel: RoomModel = new RoomModel(0);
+        const roomController: RoomController = new RoomController(roomModel, GameCache);
+        await roomController.loadRoomById(roomId);
+        return roomModel;
+    }
+
     public async endTurn(roomId: string): Promise<PublicServerResponse> {
         try {
 
