@@ -10,4 +10,8 @@ export class UserController {
     getUuid(): string {
         return this.model.uuid;
     }
+
+    getName(): string {
+        return this.model.name;
+    }
 }

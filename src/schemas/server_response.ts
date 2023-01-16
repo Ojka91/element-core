@@ -1,5 +1,4 @@
-import { IGameModel } from '@/game/models/game';
-import { IRoomModel } from '@/game/models/room';
+import { IRoomModel, IRoomModelSecured } from '@/game/models/room';
 
 export enum PrivateServerResponseStatus {
     ERROR = "ERROR",
@@ -13,11 +12,10 @@ type MessageHeader = {
 export type PrivateServerResponse = MessageHeader & {
     status: PrivateServerResponseStatus;
     message: string | null;
-    game?: IRoomModel;
 }
 
 export type PublicServerResponse = MessageHeader & {
-    room: IRoomModel;
+    room: IRoomModelSecured;
     player_turn_uuid: string;
     winner?: string | null;
 }

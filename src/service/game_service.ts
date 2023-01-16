@@ -6,7 +6,7 @@ import RoomController from "../game/controllers/room_controller";
 import { ElementTypes } from "../game/models/elements/elements";
 import { GameModel } from "../game/models/game";
 import { IPlayerModel } from "../game/models/player";
-import { IRoomModel, RoomModel } from "../game/models/room";
+import { IRoomModel, RoomModel, RoomModelMap } from "../game/models/room";
 import { UserModel } from "../game/models/user";
 import { Position } from "../game/utils/position_utils";
 import GameCache from "./game_cache";
@@ -88,7 +88,7 @@ export class GameService {
         }
     }
 
-    public async drawElements(roomId: string, numOfElements: number, socketId: string): Promise<PublicServerResponse> {
+    public async drawElements(roomId: string, numOfElements: number, userUuid: string): Promise<PublicServerResponse> {
         try {
 
             const roomModel: RoomModel = new RoomModel(0);
@@ -96,7 +96,7 @@ export class GameService {
             await roomController.loadRoomById(roomId);
 
             const gameController: GameController = new GameController(roomController.getGame())
-            if (!this.isPlayerTurn(socketId, gameController, roomController)) {
+            if (!this.isPlayerTurn(userUuid, gameController, roomController)) {
                 throw new Error('Its not your turn')
             }
 
@@ -112,7 +112,7 @@ export class GameService {
         }
     }
 
-    public async placeElement(roomId: string, socketId: string, element: ElementTypes, position: Position, reaction?: Reaction): Promise<PublicServerResponse> {
+    public async placeElement(roomId: string, userUuid: string, element: ElementTypes, position: Position, reaction?: Reaction): Promise<PublicServerResponse> {
         try {
 
             const roomModel: RoomModel = new RoomModel(0);
@@ -121,7 +121,7 @@ export class GameService {
 
             const gameController: GameController = new GameController(roomController.getGame())
 
-            if (!this.isPlayerTurn(socketId, gameController, roomController)) {
+            if (!this.isPlayerTurn(userUuid, gameController, roomController)) {
                 throw new Error('Its not your turn')
             }
 
@@ -136,7 +136,7 @@ export class GameService {
         }
     }
 
-    public async moveSage(roomId: string, socketId: string, player: string, position: Position): Promise<PublicServerResponse> {
+    public async moveSage(roomId: string, userUuid: string, player: string, position: Position): Promise<PublicServerResponse> {
         try {
 
             const roomModel: RoomModel = new RoomModel(0);
@@ -145,7 +145,7 @@ export class GameService {
 
             const gameController: GameController = new GameController(roomController.getGame())
 
-            if (!this.isPlayerTurn(socketId, gameController, roomController)) {
+            if (!this.isPlayerTurn(userUuid, gameController, roomController)) {
                 throw new Error('Its not your turn')
             }
 
@@ -222,17 +222,19 @@ export class GameService {
         }
     }
 
-    public isPlayerTurn(socketId: string, gameController: GameController, roomController: RoomController): boolean {
-        const player: IPlayerModel = roomController.getPlayerBySocketId(socketId);
+    public isPlayerTurn(userUuid: string, gameController: GameController, roomController: RoomController): boolean {
+        const player: IPlayerModel = roomController.getPlayerByUuid(userUuid);
         return player.uuid === gameController.getTurnPlayer().uuid
     }
 
     public preparePublicResponse(roomModel: IRoomModel): PublicServerResponse {
 
         const gameController: GameController = new GameController(roomModel.game);
+        const roomModelMap = new RoomModelMap();
+        
         return {
             room_uuid: roomModel.uuid,
-            room: roomModel,
+            room: roomModelMap.toSecured(roomModel),
             player_turn_uuid: gameController.getTurnPlayer().uuid,
             winner: gameController.getWinner()
         }

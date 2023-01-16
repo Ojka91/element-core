@@ -129,7 +129,7 @@ class SocketController {
         let response: PublicServerResponse | null = null;
         try {
           
-          response = await gameService.drawElements(data.roomId, data.numOfElements, socket.id);
+          response = await gameService.drawElements(data.roomId, data.numOfElements, socket.handshake.auth.userUuid);
         } catch (error) {
           // If there is any error we will notify only to the client who generate the error
           logger.warn(error)
@@ -153,7 +153,7 @@ class SocketController {
         let response: PublicServerResponse | null = null;
         try {
           
-          response = await gameService.placeElement(data.roomId, socket.id, data.element, data.position, data.reaction);
+          response = await gameService.placeElement(data.roomId, socket.handshake.auth.userUuid, data.element, data.position, data.reaction);
         } catch (error) {
           // If there is any error we will notify only to the client who generate the error
           logger.warn(error);
@@ -179,7 +179,7 @@ class SocketController {
           
           // TODO TBD !!! We should check if game ended => delete roomId from array
           
-          response = await gameService.moveSage(data.roomId, socket.id, data.playerId, data.position);
+          response = await gameService.moveSage(data.roomId, socket.handshake.auth.userUuid, data.playerId, data.position);
           
         } catch (error) {
           // If there is any error we will notify only to the client who generate the error

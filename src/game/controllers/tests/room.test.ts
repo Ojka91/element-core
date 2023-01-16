@@ -140,9 +140,9 @@ describe('RoomController', () => {
         user2.name = "Test2";
         user2.socket_id = "socket1"
 
-        expect(() => room_controller.getPlayerBySocketId(user1.socket_id)).toThrow("User ID not found");
+        expect(() => room_controller.getPlayerByUuid(user1.uuid)).toThrow("User ID not found");
         expect(room_controller.addUser(user1)).toBe(true);
-        expect( room_controller.getPlayerBySocketId(user1.socket_id) instanceof PlayerModel).toBe(true);
+        expect( room_controller.getPlayerByUuid(user1.uuid) instanceof PlayerModel).toBe(true);
     });
 
 
