@@ -5,7 +5,7 @@ import { RoomModel } from "../game/models/room";
 import { QueueController } from "../socket/queue_controller";
 import { PrivateServerResponse, PrivateServerResponseStatus, PublicServerResponse } from "../schemas/server_response";
 import { logger } from "../utils/logger";
-import { ChatClientToServer, ChatServerToClient, ClientToServerEvents, DrawElements, EndTurn, InterServerEvents, JoinGame, MoveSage, PlaceElement, Queue, ServerToClientEvents, SocketData } from "./socketUtils";
+import { ChatClientToServer, ChatServerToClient, ClientToServerEvents, DrawElements, EndTurn, InterServerEvents, JoinGame, MoveSage, PlaceElement, Queue, ServerToClientEvents, SocketData, UserAuthData } from "./socketUtils";
 import GameCache from "@/service/game_cache";
 import { UserModel } from "@/game/models/user";
 
@@ -91,13 +91,20 @@ class SocketController {
 
         // 1. Join game/roomId socket
         socket.join(data.roomId)
-        // 1. Join user into the game room and starts the game WHEN all users have joined
-        const response: PublicServerResponse | null = await gameService.joinGame(data.roomId, {
+        // 1. Join user into the game room
+        const userAuthData: UserAuthData = await gameService.joinGame(data.roomId, {
           socketId: socket.id,
           username: data.username
         });
 
-        if (response) this.io.to(data.roomId).emit('gameUpdate', response);
+        // We emit auth userData to joinedSocket
+        socket.emit('userAuthData', userAuthData);
+       
+        // When room is full we startGame and send gameUpdate to the players
+        if (await gameService.isRoomFull(data.roomId)) {
+          const roomModel = await gameService.gameStart(data.roomId);
+          this.io.to(data.roomId).emit('gameUpdate', gameService.preparePublicResponse(roomModel));
+        }
 
       })
 
