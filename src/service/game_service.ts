@@ -4,9 +4,8 @@ import { Queue, UserAuthData } from "@/socket/socketUtils";
 import { GameController } from "../game/controllers/game_controller";
 import RoomController from "../game/controllers/room_controller";
 import { ElementTypes } from "../game/models/elements/elements";
-import { GameModel } from "../game/models/game";
 import { IPlayerModel } from "../game/models/player";
-import { IRoomModel, RoomModel, RoomModelMap } from "../game/models/room";
+import { IRoomModel, RoomModel } from "../game/models/room";
 import { UserModel } from "../game/models/user";
 import { Position } from "../game/utils/position_utils";
 import GameCache from "./game_cache";
@@ -237,11 +236,10 @@ export class GameService {
     public preparePublicResponse(roomModel: IRoomModel): PublicServerResponse {
 
         const gameController: GameController = new GameController(roomModel.game);
-        const roomModelMap = new RoomModelMap();
         
         return {
             room_uuid: roomModel.uuid,
-            room: roomModelMap.toSecured(roomModel),
+            room: roomModel,
             player_turn_uuid: gameController.getTurnPlayer().uuid,
             winner: gameController.getWinner()
         }

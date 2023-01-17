@@ -30,6 +30,8 @@ export class PlayerModelMap extends Mapper{
         player.sage = new SageModelMap().toDomain(raw.sage);
         player.uuid = raw.uuid;
         player.target = raw.target;
+        console.log("player")
+        console.log(player)
         return player;
     }
 }

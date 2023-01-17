@@ -17,17 +17,6 @@ export interface IRoomModel {
     game: GameModel;
     size: number;
 }
-
-// This interface exist so we dont leak user details data to the whole room
-export interface IRoomModelSecured {
-    uuid: string;
-    user_list: Array<Partial<UserModel>>
-    user_to_player_map: Array<Partial<UserToPlayerMap>>
-    game: GameModel;
-    size: number;
-}
-
-
 export class RoomModel {
     uuid: string = "";
     user_list: Array<UserModel> = [];
@@ -57,22 +46,6 @@ export class RoomModelMap extends Mapper {
         const user_mapper: UserModelMap = new UserModelMap();
         for (let user of raw.user_list) {
             room.user_list.push(user_mapper.toDomain(user));
-        }
-        return room;
-    }
-
-    public toSecured(raw: RoomModel): IRoomModelSecured {
-        const room: IRoomModelSecured = new RoomModel(5);
-        room.uuid = raw.uuid;
-        room.size = raw.size;
-        room.game = new GameModelMap().toDomain(raw.game);
-        for (let user of raw.user_to_player_map) {
-            room.user_to_player_map.push({
-                user_name: user.user_name
-            });
-        }
-        for (let user of raw.user_list) {
-            room.user_list.push({name: user.name});
         }
         return room;
     }
