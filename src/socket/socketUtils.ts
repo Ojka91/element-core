@@ -9,6 +9,7 @@ export interface ServerToClientEvents {
   gameUpdate: (response: PublicServerResponse | null) => void;
   gameFound: (response: GameFound) => void;
   chat: (response: ChatServerToClient) => void;
+  userAuthData: (response: UserAuthData) => void;
 
   // Testing porpouses
   boardMovement: (response: {}) => void;
@@ -84,4 +85,8 @@ export type ChatClientToServer = {
 export type ChatServerToClient = {
   user: UserModel,
   message: string
+}
+export type UserAuthData = {
+  userUuid: string,
+  roomUuid: string
 }
