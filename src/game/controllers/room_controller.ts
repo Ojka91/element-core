@@ -2,7 +2,7 @@ import { GameController } from './game_controller'
 import { UserController } from './user_controller'
 import { UserModel } from '../models/user'
 import { IGameModel } from '../models/game'
-import { IRoomModel, RoomModel } from '../models/room'
+import { IRoomModel, RoomModel, UserToPlayerMap } from '../models/room'
 import { IPlayerModel, PlayerModel } from '../models/player'
 import PlayerController from './player_controller'
 
@@ -64,6 +64,22 @@ class RoomController implements IRoomController {
     public getUserList(): Array<UserModel> {
         return this.model.user_list;
     }
+
+    /** Update socket id */
+    public updateSocketId(userUuid: string, socketId: string): void {
+        this.model.user_list.forEach(user => {
+            if (user.uuid === userUuid) {
+                user.socket_id = socketId;
+            }
+        })
+
+        this.model.user_to_player_map.forEach(user => {
+            if (user.user_uuid === userUuid) {
+                user.socket_uuid = socketId;
+            }
+        })
+    }
+
 
     /**
      * getPlayerBySocketId

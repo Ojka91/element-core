@@ -41,20 +41,21 @@ class SocketController {
       console.log("user connected: " + socket.id)
       console.log(socket.handshake.auth)
       // If client is sending on connection userUuid and roomId, he may be trying to reconnect to a game
-      if (socket.handshake.auth.userUuid && socket.handshake.auth.roomId) {
+      if (socket.handshake.auth.userUuid && socket.handshake.auth.roomUuid) {
         try { 
 
-          console.log(`User reconnecting - uuid: ${socket.handshake.auth.userUuid} | roomId ${socket.handshake.auth.roomId}`)
+          console.log(`User reconnecting - uuid: ${socket.handshake.auth.userUuid} | roomId ${socket.handshake.auth.roomUuid}`)
           // Get the game from redis
-          const room: IRoomModel = await gameService.getRoom(socket.handshake.auth.roomId)
+          const room: IRoomModel = await gameService.getRoom(socket.handshake.auth.roomUuid)
           // If game exist AND userUuid belongs to the game we join the user to the room and send him an update with info
           if (room && room.user_list.filter(user => user.uuid === socket.handshake.auth.userUuid)) {
-            socket.join(socket.handshake.auth.roomId)
+            await gameService.updateSocketId(room, socket.handshake.auth.userUuid, socket.id)
+            socket.join(socket.handshake.auth.roomUuid)
             socket.emit('gameUpdate', gameService.preparePublicResponse(room))
             console.log('User reconnected to a game successfuly')
           }
         } catch (error) {
-          
+          console.log(error)
         }
       }
 

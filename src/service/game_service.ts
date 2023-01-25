@@ -234,6 +234,12 @@ export class GameService {
         return player.uuid === gameController.getTurnPlayer().uuid
     }
 
+    public async updateSocketId(room: IRoomModel,userUuid: string, socketId: string): Promise<void> {
+        const roomController: RoomController = new RoomController(room, GameCache);
+        roomController.updateSocketId(userUuid, socketId);
+        await roomController.save(); 
+    }
+
     public preparePublicResponse(roomModel: IRoomModel): PublicServerResponse {
 
         const gameController: GameController = new GameController(roomModel.game);
