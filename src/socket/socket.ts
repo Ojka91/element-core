@@ -1,11 +1,11 @@
 import { Server, Socket } from "socket.io";
 import RoomController from "../game/controllers/room_controller";
 import { GameService } from "../service/game_service";
-import { RoomModel } from "../game/models/room";
+import { IRoomModel, RoomModel } from "../game/models/room";
 import { QueueController } from "../socket/queue_controller";
 import { PrivateServerResponse, PrivateServerResponseStatus, PublicServerResponse } from "../schemas/server_response";
 import { logger } from "../utils/logger";
-import { ChatClientToServer, ChatServerToClient, ClientToServerEvents, DrawElements, EndTurn, InterServerEvents, JoinGame, MoveSage, PlaceElement, Queue, ServerToClientEvents, SocketData } from "./socketUtils";
+import { ChatClientToServer, ChatServerToClient, ClientToServerEvents, DrawElements, EndTurn, InterServerEvents, JoinGame, MoveSage, PlaceElement, Queue, ServerToClientEvents, SocketData, UserAuthData } from "./socketUtils";
 import GameCache from "@/service/game_cache";
 import { UserModel } from "@/game/models/user";
 
@@ -35,10 +35,29 @@ class SocketController {
     const queueController = new QueueController();
     const gameService = new GameService()
 
-    this.io.on("connection", (socket: Socket<ClientToServerEvents,
+    this.io.on("connection", async (socket: Socket<ClientToServerEvents,
       ServerToClientEvents>) => {
 
       console.log("user connected: " + socket.id)
+      console.log(socket.handshake.auth)
+      // If client is sending on connection userUuid and roomId, he may be trying to reconnect to a game
+      if (socket.handshake.auth.userUuid && socket.handshake.auth.roomUuid) {
+        try { 
+
+          console.log(`User reconnecting - uuid: ${socket.handshake.auth.userUuid} | roomId ${socket.handshake.auth.roomUuid}`)
+          // Get the game from redis
+          const room: IRoomModel = await gameService.getRoom(socket.handshake.auth.roomUuid)
+          // If game exist AND userUuid belongs to the game we join the user to the room and send him an update with info
+          if (room && room.user_list.filter(user => user.uuid === socket.handshake.auth.userUuid)) {
+            await gameService.updateSocketId(room, socket.handshake.auth.userUuid, socket.id)
+            socket.join(socket.handshake.auth.roomUuid)
+            socket.emit('gameUpdate', gameService.preparePublicResponse(room))
+            console.log('User reconnected to a game successfuly')
+          }
+        } catch (error) {
+          console.log(error)
+        }
+      }
 
       /**
        * onQueue: Clients that want to play a game search for a game emitting to this event with the type of queue they join (2, 3 or 4 players)
@@ -91,13 +110,20 @@ class SocketController {
 
         // 1. Join game/roomId socket
         socket.join(data.roomId)
-        // 1. Join user into the game room and starts the game WHEN all users have joined
-        const response: PublicServerResponse | null = await gameService.joinGame(data.roomId, {
+        // 1. Join user into the game room
+        const userAuthData: UserAuthData = await gameService.joinGame(data.roomId, {
           socketId: socket.id,
           username: data.username
         });
-
-        if (response) this.io.to(data.roomId).emit('gameUpdate', response);
+        console.log({userAuthData})
+        // We emit auth userData to joinedSocket
+        socket.emit('userAuthData', userAuthData);
+       
+        // When room is full we startGame and send gameUpdate to the players
+        if (await gameService.isRoomFull(data.roomId)) {
+          const roomModel = await gameService.gameStart(data.roomId);
+          this.io.to(data.roomId).emit('gameUpdate', gameService.preparePublicResponse(roomModel));
+        }
 
       })
 
