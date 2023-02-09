@@ -6,7 +6,9 @@
 
 
 # Element - backend
-Backend service for unofficial [element board game online](https://ratherdashinggames.com/games/element-silver.html)
+This is not an official game and we have no relation with the owners of the board game [element/element silver edition](https://ratherdashinggames.com/games/element-silver.html)
+
+Backend service for non official element board game online 
 
 Frontend project can be found [here](https://github.com/Arkk92/element-front)
 
