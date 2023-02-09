@@ -5,8 +5,11 @@
 | Beta  | Works with known bugs 🪲 |
 
 
+This is a non profit project we've built inspired by [Element Silver Edition board game](https://ratherdashinggames.com/games/element-silver.html)
+
+This is not an official game and we have no relation with the owners of the board game [Element Silver Edition](https://ratherdashinggames.com/games/element-silver.html)
+
 # Element - backend
-This is not an official game and we have no relation with the owners of the board game [element/element silver edition](https://ratherdashinggames.com/games/element-silver.html)
 
 Backend service for non official element board game online 
 
