@@ -1,5 +1,10 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
+| Current version | Status       |
+| ------- | ------------------ |
+| Beta  | Works with known bugs 🪲 |
+
+
 # Element - backend
 Backend service for unofficial [element board game online](https://ratherdashinggames.com/games/element-silver.html)
 
