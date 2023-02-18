@@ -1,6 +1,6 @@
 import { Reaction } from "@/schemas/player_actions";
 import { PublicServerResponse } from "@/schemas/server_response";
-import { Queue, UserAuthData } from "@/socket/socketUtils";
+import { ForfeitData, Queue, UserAuthData } from "@/socket/socketUtils";
 import { GameController } from "../game/controllers/game_controller";
 import RoomController from "../game/controllers/room_controller";
 import { ElementTypes } from "../game/models/elements/elements";
@@ -174,12 +174,13 @@ export class GameService {
             await roomController.loadRoomById(roomId);
 
             const gameController: GameController = new GameController(roomController.getGame())
+            const player = roomController.getPlayerBySocketId(socketId)
 
-            gameController.forceLoser(socketId);
+            gameController.forceLoser(player.sage.uuid);
             const winner = gameController.getWinner();
-            let publicResponse = this.preparePublicResponse(roomModel);
-
             await roomController.save();
+            
+            let publicResponse = this.preparePublicResponse(roomModel);
 
             publicResponse.winner = winner;
             return publicResponse;
