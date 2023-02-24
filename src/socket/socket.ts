@@ -253,7 +253,6 @@ class SocketController {
         this.roomsIds.filter(id => {
           return id != roomId
         })
-        console.log(response)
         this.io.to(roomId).emit('gameUpdate', response)
         
       })

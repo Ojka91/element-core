@@ -198,22 +198,18 @@ export class GameService {
         };
         let roomId: string = '';
         // Looping through array of rooms
-        roomsIds.every(async id => {
+        for (const id of roomsIds) {
             // Getting users for every roomId
             let userList: Array<UserModel> = await this.getUserList(id)
-
             //Looping through array of users for certain room
-            userList.every(async user => {
+            for (const user of userList) {
                 // If user match, we update room and response
                 if (user.socket_id === socketId) {
                     response = await this.forceLoser(id, socketId);
                     roomId = id;
-                    return false;
                 }
-                return true;
-            })
-            return true;
-        });
+            }
+        }
         return [response, roomId]
     }
 
