@@ -25,6 +25,7 @@ export interface ClientToServerEvents {
   placeElement: (data: PlaceElement) => void;
   moveSage: (data: MoveSage) => void;
   chat: (data: ChatClientToServer) => void;
+  forfeit: (data: ForfeitData) => void;
 
   // Testing porpouses
   joinRoom: (data: any) => void;
@@ -89,4 +90,9 @@ export type ChatServerToClient = {
 export type UserAuthData = {
   userUuid: string,
   roomUuid: string
+}
+
+export type ForfeitData = {
+  roomId: string,
+  userId: string
 }

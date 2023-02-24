@@ -1,6 +1,6 @@
 import { Reaction } from "@/schemas/player_actions";
 import { PublicServerResponse } from "@/schemas/server_response";
-import { Queue, UserAuthData } from "@/socket/socketUtils";
+import { ForfeitData, Queue, UserAuthData } from "@/socket/socketUtils";
 import { GameController } from "../game/controllers/game_controller";
 import RoomController from "../game/controllers/room_controller";
 import { ElementTypes } from "../game/models/elements/elements";
@@ -174,12 +174,13 @@ export class GameService {
             await roomController.loadRoomById(roomId);
 
             const gameController: GameController = new GameController(roomController.getGame())
+            const player = roomController.getPlayerBySocketId(socketId)
 
-            gameController.forceLoser(socketId);
+            gameController.forceLoser(player.sage.uuid);
             const winner = gameController.getWinner();
-            let publicResponse = this.preparePublicResponse(roomModel);
-
             await roomController.save();
+            
+            let publicResponse = this.preparePublicResponse(roomModel);
 
             publicResponse.winner = winner;
             return publicResponse;
@@ -197,22 +198,18 @@ export class GameService {
         };
         let roomId: string = '';
         // Looping through array of rooms
-        roomsIds.every(async id => {
+        for (const id of roomsIds) {
             // Getting users for every roomId
             let userList: Array<UserModel> = await this.getUserList(id)
-
             //Looping through array of users for certain room
-            userList.every(async user => {
+            for (const user of userList) {
                 // If user match, we update room and response
                 if (user.socket_id === socketId) {
                     response = await this.forceLoser(id, socketId);
                     roomId = id;
-                    return false;
                 }
-                return true;
-            })
-            return true;
-        });
+            }
+        }
         return [response, roomId]
     }
 

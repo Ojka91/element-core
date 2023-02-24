@@ -5,7 +5,7 @@ import { IRoomModel, RoomModel } from "../game/models/room";
 import { QueueController } from "../socket/queue_controller";
 import { PrivateServerResponse, PrivateServerResponseStatus, PublicServerResponse } from "../schemas/server_response";
 import { logger } from "../utils/logger";
-import { ChatClientToServer, ChatServerToClient, ClientToServerEvents, DrawElements, EndTurn, InterServerEvents, JoinGame, MoveSage, PlaceElement, Queue, ServerToClientEvents, SocketData, UserAuthData } from "./socketUtils";
+import { ChatClientToServer, ChatServerToClient, ClientToServerEvents, DrawElements, EndTurn, ForfeitData, InterServerEvents, JoinGame, MoveSage, PlaceElement, Queue, ServerToClientEvents, SocketData, UserAuthData } from "./socketUtils";
 import GameCache from "@/service/game_cache";
 import { UserModel } from "@/game/models/user";
 
@@ -215,6 +215,31 @@ class SocketController {
       })
 
       /**
+       * forfeit: A player surrender
+       */
+      socket.on("forfeit", async (data: ForfeitData) => {
+        console.log(`forfeit ${data} `)
+
+        let response: PublicServerResponse | null = null;
+        try {
+          
+          response = await gameService.forceLoser(data.roomId, socket.id);
+                    
+        } catch (error) {
+          // If there is any error we will notify only to the client who generate the error
+          logger.warn(error)
+          let response: PrivateServerResponse = {
+            room_uuid: data.roomId,
+            status: PrivateServerResponseStatus.ERROR,
+            message: (error as Error).message,
+          }
+          socket.emit('error', response)
+        }
+        this.io.to(data.roomId).emit('gameUpdate', response)
+
+      })
+
+      /**
        * When player disconnect we only have socket id.
        * We loop through roomId array and get userLists for every room
        * When a user match the socketId it's disconnected we force that player as a loser and emit response
@@ -228,7 +253,6 @@ class SocketController {
         this.roomsIds.filter(id => {
           return id != roomId
         })
-
         this.io.to(roomId).emit('gameUpdate', response)
         
       })
