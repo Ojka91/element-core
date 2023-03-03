@@ -31,11 +31,13 @@ If you just want to run the  game execute:
 make run
 ```
 
-You can run the project using 
-```
-make run
-or
-npm run start
-```
-But keep in mind redis won't be up and that may cause some issues
+This will build the image setup a volume for hot reloading and setup a redis. All ready to work
 
+
+### Other commands
+```
+make test // run tests locally
+make build // install required packages locally
+```
+
+You can try and run the project locally without docker (using package.json commands) but this is not recommended since it won't setup redis and basically the server won't really work
