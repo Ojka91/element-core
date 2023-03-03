@@ -31,11 +31,6 @@ If you just want to run the  game execute:
 make run
 ```
 
-If you want to rebuild do:
-```
-make run-build
-```
-
 You can run the project using 
 ```
 make run
