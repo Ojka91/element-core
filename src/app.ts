@@ -26,7 +26,7 @@ Swagger.setup(app);
 //Database.connect();
 
 app.get('/health', async (_req: Request, res: Response) => {
-  return res.send({ status: 'ok' });
+  return res.send({ status: 'oak' });
 });
 
 var server = app.listen(process.env.PORT || 3000, () => {

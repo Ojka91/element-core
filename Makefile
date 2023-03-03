@@ -13,9 +13,6 @@ docker-run:
 build:
 	npm install typescript -g && npm i -g dotenv-cli &&	npm install
 
-# Run locally dev using npm
-run:
-	npm run start
 
 test:
 	npm run test
