@@ -26,14 +26,14 @@ If you want to play with your friends visit [here](https://element-online.netlif
 
 ### Running for first time
 
-If you just want to run the whole game for first time execute:
+If you just want to run the  game execute:
 ```
-make local-up-build
+make run
 ```
 
-If you don't want to build the container again just execute:
+If you want to rebuild do:
 ```
-make local-up
+make run-build
 ```
 
 You can run the project using 
