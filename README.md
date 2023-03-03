@@ -31,11 +31,12 @@ If you just want to run the  game execute:
 make run
 ```
 
-This will build the image setup a volume for hot reloading and setup a redis. All ready to work
+This will run docker compose building the image seting up a volume for hot reloading and seting up a redis. All ready to work!
 
 
 ### Other commands
 ```
+make run-build // same as make run but forcing the docker compose building flag
 make test // run tests locally
 make build // install required packages locally
 ```
