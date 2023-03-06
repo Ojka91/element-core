@@ -190,6 +190,12 @@ export class GameService {
         }
     }
 
+    /**
+     * 
+     * This is not being used now since players can reconnect to continue game
+     * This method forces a loser based on the disconnecting socket id
+     * We keep it for knowledge porpouses 
+     */
     public async playerDisconnect(roomsIds: string[], socketId: string): Promise<[PublicServerResponse, string]> {
         let response: PublicServerResponse = {
             room_uuid: '',

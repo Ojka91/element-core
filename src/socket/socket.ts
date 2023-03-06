@@ -247,13 +247,18 @@ class SocketController {
       socket.on("disconnect", async () => {
         console.log('disconnecting ' + socket.id)
         queueController.deleteUserFromArray(socket.id);
-        let [response, roomId]: [PublicServerResponse, string] = await gameService.playerDisconnect(this.roomsIds, socket.id);
+
+        /**
+         * 
+         * This is not being used anymore since now we allow reconnection 
+         * */
+        // let [response, roomId]: [PublicServerResponse, string] = await gameService.playerDisconnect(this.roomsIds, socket.id);
         
-        // Deleting the roomId of the ended game
-        this.roomsIds.filter(id => {
-          return id != roomId
-        })
-        this.io.to(roomId).emit('gameUpdate', response)
+        // // Deleting the roomId of the ended game
+        // this.roomsIds.filter(id => {
+        //   return id != roomId
+        // })
+        // this.io.to(roomId).emit('gameUpdate', response)
         
       })
 
