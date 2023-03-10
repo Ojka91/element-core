@@ -9,8 +9,11 @@ services:
       - '6379:6379'
     command: redis-server
   element-core:
+    volumes:
+      - ./src:/app/src
+      - ./nodemon.json:/app/nodemon.json
     build:
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
       context: ./
     ports:
       - '3000:3000'
@@ -21,3 +24,4 @@ services:
     environment:
       - REDIS_URL=redis://redis:6379
       - ENV=local
+    command: nodemon --exec npm run dev

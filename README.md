@@ -26,21 +26,19 @@ If you want to play with your friends visit [here](https://element-online.netlif
 
 ### Running for first time
 
-If you just want to run the whole game for first time execute:
-```
-make local-up-build
-```
-
-If you don't want to build the container again just execute:
-```
-make local-up
-```
-
-You can run the project using 
+If you just want to run the  game execute:
 ```
 make run
-or
-npm run start
 ```
-But keep in mind redis won't be up and that may cause some issues
 
+This will run docker compose building the image seting up a volume for hot reloading and seting up a redis. All ready to work!
+
+
+### Other commands
+```
+make run-build // same as make run but forcing the docker compose building flag
+make test // run tests locally
+make build // install required packages locally
+```
+
+You can try and run the project locally without docker (using package.json commands) but this is not recommended since it won't setup redis and basically the server won't really work
