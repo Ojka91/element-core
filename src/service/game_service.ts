@@ -138,7 +138,6 @@ export class GameService {
 
     public async moveSage(roomId: string, socketId: string, player: string, position: Position): Promise<PublicServerResponse> {
         try {
-
             const roomModel: RoomModel = new RoomModel(0);
             const roomController: RoomController = new RoomController(roomModel, GameCache);
             await roomController.loadRoomById(roomId);

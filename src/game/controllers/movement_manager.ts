@@ -7,9 +7,8 @@ import { WindController } from "./elements/wind_controller";
 
 export class MovementManager {
     
-    public static isWindBlocked(grid: IGridModel, origin: Position, wind: WindModel, counter: number = 1): boolean {
-        console.log("IswindBlocked counter: " + counter)
-        if (counter === 10) return true;
+    public static isWindBlocked(grid: IGridModel, origin: Position, wind: WindModel): boolean {
+        
         const grid_controller: GridController = new GridController(grid);
         const wind_controller: WindController = new WindController(wind);
         // Distance of each axis
@@ -21,20 +20,20 @@ export class MovementManager {
         const y_dir: number = y_dist != 0 ? y_dist / Math.abs(y_dist) : y_dist;
 
         const jump_distance = wind_controller.getNumberOfStackedWinds();
-
         const landing_position: Position = {
             row: wind.position.row + jump_distance * y_dir,
             column: wind.position.column + jump_distance * x_dir,
         }
 
         if (grid_controller.isPositionValid(landing_position) == false) {
-            return false;
+            return true;
         }
 
         if (grid_controller.isPositionEmpty(landing_position)) {
             return false;
         } else if (grid_controller.isWindCell(landing_position)) {
-            return this.isWindBlocked(grid, landing_position, grid_controller.getGridCellByPosition(landing_position) as WindModel, counter++);
+
+            return this.isWindBlocked(grid, origin, grid_controller.getGridCellByPosition(landing_position) as WindModel);
         }
         return true
 

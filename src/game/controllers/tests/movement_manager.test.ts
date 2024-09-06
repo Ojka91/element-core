@@ -12,6 +12,8 @@ import GridController from "../grid_controller";
 import { SageController } from "../pieces/sage_controller";
 import { ElementPoolManagerModel } from "@/game/models/element_pool";
 import ElementPoolManager from "../element_pool_controller";
+import { FireModel } from "@/game/models/elements/fire";
+import { FireController } from "../elements/fire_controller";
 
 const surroundingSageMoves: Position[] = [
    // Orthogonal moves
@@ -787,7 +789,7 @@ describe('movement_manager', () => {
       new WindController(wind).place(grid, wind_pos, element_pool_manager);
 
       let wind_2: WindModel = new WindModel();
-      new WindController(wind).place(grid, wind_pos_2, element_pool_manager);
+      new WindController(wind_2).place(grid, wind_pos_2, element_pool_manager);
 
       expect(MovementManager.isWindBlocked(grid, cur_pos, wind)).toBe(false);
 
@@ -797,7 +799,7 @@ describe('movement_manager', () => {
       expect(MovementManager.isWindBlocked(grid, cur_pos, wind)).toBe(true);
    })
 
-   it('MovementManager.isWindBlocked: should return false if wind landing position is outside the boundaries', async () => {
+   it('MovementManager.isWindBlocked: should return true if wind landing position is outside the boundaries', async () => {
       /* test wind jumps with grid boundaries
          S: Sage
          W: Wind
@@ -836,9 +838,328 @@ describe('movement_manager', () => {
       new WindController(wind).place(grid, wind_pos, element_pool_manager);
 
       let wind_2: WindModel = new WindModel();
-      new WindController(wind).place(grid, wind_pos_2, element_pool_manager);
+      new WindController(wind_2).place(grid, wind_pos_2, element_pool_manager);
+
+      expect(MovementManager.isWindBlocked(grid, cur_pos, wind)).toBe(true);
+   })
+
+   it('MovementManager.isWindBlocked: multiple wind chain not blocked', async () => {
+      /* test wind jumps with grid boundaries
+         S: Sage
+         W: Wind
+         E: Earth
+           0   1   2   3   4   5   6   7   8   9   10
+         ---------------------------------------------
+      0  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      1  |   |   |   |   |   | W |   |   |   |   |   |
+         ---------------------------------------------
+      2  |   |   |   |   | F | W | F |   |   |   |   |
+         ---------------------------------------------
+      3  |   |   |   |   | F | S | F |   |   |   |   |
+         ---------------------------------------------
+      4  |   |   |   |   | F | F | F |   |   |   |   |
+         ---------------------------------------------
+      5  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      6  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      7  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      */
+      const cur_pos: Position = { row: 3, column: 5 };
+      const wind_pos: Position = { row: 2, column: 5 };
+      const wind_pos_2: Position = { row: 1, column: 5 };
+      const fire_pos_0: Position = { row: 2, column: 4 };
+      const fire_pos_1: Position = { row: 3, column: 4 };
+      const fire_pos_2: Position = { row: 4, column: 4 };
+      const fire_pos_3: Position = { row: 4, column: 5 };
+      const fire_pos_4: Position = { row: 4, column: 6 };
+      const fire_pos_5: Position = { row: 3, column: 6 };
+      const fire_pos_6: Position = { row: 2, column: 6 };
+
+      const grid: GridModel = new GridModel();
+      const grid_controller: GridController = new GridController(grid);
+      grid_controller.generateInitialGrid(11, 8);
+      const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+      const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
+      element_pool_manager.emptyPool(); // Empty pool so when replacement happens and element go back to pool, the pool is not full
+
+      let wind: WindModel = new WindModel();
+      new WindController(wind).place(grid, wind_pos, element_pool_manager);
+
+      let wind_2: WindModel = new WindModel();
+      new WindController(wind_2).place(grid, wind_pos_2, element_pool_manager);
+
+
+      new FireController(new FireModel()).place(grid, fire_pos_0, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_1, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_2, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_3, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_4, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_5, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_6, element_pool_manager);
 
       expect(MovementManager.isWindBlocked(grid, cur_pos, wind)).toBe(false);
+   })
+
+   it('MovementManager.isWindBlocked: multiple wind chain with whirlding 1', async () => {
+      /* test wind jumps with grid boundaries
+         S: Sage
+         W: Wind
+         E: Earth
+           0   1   2   3   4   5   6   7   8   9   10
+         ---------------------------------------------
+      0  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      1  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      2  |   |   |   |   |   | W |   |   |   |   |   |
+         ---------------------------------------------
+      3  |   |   |   |   | F | W2| F |   |   |   |   |
+         ---------------------------------------------
+      4  |   |   |   |   | F | S | F |   |   |   |   |
+         ---------------------------------------------
+      5  |   |   |   |   | F | F | F |   |   |   |   |
+         ---------------------------------------------
+      6  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      7  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      8  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      */
+      const cur_pos: Position = { row: 4, column: 5 };
+      const wind_pos: Position = { row: 3, column: 5 };
+      const wind_pos_1: Position = { row: 3, column: 5 };
+      const wind_pos_2: Position = { row: 2, column: 5 };
+      const fire_pos_0: Position = { row: 3, column: 4 };
+      const fire_pos_1: Position = { row: 4, column: 4 };
+      const fire_pos_2: Position = { row: 5, column: 4 };
+      const fire_pos_3: Position = { row: 5, column: 5 };
+      const fire_pos_4: Position = { row: 5, column: 6 };
+      const fire_pos_5: Position = { row: 4, column: 6 };
+      const fire_pos_6: Position = { row: 3, column: 6 };
+
+      const grid: GridModel = new GridModel();
+      const grid_controller: GridController = new GridController(grid);
+      grid_controller.generateInitialGrid(11, 8);
+      const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+      const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
+      element_pool_manager.emptyPool(); // Empty pool so when replacement happens and element go back to pool, the pool is not full
+
+      let wind: WindModel = new WindModel();
+      new WindController(wind).place(grid, wind_pos, element_pool_manager);
+      wind.stacked_winds = 2;
+      let wind_1: WindModel = new WindModel();
+      new WindController(wind_1).place(grid, wind_pos_1, element_pool_manager);
+      let wind_2: WindModel = new WindModel();
+      new WindController(wind_2).place(grid, wind_pos_2, element_pool_manager);
+
+
+      new FireController(new FireModel()).place(grid, fire_pos_0, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_1, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_2, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_3, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_4, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_5, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_6, element_pool_manager);
+
+      expect(MovementManager.isWindBlocked(grid, cur_pos, wind)).toBe(false);
+   })
+
+   it('MovementManager.isWindBlocked: multiple wind chain not blocked with whirlwind', async () => {
+      /* test wind jumps with grid boundaries
+         S: Sage
+         W: Wind
+         E: Earth
+           0   1   2   3   4   5   6   7   8   9   10
+         ---------------------------------------------
+      0  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      1  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      2  |   |   |   |   |   | W2 |   |   |   |   |   |
+         ---------------------------------------------
+      3  |   |   |   |   | F | W | F |   |   |   |   |
+         ---------------------------------------------
+      4  |   |   |   |   | F | S | F |   |   |   |   |
+         ---------------------------------------------
+      5  |   |   |   |   | F | F | F |   |   |   |   |
+         ---------------------------------------------
+      6  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      7  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      8  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      */
+      const cur_pos: Position = { row: 4, column: 5 };
+      const wind_pos: Position = { row: 3, column: 5 };
+      const wind_pos_1: Position = { row: 2, column: 5 };
+      const wind_pos_2: Position = { row: 2, column: 5 };
+      const fire_pos_0: Position = { row: 3, column: 4 };
+      const fire_pos_1: Position = { row: 4, column: 4 };
+      const fire_pos_2: Position = { row: 5, column: 4 };
+      const fire_pos_3: Position = { row: 5, column: 5 };
+      const fire_pos_4: Position = { row: 5, column: 6 };
+      const fire_pos_5: Position = { row: 4, column: 6 };
+      const fire_pos_6: Position = { row: 3, column: 6 };
+
+      const grid: GridModel = new GridModel();
+      const grid_controller: GridController = new GridController(grid);
+      grid_controller.generateInitialGrid(11, 8);
+      const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+      const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
+      element_pool_manager.emptyPool(); // Empty pool so when replacement happens and element go back to pool, the pool is not full
+
+      let wind: WindModel = new WindModel();
+      new WindController(wind).place(grid, wind_pos, element_pool_manager);
+      let wind_1: WindModel = new WindModel();
+      new WindController(wind_1).place(grid, wind_pos_1, element_pool_manager);
+      let wind_2: WindModel = new WindModel();
+      new WindController(wind_2).place(grid, wind_pos_2, element_pool_manager);
+
+
+      new FireController(new FireModel()).place(grid, fire_pos_0, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_1, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_2, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_3, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_4, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_5, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_6, element_pool_manager);
+
+      expect(MovementManager.isWindBlocked(grid, cur_pos, wind)).toBe(false);
+   })
+
+   it('MovementManager.isWindBlocked: multiple wind chain not blocked', async () => {
+      /* test wind jumps with grid boundaries
+         S: Sage
+         W: Wind
+         E: Earth
+           0   1   2   3   4   5   6   7   8   9   10
+         ---------------------------------------------
+      0  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      1  |   |   |   |   |   | W |   |   |   |   |   |
+         ---------------------------------------------
+      2  |   |   |   |   |   | W |   |   |   |   |   |
+         ---------------------------------------------
+      3  |   |   |   |   | F | W | F |   |   |   |   |
+         ---------------------------------------------
+      4  |   |   |   |   | F | S | F |   |   |   |   |
+         ---------------------------------------------
+      5  |   |   |   |   | F | F | F |   |   |   |   |
+         ---------------------------------------------
+      6  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      7  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      8  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      */
+      const cur_pos: Position = { row: 4, column: 5 };
+      const wind_pos: Position = { row: 3, column: 5 };
+      const wind_pos_1: Position = { row: 2, column: 5 };
+      const wind_pos_2: Position = { row: 1, column: 5 };
+      const fire_pos_0: Position = { row: 3, column: 4 };
+      const fire_pos_1: Position = { row: 4, column: 4 };
+      const fire_pos_2: Position = { row: 5, column: 4 };
+      const fire_pos_3: Position = { row: 5, column: 5 };
+      const fire_pos_4: Position = { row: 5, column: 6 };
+      const fire_pos_5: Position = { row: 4, column: 6 };
+      const fire_pos_6: Position = { row: 3, column: 6 };
+
+      const grid: GridModel = new GridModel();
+      const grid_controller: GridController = new GridController(grid);
+      grid_controller.generateInitialGrid(11, 8);
+      const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+      const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
+      element_pool_manager.emptyPool(); // Empty pool so when replacement happens and element go back to pool, the pool is not full
+
+      let wind: WindModel = new WindModel();
+      new WindController(wind).place(grid, wind_pos, element_pool_manager);
+      let wind_1: WindModel = new WindModel();
+      new WindController(wind_1).place(grid, wind_pos_1, element_pool_manager);
+      let wind_2: WindModel = new WindModel();
+      new WindController(wind_2).place(grid, wind_pos_2, element_pool_manager);
+
+
+      new FireController(new FireModel()).place(grid, fire_pos_0, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_1, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_2, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_3, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_4, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_5, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_6, element_pool_manager);
+
+      expect(MovementManager.isWindBlocked(grid, cur_pos, wind)).toBe(false);
+   })
+
+   it('MovementManager.isWindBlocked: multiple wind chain blocked at the end', async () => {
+      /* test wind jumps with grid boundaries
+         S: Sage
+         W: Wind
+         E: Earth
+           0   1   2   3   4   5   6   7   8   9   10
+         ---------------------------------------------
+      0  |   |   |   |   |   | F |   |   |   |   |   |
+         ---------------------------------------------
+      1  |   |   |   |   |   | W |   |   |   |   |   |
+         ---------------------------------------------
+      2  |   |   |   |   |   | W |   |   |   |   |   |
+         ---------------------------------------------
+      3  |   |   |   |   | F | W | F |   |   |   |   |
+         ---------------------------------------------
+      4  |   |   |   |   | F | S | F |   |   |   |   |
+         ---------------------------------------------
+      5  |   |   |   |   | F | F | F |   |   |   |   |
+         ---------------------------------------------
+      6  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      7  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      8  |   |   |   |   |   |   |   |   |   |   |   |
+         ---------------------------------------------
+      */
+      const cur_pos: Position = { row: 4, column: 5 };
+      const wind_pos: Position = { row: 3, column: 5 };
+      const wind_pos_1: Position = { row: 2, column: 5 };
+      const wind_pos_2: Position = { row: 1, column: 5 };
+      const fire_pos_7: Position = { row: 0, column: 5 };
+      const fire_pos_0: Position = { row: 3, column: 4 };
+      const fire_pos_1: Position = { row: 4, column: 4 };
+      const fire_pos_2: Position = { row: 5, column: 4 };
+      const fire_pos_3: Position = { row: 5, column: 5 };
+      const fire_pos_4: Position = { row: 5, column: 6 };
+      const fire_pos_5: Position = { row: 4, column: 6 };
+      const fire_pos_6: Position = { row: 3, column: 6 };
+
+      const grid: GridModel = new GridModel();
+      const grid_controller: GridController = new GridController(grid);
+      grid_controller.generateInitialGrid(11, 8);
+      const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+      const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
+      element_pool_manager.emptyPool(); // Empty pool so when replacement happens and element go back to pool, the pool is not full
+
+      let wind: WindModel = new WindModel();
+      new WindController(wind).place(grid, wind_pos, element_pool_manager);
+      let wind_1: WindModel = new WindModel();
+      new WindController(wind_1).place(grid, wind_pos_1, element_pool_manager);
+      let wind_2: WindModel = new WindModel();
+      new WindController(wind_2).place(grid, wind_pos_2, element_pool_manager);
+
+
+      new FireController(new FireModel()).place(grid, fire_pos_0, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_1, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_2, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_3, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_4, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_5, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_6, element_pool_manager);
+      new FireController(new FireModel()).place(grid, fire_pos_7, element_pool_manager);
+
+      expect(MovementManager.isWindBlocked(grid, cur_pos, wind)).toBe(true);
    })
 
 })
