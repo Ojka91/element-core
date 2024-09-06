@@ -77,10 +77,10 @@ class BoardController {
     public placePlayerSage(player: IPlayerModel, new_position: Position): void {
         let sage = new PlayerController(player).getSage();
         
-        if (this.grid_controller.isPositionValid(new_position) == false) {
+        if (!this.grid_controller.isPositionValid(new_position)) {
             throw new Error("Incorrect new row or new column dimensions");
         }
-        if (MovementManager.isSageMoveValid(this.model.grid, sage.position, new_position) == false) {
+        if (!MovementManager.isSageMoveValid(this.model.grid, sage.position, new_position)) {
             throw new Error("Sage movement is not valid");
         }
         this.grid_controller.clearCell(sage.position);
