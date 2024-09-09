@@ -29,6 +29,10 @@ export class MovementManager {
             return true;
         }
 
+        if (this.isCrossingRange(grid, origin, wind.position)) {
+            return true;
+        }
+
         if (grid_controller.isPositionEmpty(landing_position)) {
             return false;
         } else if (grid_controller.isWindCell(landing_position)) {
