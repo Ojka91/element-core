@@ -26,11 +26,11 @@ export interface ClientToServerEvents {
   moveSage: (data: MoveSage) => void;
   chat: (data: ChatClientToServer) => void;
   forfeit: (data: ForfeitData) => void;
+  forceGameUpdate: (data: any) => void;
 
   // Testing porpouses
   joinRoom: (data: any) => void;
   triggerFromClient: (data: any) => void;
-  forceGameUpdate: (data: any) => void;
 }
 
 export interface InterServerEvents {

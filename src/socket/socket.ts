@@ -281,6 +281,15 @@ class SocketController {
         this.io.to(data.roomId).emit('chat', response);
       })
 
+      socket.on("forceGameUpdate", async (data: any) => {
+        /**
+         * Testing porpouses
+         * When client triggers this event, an event is sent to the room1 under boardMovement event
+         */
+        const room: IRoomModel = await gameService.getRoom(socket.handshake.auth.roomUuid)
+        socket.emit('gameUpdate', gameService.preparePublicResponse(room))
+
+      })
 
 
 
@@ -303,17 +312,7 @@ class SocketController {
         console.log(data)
       })
 
-      socket.on("forceGameUpdate", async (data: any) => {
-        /**
-         * Testing porpouses
-         * When client triggers this event, an event is sent to the room1 under boardMovement event
-         */
-        const room: RoomModel = new RoomModel(0);
-        const room_controller: RoomController = new RoomController(room, GameCache);
-        await room_controller.loadRoomById(data.roomId);
-
-        this.io.to("room1").emit('testUpdate', { room: room });
-      })
+      
 
     })
 
