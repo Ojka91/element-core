@@ -10,6 +10,12 @@ run-build:
 docker-run:	
 	docker build -t element-backend . && docker run --env-file='.env-dev' -p 3000:3000 element-backend
 
+# Deploys fresh container
+.ONESHELL:
+deploy:
+	docker-compose stop
+	docker-compose build --no-cache
+	docker-compose up
 
 ## LOCAL COMMANDS
 # Use build to install required packages for running locally ("sudo" required!!)
