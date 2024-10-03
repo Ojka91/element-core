@@ -26,7 +26,7 @@ Swagger.setup(app);
 //Database.connect();
 
 app.get('/health', async (_req: Request, res: Response) => {
-  return res.send({ status: 'ok' });
+  res.send({ status: 'ok' });
 });
 
 var server = app.listen(process.env.PORT || 3000, () => {
@@ -51,7 +51,7 @@ app.get('/game', async (_req: Request, res: Response) => {
 
   await room_controller.gameStart();
 
-  return res.send(room);
+  res.send(room);
 });
 
 /** Debugging purposes: Display the entire room */
@@ -61,7 +61,7 @@ app.get('/display_room', async (_req: Request, res: Response) => {
   const room_controller: RoomController = new RoomController(room, GameCache);
   await room_controller.loadRoomById(room_id);
   console.log(room)
-  return res.send(room);
+  res.send(room);
 });
 
 app.get('/add', async (_req: Request, res: Response) => {
@@ -77,7 +77,7 @@ app.get('/add', async (_req: Request, res: Response) => {
       }
     ]
   })
-  return res.send(response);
+  res.send(response);
 });
 
 app.get('/get', async (_req: Request, res: Response) => {
@@ -95,7 +95,7 @@ app.get('/get', async (_req: Request, res: Response) => {
 
   // console.log( room)
 
-  return res.send('room_asdasda');
+  res.send('room_asdasda');
 });
 
 if (process.env.ENV != 'development') RedisSingleton.getInstance().connect()
