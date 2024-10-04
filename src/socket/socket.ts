@@ -1,13 +1,8 @@
 import { Server, Socket } from "socket.io";
-import RoomController from "../game/controllers/room_controller";
 import { GameService } from "../service/game_service";
-import { IRoomModel, RoomModel } from "../game/models/room";
 import { QueueController } from "../socket/queue_controller";
-import { PrivateServerResponse, PrivateServerResponseStatus, PublicServerResponse } from "../schemas/server_response";
-import { logger } from "../utils/logger";
-import { ChatClientToServer, ChatServerToClient, ClientToServerEvents, DrawElements, EndTurn, ForfeitData, InterServerEvents, JoinGame, MoveSage, PlaceElement, Queue, ServerToClientEvents, SocketData, UserAuthData } from "./socketUtils";
-import GameCache from "@/service/game_cache";
-import { UserModel } from "@/game/models/user";
+import { ChatClientToServer, ClientToServerEvents, DrawElements, EndTurn, ForfeitData, InterServerEvents, JoinGame, MoveSage, PlaceElement, Queue, ServerToClientEvents, SocketData } from "./socketUtils";
+import { cancelQueue, chat, connectionService, disconnect, drawElements, endTurn, forceGameUpdate, forfeit, joinGame, joinRoom, moveSage, onQueueService, placeElement, triggerFromClient } from "./socketServices";
 
 /**
  * This class is reponsible to mantain socket connection and logic between players and server when game begins
@@ -38,26 +33,7 @@ class SocketController {
     this.io.on("connection", async (socket: Socket<ClientToServerEvents,
       ServerToClientEvents>) => {
 
-      console.log("user connected: " + socket.id)
-      console.log(socket.handshake.auth)
-      // If client is sending on connection userUuid and roomId, he may be trying to reconnect to a game
-      if (socket.handshake.auth.userUuid && socket.handshake.auth.roomUuid) {
-        try { 
-
-          console.log(`User reconnecting - uuid: ${socket.handshake.auth.userUuid} | roomId ${socket.handshake.auth.roomUuid}`)
-          // Get the game from redis
-          const room: IRoomModel = await gameService.getRoom(socket.handshake.auth.roomUuid)
-          // If game exist AND userUuid belongs to the game we join the user to the room and send him an update with info
-          if (room && room.user_list.filter(user => user.uuid === socket.handshake.auth.userUuid)) {
-            await gameService.updateSocketId(room, socket.handshake.auth.userUuid, socket.id)
-            socket.join(socket.handshake.auth.roomUuid)
-            socket.emit('gameUpdate', gameService.preparePublicResponse(room))
-            console.log('User reconnected to a game successfuly')
-          }
-        } catch (error) {
-          console.log(error)
-        }
-      }
+      connectionService(socket, gameService);
 
       /**
        * onQueue: Clients that want to play a game search for a game emitting to this event with the type of queue they join (2, 3 or 4 players)
@@ -66,26 +42,7 @@ class SocketController {
        * 2.1 If so, we should make those players join new room (roomId), and kick them from queue room
        */
       socket.on("onQueue", async (queue: Queue) => {
-        console.log(queue)
-
-        // 1. Client join queue room
-        socket.join(queue)
-
-        // Add to the queue
-        queueController.addToQueue(queue, socket.id);
-
-        // 2. Checking if that queue have enough players
-        if (queueController.isQueueFull(queue)) {
-          // 2.1 Creating and saving new room
-          const roomId = await gameService.createRoom(queue);
-          // Adding roomID to our array that controls rooms
-          this.roomsIds.push(roomId);
-          // 2.1 Sending roomId to client for them to join
-          this.io.to(queue).emit('gameFound', { roomId: roomId });
-          // 2.1 Cleaning queue room. Kick all clients on the room !! This system may fail if we have a lot of concurrency, we may change it in the future
-          queueController.resetQueue(queue);
-          this.io.socketsLeave(queue);
-        }
+        onQueueService(this.io, socket, this.roomsIds, queue, queueController, gameService);
 
       })
 
@@ -93,10 +50,7 @@ class SocketController {
        * User in queue cancels being in queue
        */
       socket.on("cancelQueue", async (data: Queue) => {
-        console.log(data)
-        socket.leave(data);
-        queueController.deleteUserFromArray(socket.id, data);
-
+        cancelQueue(socket, data, queueController);
       })
 
       /**
@@ -106,60 +60,21 @@ class SocketController {
        * 2.1 If so, we start the game
        */
       socket.on("joinGame", async (data: JoinGame) => {
-        console.log(data.roomId)
-
-        // 1. Join game/roomId socket
-        socket.join(data.roomId)
-        // 1. Join user into the game room
-        const userAuthData: UserAuthData = await gameService.joinGame(data.roomId, {
-          socketId: socket.id,
-          username: data.username
-        });
-        console.log({userAuthData})
-        // We emit auth userData to joinedSocket
-        socket.emit('userAuthData', userAuthData);
-       
-        // When room is full we startGame and send gameUpdate to the players
-        if (await gameService.isRoomFull(data.roomId)) {
-          const roomModel = await gameService.gameStart(data.roomId);
-          this.io.to(data.roomId).emit('gameUpdate', gameService.preparePublicResponse(roomModel));
-        }
-
+        joinGame(this.io, socket, data, gameService);
       })
 
       /**
        * endTurn: Client which turn is playing should emit to this event with all the changes in the board
        */
       socket.on("endTurn", async (data: EndTurn) => {
-        console.log(data.roomId)
-
-        // A client may decide to force ending turn
-        const response: PublicServerResponse = await gameService.endTurn(data.roomId)
-        this.io.to(data.roomId).emit('gameUpdate', response)
-
+        endTurn(this.io, data, gameService);
       })
 
       /**
        * drawElements: Client which turn is playing should draw elements
        */
       socket.on("drawElements", async (data: DrawElements) => {
-        console.log(data)
-
-        let response: PublicServerResponse | null = null;
-        try {
-          
-          response = await gameService.drawElements(data.roomId, data.numOfElements, socket.id);
-        } catch (error) {
-          // If there is any error we will notify only to the client who generate the error
-          logger.warn(error)
-          const response_error: PrivateServerResponse = {
-            room_uuid: data.roomId,
-            status: PrivateServerResponseStatus.ERROR,
-            message: (error as Error).message,
-          }
-          socket.emit('error', response_error)
-        }
-        this.io.to(data.roomId).emit('gameUpdate', response)
+        drawElements(this.io, socket, data, gameService);
 
       })
 
@@ -167,23 +82,7 @@ class SocketController {
        * placeElement: Client which turn is playing should place element
        */
       socket.on("placeElement", async (data: PlaceElement) => {
-        console.log(data.element)
-
-        let response: PublicServerResponse | null = null;
-        try {
-          
-          response = await gameService.placeElement(data.roomId, socket.id, data.element, data.position, data.reaction);
-        } catch (error) {
-          // If there is any error we will notify only to the client who generate the error
-          logger.warn(error);
-          let response: PrivateServerResponse = {
-            room_uuid: data.roomId,
-            status: PrivateServerResponseStatus.ERROR,
-            message: (error as Error).message,
-          }
-          socket.emit('error', response)
-        }
-        this.io.to(data.roomId).emit('gameUpdate', response)
+        placeElement(this.io, socket, gameService, data);
 
       })
 
@@ -191,52 +90,14 @@ class SocketController {
        * moveSage: Client which turn is playing should move sage
        */
       socket.on("moveSage", async (data: MoveSage) => {
-        console.log(data.playerId)
-
-        let response: PublicServerResponse | null = null;
-        try {
-          
-          // TODO TBD !!! We should check if game ended => delete roomId from array
-          
-          response = await gameService.moveSage(data.roomId, socket.id, data.playerId, data.position);
-          
-        } catch (error) {
-          // If there is any error we will notify only to the client who generate the error
-          logger.warn(error)
-          let response: PrivateServerResponse = {
-            room_uuid: data.roomId,
-            status: PrivateServerResponseStatus.ERROR,
-            message: (error as Error).message,
-          }
-          socket.emit('error', response)
-        }
-        this.io.to(data.roomId).emit('gameUpdate', response)
-
+        moveSage(this.io, socket, gameService, data);
       })
 
       /**
        * forfeit: A player surrender
        */
       socket.on("forfeit", async (data: ForfeitData) => {
-        console.log(`forfeit ${data} `)
-
-        let response: PublicServerResponse | null = null;
-        try {
-          
-          response = await gameService.forceLoser(data.roomId, socket.id);
-                    
-        } catch (error) {
-          // If there is any error we will notify only to the client who generate the error
-          logger.warn(error)
-          let response: PrivateServerResponse = {
-            room_uuid: data.roomId,
-            status: PrivateServerResponseStatus.ERROR,
-            message: (error as Error).message,
-          }
-          socket.emit('error', response)
-        }
-        this.io.to(data.roomId).emit('gameUpdate', response)
-
+        forfeit(this.io, socket, gameService, data);
       })
 
       /**
@@ -245,21 +106,7 @@ class SocketController {
        * When a user match the socketId it's disconnected we force that player as a loser and emit response
        */
       socket.on("disconnect", async () => {
-        console.log('disconnecting ' + socket.id)
-        queueController.deleteUserFromArray(socket.id);
-
-        /**
-         * 
-         * This is not being used anymore since now we allow reconnection 
-         * */
-        // let [response, roomId]: [PublicServerResponse, string] = await gameService.playerDisconnect(this.roomsIds, socket.id);
-        
-        // // Deleting the roomId of the ended game
-        // this.roomsIds.filter(id => {
-        //   return id != roomId
-        // })
-        // this.io.to(roomId).emit('gameUpdate', response)
-        
+        disconnect(socket, queueController);
       })
 
       /**
@@ -268,52 +115,21 @@ class SocketController {
        * to all players within the room
        */
       socket.on("chat", async (data: ChatClientToServer) => {
-        console.log(`Chat | RoomId: ${data.roomId}, message: ${data.message}`);
-        
-        const userList: Array<UserModel> = await gameService.getUserList(data.roomId);
-        const userModel: UserModel = userList.filter(user => user.socket_id == socket.id)[0];
-        
-        const response: ChatServerToClient = {
-          user: userModel,
-          message: data.message
-        };
-
-        this.io.to(data.roomId).emit('chat', response);
+        chat(this.io, socket, gameService, data);
       })
 
       socket.on("forceGameUpdate", async (data: any) => {
-        /**
-         * Testing porpouses
-         * When client triggers this event, an event is sent to the room1 under boardMovement event
-         */
-        const room: IRoomModel = await gameService.getRoom(socket.handshake.auth.roomUuid)
-        socket.emit('gameUpdate', gameService.preparePublicResponse(room))
-
+        forceGameUpdate(this.io, socket, gameService, data);
       })
-
-
 
       // From here below, testing only
       socket.on("joinRoom", (data: any) => {
-        /**
-         * Testing porpouses
-         * When client triggers this event, client will join data1
-         */
-        socket.join('room1')
-        console.log(data)
+        joinRoom(socket, data);
       })
 
       socket.on("triggerFromClient", (data: any) => {
-        /**
-         * Testing porpouses
-         * When client triggers this event, an event is sent to the room1 under boardMovement event
-         */
-        this.io.to("room1").emit('boardMovement', { board: 'new' });
-        console.log(data)
+        triggerFromClient(this.io, data);
       })
-
-      
-
     })
 
   }
