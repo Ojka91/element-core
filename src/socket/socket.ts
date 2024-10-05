@@ -37,9 +37,10 @@ class SocketController {
 
     this.io.on("connection", async (socket: Socket<ClientToServerEvents,
       ServerToClientEvents>) => {
-
+        
+      socket.broadcast.emit('currentUsersConnected', { currentUsersCount: this.io.engine.clientsCount })
       console.log("user connected: " + socket.id)
-      console.log(socket.handshake.auth)
+      
       // If client is sending on connection userUuid and roomId, he may be trying to reconnect to a game
       if (socket.handshake.auth.userUuid && socket.handshake.auth.roomUuid) {
         try { 
@@ -93,7 +94,6 @@ class SocketController {
        * User in queue cancels being in queue
        */
       socket.on("cancelQueue", async (data: Queue) => {
-        console.log(data)
         socket.leave(data);
         queueController.deleteUserFromArray(socket.id, data);
 
@@ -106,7 +106,6 @@ class SocketController {
        * 2.1 If so, we start the game
        */
       socket.on("joinGame", async (data: JoinGame) => {
-        console.log(data.roomId)
 
         // 1. Join game/roomId socket
         socket.join(data.roomId)
@@ -115,7 +114,6 @@ class SocketController {
           socketId: socket.id,
           username: data.username
         });
-        console.log({userAuthData})
         // We emit auth userData to joinedSocket
         socket.emit('userAuthData', userAuthData);
        
@@ -131,7 +129,6 @@ class SocketController {
        * endTurn: Client which turn is playing should emit to this event with all the changes in the board
        */
       socket.on("endTurn", async (data: EndTurn) => {
-        console.log(data.roomId)
 
         // A client may decide to force ending turn
         const response: PublicServerResponse = await gameService.endTurn(data.roomId)
@@ -143,7 +140,6 @@ class SocketController {
        * drawElements: Client which turn is playing should draw elements
        */
       socket.on("drawElements", async (data: DrawElements) => {
-        console.log(data)
 
         let response: PublicServerResponse | null = null;
         try {
@@ -247,19 +243,7 @@ class SocketController {
       socket.on("disconnect", async () => {
         console.log('disconnecting ' + socket.id)
         queueController.deleteUserFromArray(socket.id);
-
-        /**
-         * 
-         * This is not being used anymore since now we allow reconnection 
-         * */
-        // let [response, roomId]: [PublicServerResponse, string] = await gameService.playerDisconnect(this.roomsIds, socket.id);
-        
-        // // Deleting the roomId of the ended game
-        // this.roomsIds.filter(id => {
-        //   return id != roomId
-        // })
-        // this.io.to(roomId).emit('gameUpdate', response)
-        
+        socket.broadcast.emit('currentUsersConnected', { currentUsersCount: this.io.engine.clientsCount })        
       })
 
       /**

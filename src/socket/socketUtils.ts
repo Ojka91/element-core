@@ -10,6 +10,7 @@ export interface ServerToClientEvents {
   gameFound: (response: GameFound) => void;
   chat: (response: ChatServerToClient) => void;
   userAuthData: (response: UserAuthData) => void;
+  currentUsersConnected: (response: UsersConnectedCount) => void;
 
   // Testing porpouses
   boardMovement: (response: {}) => void;
@@ -95,4 +96,8 @@ export type UserAuthData = {
 export type ForfeitData = {
   roomId: string,
   userId: string
+}
+
+export type UsersConnectedCount = {
+  currentUsersCount: number
 }
