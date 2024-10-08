@@ -1,20 +1,20 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import { routes } from '@/routes';
+import { routes } from '@/infra/routes';
 import * as dotenv from 'dotenv'
-import Database from './database';
-import Swagger from './utils/swagger';
-import SocketController from './socket/socket';
+import Database from '@/infra/database';
+import Swagger from '@/utils/swagger';
+import SocketController from '@/infra/socket/socketController';
 export const app: Express = express();
-import { RedisSingleton } from './redis';
-import { GameController } from './game/controllers/game_controller';
-import { RoomModel } from './game/models/room';
-import RoomController from './game/controllers/room_controller';
-import { UserModel } from './game/models/user';
-import user from './database/models/user';
-import GameCache from './service/game_cache';
-//import { User } from './controllers/user';
+import { RedisSingleton } from '@/infra/redis';
+import { GameController } from '@/domain/game/controllers/game_controller';
+import { RoomModel } from '@/domain/game/models/room';
+import RoomController from '@/domain/game/controllers/room_controller';
+import { UserModel } from '@/domain/game/models/user';
+import user from '@/infra/database/models/user';
+import GameCache from '@/infra/service/gameCache';
+//import { User } from '@/controllers/user';
 dotenv.config({ path: `.env${process.env.NODE_ENV}` });
 
 app.use(cors());
@@ -49,7 +49,7 @@ app.get('/game', async (_req: Request, res: Response) => {
   room_controller.addUser(user_1);
   room_controller.addUser(user_2);
 
-  await room_controller.gameStart();
+  // await room_controller.gameStart();
 
   res.send(room);
 });
