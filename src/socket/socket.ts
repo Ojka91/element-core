@@ -53,7 +53,7 @@ class SocketController {
             await gameService.updateSocketId(room, socket.handshake.auth.userUuid, socket.id)
             socket.join(socket.handshake.auth.roomUuid)
             socket.emit('gameUpdate', gameService.preparePublicResponse(room))
-            console.log('user reconnected to a game successfuly')
+            console.log('User reconnected to a game successfuly')
           }
         } catch (error) {
           console.log(error)
