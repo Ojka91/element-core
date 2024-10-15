@@ -1,4 +1,3 @@
-import { IGameModel } from '@/domain/game/models/game';
 import { IRoomModel } from '@/domain/game/models/room';
 
 export enum PrivateServerResponseStatus {
@@ -12,7 +11,7 @@ type MessageHeader = {
 
 export type PrivateServerResponse = MessageHeader & {
     status: PrivateServerResponseStatus;
-    message: string | null;
+    message?: string;
     game?: IRoomModel;
 }
 

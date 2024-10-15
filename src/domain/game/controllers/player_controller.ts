@@ -29,6 +29,18 @@ class PlayerController {
     public getPlayerNumber(): number {
         return this.model.player_number;
     }
+
+    public getConsecutiveSkippedTurns(): number {
+        return this.model.consecutiveSkippedTurns;
+    }
+
+    public increaseConsecutiveSkippedTurns(): number {
+        return ++this.model.consecutiveSkippedTurns;
+    }
+
+    public resetConsecutiveSkippedTurns(){
+        this.model.consecutiveSkippedTurns = 0;
+    }
 }
 
 export default PlayerController;

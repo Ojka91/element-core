@@ -159,6 +159,24 @@ export class GameController implements IGameController {
         this.nextPlayerTurn();
     }
 
+    public increaseCurrentPlayerInnactivityCounter(): number {
+        const playerModel = this.getTurnPlayer();
+        const playerController = new PlayerController(playerModel);
+        return playerController.increaseConsecutiveSkippedTurns();
+    }
+
+    public getCurrentPlayerInnactivityCounter(): number {
+        const playerModel = this.getTurnPlayer();
+        const playerController = new PlayerController(playerModel);
+        return playerController.getConsecutiveSkippedTurns();
+    }
+
+    public resetCurrentPlayerInnactivityCounter() {
+        const playerModel = this.getTurnPlayer();
+        const playerController = new PlayerController(playerModel);
+        playerController.resetConsecutiveSkippedTurns();
+    }
+
     public getBoard(): IBoardModel {
         return this.model.board;
     }
@@ -211,6 +229,10 @@ export class GameController implements IGameController {
      */
     public forceLoser(player_id: string) {
         this.model.loser_uuid = player_id;
+    }
+
+    public forceCurrentPlayerLoser(){
+        this.model.loser_uuid = this.getTurnPlayer().sage.uuid;
     }
 
     public isPlayerTurn(playerId: string): boolean {

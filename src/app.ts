@@ -14,6 +14,8 @@ import RoomController from '@/domain/game/controllers/room_controller';
 import { UserModel } from '@/domain/game/models/user';
 import user from '@/infra/database/models/user';
 import GameCache from '@/infra/service/gameCache';
+import DomainEventEmitterSingleton from './domain/service/DomainEventEmitter';
+import TimerService from './domain/service/timer/TimerService';
 //import { User } from '@/controllers/user';
 dotenv.config({ path: `.env${process.env.NODE_ENV}` });
 
@@ -98,7 +100,9 @@ app.get('/get', async (_req: Request, res: Response) => {
   res.send('room_asdasda');
 });
 
-if (process.env.ENV != 'development') RedisSingleton.getInstance().connect()
+if (process.env.ENV != 'development') RedisSingleton.getInstance().connect();
+const timerService = new TimerService();
+const eventEmitter = DomainEventEmitterSingleton.getInstance();
 
-export const socket = new SocketController(server);
+export const socket = new SocketController(server, timerService, eventEmitter);
 socket.init()

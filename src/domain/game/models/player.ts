@@ -7,6 +7,7 @@ export interface IPlayerModel {
     player_number: number;
     sage: ISageModel;
     target: number;
+    consecutiveSkippedTurns: number;
 }
 
 export class PlayerModel implements IPlayerModel {
@@ -14,6 +15,7 @@ export class PlayerModel implements IPlayerModel {
     player_number: number;
     sage: ISageModel;
     target: number = 0;
+    consecutiveSkippedTurns: number = 0;
 
     constructor(player_number: number) {
 
@@ -30,6 +32,7 @@ export class PlayerModelMap extends Mapper{
         player.sage = new SageModelMap().toDomain(raw.sage);
         player.uuid = raw.uuid;
         player.target = raw.target;
+        player.consecutiveSkippedTurns = raw.consecutiveSkippedTurns;
         return player;
     }
 }
