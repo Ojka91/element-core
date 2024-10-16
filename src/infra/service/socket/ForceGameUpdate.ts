@@ -13,7 +13,7 @@ type InputSocket = Socket<ClientToServerEvents, ServerToClientEvents>;
 export class ForceGameUpdateService {
   constructor(private socket: InputSocket) {}
 
-  public async execute(data: any): Promise<PublicServerResponse> {
+  public async execute(): Promise<PublicServerResponse> {
     /**
      * When client triggers this event, an event is sent to the room1 under boardMovement event
      */

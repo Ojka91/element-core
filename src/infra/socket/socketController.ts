@@ -222,9 +222,10 @@ class SocketController {
           await chatService.execute(data);
         });
 
-        socket.on("forceGameUpdate", async (data: any) => {
+        socket.on("forceGameUpdate", async () => {
           const forceGameUpdateService = new ForceGameUpdateService(socket);
-          forceGameUpdateService.execute(data);
+          const response = await forceGameUpdateService.execute();
+          gameUpdateService.execute(response.room_uuid, response);
         });
       }
     );

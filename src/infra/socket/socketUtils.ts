@@ -27,7 +27,7 @@ export interface ClientToServerEvents {
   moveSage: (data: MoveSageData) => void;
   chat: (data: ChatClientToServer) => void;
   forfeit: (data: ForfeitData) => void;
-  forceGameUpdate: (data: any) => void;
+  forceGameUpdate: () => void;
 
   // Testing porpouses
   joinRoom: (data: any) => void;
