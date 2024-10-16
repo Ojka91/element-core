@@ -8,14 +8,10 @@ export class DomainEventEmitter {
   }
 
   addListener(listener: (event: DomainEvent) => void) {
-    console.log(`Adding listener to list`)
-    console.log(this.listeners);
     if(this.listeners.includes(listener)){
       this.removeListener(listener);
     }
     this.listeners.push(listener);  
-    console.log(`Listener list`)
-    console.log(this.listeners)
   }
 
   removeListener(listenerToRemove: (event: DomainEvent) => void) {

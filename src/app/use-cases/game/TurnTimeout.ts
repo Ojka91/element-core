@@ -1,11 +1,10 @@
 import { GameController } from "@/domain/game/controllers/game_controller";
 import RoomController from "@/domain/game/controllers/room_controller";
-import { IRoomModel, RoomModel } from "@/domain/game/models/room";
+import { RoomModel } from "@/domain/game/models/room";
+import { GameServices } from "@/domain/service/GameServices";
+import { PublicServerResponse } from "@/infra/schemas/server_response";
 import GameCache from "@/infra/service/gameCache";
 import SetTurnTimer from "../timer/SetTurnTimer";
-import { PublicServerResponse } from "@/infra/schemas/server_response";
-import { GameServices } from "@/domain/service/GameServices";
-import { response } from "express";
 
 const TURN_INNACTIVITY_ALLOWANCE = 3;
 
