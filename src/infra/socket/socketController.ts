@@ -4,7 +4,7 @@ import { DomainEventEmitter } from "@/domain/service/DomainEventEmitter";
 import DomainEvent from "@/domain/service/domainEvents/DomainEvent";
 import TimerService from "@/domain/service/timer/TimerService";
 import { Server, Socket } from "socket.io";
-import { ChatService } from "../service/chat/socketServices";
+import { ChatService } from "../service/chat/ChatService";
 import { CancelQueueService } from "../service/queue/CancelQueue";
 import { OnQueueService } from "../service/queue/OnQueue";
 import { DrawElementsService } from "../service/socket/DrawElements";
