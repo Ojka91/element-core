@@ -1,32 +1,12 @@
-import { Server, Socket } from "socket.io";
-import {
-  ClientToServerEvents,
-  InterServerEvents,
-  ServerToClientEvents,
-  SocketData,
-
-} from "../../socket/socketUtils";
-import { IRoomModel } from "@/domain/game/models/room";
 import GetRoom from "@/app/use-cases/room/GetRoom";
 import UpdateSocketId from "@/app/use-cases/room/UpdateSocketId";
-import { PublicServerResponse } from "@/infra/schemas/server_response";
+import { IRoomModel } from "@/domain/game/models/room";
 import { GameServices } from "@/domain/service/GameServices";
-
-
-type InputSocket = Socket<ClientToServerEvents, ServerToClientEvents>;
-type SocketIo = Server<
-  ClientToServerEvents,
-  ServerToClientEvents,
-  InterServerEvents,
-  SocketData
->;
+import { PublicServerResponse } from "@/infra/schemas/server_response";
+import { InputSocket, SocketIo } from "../types/socketType";
 
 export class SocketConnectionService {
-  constructor(
-    private io: SocketIo,
-    private socket: InputSocket
-  ) {
-  }
+  constructor(private io: SocketIo, private socket: InputSocket) {}
 
   public async execute(): Promise<PublicServerResponse | null> {
     this.socket.broadcast.emit("currentUsersConnected", {

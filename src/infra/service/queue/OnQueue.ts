@@ -1,29 +1,14 @@
-import { Server, Socket } from "socket.io";
-import {
-  ClientToServerEvents,
-  InterServerEvents,
-  Queue,
-  ServerToClientEvents,
-  SocketData,
-} from "../../socket/socketUtils";
-import { QueueController } from "../../socket/queue_controller";
 import CreateRoom from "@/app/use-cases/room/CreateRoom";
-
-type InputSocket = Socket<ClientToServerEvents, ServerToClientEvents>;
-type SocketIo = Server<
-  ClientToServerEvents,
-  ServerToClientEvents,
-  InterServerEvents,
-  SocketData
->;
+import { QueueController } from "../../socket/queue_controller";
+import { Queue } from "../../socket/socketUtils";
+import { InputSocket, SocketIo } from "../types/socketType";
 
 export class OnQueueService {
   constructor(
     private io: SocketIo,
     private socket: InputSocket,
     private queueController: QueueController
-  ) {
-  }
+  ) {}
 
   /**
    * onQueue: Clients that want to play a game search for a game emitting to this event with the type of queue they join (2, 3 or 4 players)
@@ -31,10 +16,7 @@ export class OnQueueService {
    * 2. We should check if there are enough players on queue room to start a game
    * 2.1 If so, we should make those players join new room (roomId), and kick them from queue room
    */
-  public async execute(
-    roomIdList: string[],
-    queue: Queue,
-  ) {
+  public async execute(roomIdList: string[], queue: Queue) {
     console.log(queue);
 
     // 1. Client join queue room

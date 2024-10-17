@@ -121,7 +121,6 @@ class SocketController {
           const joinGameService = new JoinGameService(
             socket,
             setTurnTimerUseCase,
-            this.eventEmitter,
             gameStartUseCase
           );
           const response = await joinGameService.execute(data);
@@ -144,7 +143,6 @@ class SocketController {
          */
         socket.on("endTurn", async (data: EndTurnData) => {
           const endTurnService = new EndTurnService(
-            socket,
             setTurnTimerUseCase
           );
           const response = await endTurnService.execute(data);

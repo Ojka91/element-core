@@ -1,22 +1,19 @@
 import DrawElements from "@/app/use-cases/game/DrawElements";
+import SetTurnTimer from "@/app/use-cases/timer/SetTurnTimer";
 import { GameServices } from "@/domain/service/GameServices";
 import {
   PrivateServerResponse,
   PublicServerResponse,
 } from "@/infra/schemas/server_response";
 import { logger } from "@/utils/logger";
-import { Socket } from "socket.io";
-import {
-  ClientToServerEvents,
-  DrawElementsData,
-  ServerToClientEvents,
-} from "../../socket/socketUtils";
-import SetTurnTimer from "@/app/use-cases/timer/SetTurnTimer";
-
-type InputSocket = Socket<ClientToServerEvents, ServerToClientEvents>;
+import { DrawElementsData } from "../../socket/socketUtils";
+import { InputSocket } from "../types/socketType";
 
 export class DrawElementsService {
-  constructor(private socket: InputSocket, private setTurnTimerUseCase: SetTurnTimer) {}
+  constructor(
+    private socket: InputSocket,
+    private setTurnTimerUseCase: SetTurnTimer
+  ) {}
 
   /**
    * drawElements: Client which turn is playing should draw elements

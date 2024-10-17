@@ -1,15 +1,12 @@
 import MoveSage from "@/app/use-cases/game/MoveSage";
 import { GameServices } from "@/domain/service/GameServices";
-import { PrivateServerResponse, PublicServerResponse } from "@/infra/schemas/server_response";
-import { logger } from "@/utils/logger";
-import { Socket } from "socket.io";
 import {
-  ClientToServerEvents,
-  MoveSageData,
-  ServerToClientEvents,
-} from "../../socket/socketUtils";
-
-type InputSocket = Socket<ClientToServerEvents, ServerToClientEvents>;
+  PrivateServerResponse,
+  PublicServerResponse,
+} from "@/infra/schemas/server_response";
+import { logger } from "@/utils/logger";
+import { MoveSageData } from "../../socket/socketUtils";
+import { InputSocket } from "../types/socketType";
 
 export class MoveSageService {
   constructor(private socket: InputSocket) {}
@@ -18,7 +15,9 @@ export class MoveSageService {
    * moveSage: Client which turn is playing should move sage
    */
 
-  public async execute(data: MoveSageData): Promise<PublicServerResponse | null> {
+  public async execute(
+    data: MoveSageData
+  ): Promise<PublicServerResponse | null> {
     try {
       // TODO TBD !!! We should check if game ended => delete roomId from array
 

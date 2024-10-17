@@ -2,18 +2,12 @@ import EndTurn from "@/app/use-cases/game/EndTurn";
 import SetTurnTimer from "@/app/use-cases/timer/SetTurnTimer";
 import { GameServices } from "@/domain/service/GameServices";
 import { PublicServerResponse } from "@/infra/schemas/server_response";
-import { Socket } from "socket.io";
 import {
-  ClientToServerEvents,
-  EndTurnData,
-  ServerToClientEvents,
+  EndTurnData
 } from "../../socket/socketUtils";
-
-type InputSocket = Socket<ClientToServerEvents, ServerToClientEvents>;
 
 export class EndTurnService {
   constructor(
-    private socket: InputSocket,
     private setTurnTimerUseCase: SetTurnTimer
   ) {}
 

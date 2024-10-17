@@ -1,19 +1,5 @@
-import { Server, Socket } from "socket.io";
 import { QueueController } from "../../socket/queue_controller";
-import {
-  ClientToServerEvents,
-  InterServerEvents,
-  ServerToClientEvents,
-  SocketData,
-} from "../../socket/socketUtils";
-
-type InputSocket = Socket<ClientToServerEvents, ServerToClientEvents>;
-type SocketIo = Server<
-  ClientToServerEvents,
-  ServerToClientEvents,
-  InterServerEvents,
-  SocketData
->;
+import { InputSocket, SocketIo } from "../types/socketType";
 
 export class SocketDisconnectService {
   constructor(

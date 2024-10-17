@@ -1,22 +1,10 @@
 import GetUserList from "@/app/use-cases/room/GetUserList";
 import { UserModel } from "@/domain/game/models/user";
-import { Server, Socket } from "socket.io";
 import {
   ChatClientToServer,
   ChatServerToClient,
-  ClientToServerEvents,
-  InterServerEvents,
-  ServerToClientEvents,
-  SocketData,
 } from "../../socket/socketUtils";
-
-type InputSocket = Socket<ClientToServerEvents, ServerToClientEvents>;
-type SocketIo = Server<
-  ClientToServerEvents,
-  ServerToClientEvents,
-  InterServerEvents,
-  SocketData
->;
+import { InputSocket, SocketIo } from "../types/socketType";
 
 export class ChatService {
   constructor(private io: SocketIo, private socket: InputSocket) {}

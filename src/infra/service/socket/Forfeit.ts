@@ -3,14 +3,8 @@ import SetTurnTimer from "@/app/use-cases/timer/SetTurnTimer";
 import { GameServices } from "@/domain/service/GameServices";
 import { PublicServerResponse } from "@/infra/schemas/server_response";
 import { logger } from "@/utils/logger";
-import { Socket } from "socket.io";
-import {
-  ClientToServerEvents,
-  ForfeitData,
-  ServerToClientEvents,
-} from "../../socket/socketUtils";
-
-type InputSocket = Socket<ClientToServerEvents, ServerToClientEvents>;
+import { ForfeitData } from "../../socket/socketUtils";
+import { InputSocket } from "../types/socketType";
 
 export class ForfeitService {
   constructor(

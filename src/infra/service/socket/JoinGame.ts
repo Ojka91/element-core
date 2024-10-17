@@ -1,30 +1,17 @@
 import GameStart from "@/app/use-cases/room/GameStart";
 import JoinGame from "@/app/use-cases/room/JoinGame";
 import SetTurnTimer from "@/app/use-cases/timer/SetTurnTimer";
-import { DomainEventEmitter } from "@/domain/service/DomainEventEmitter";
-import DomainEvent from "@/domain/service/domainEvents/DomainEvent";
 import { GameServices } from "@/domain/service/GameServices";
 import { PublicServerResponse } from "@/infra/schemas/server_response";
-import { Socket } from "socket.io";
-import {
-  ClientToServerEvents,
-  JoinGameData,
-  ServerToClientEvents,
-  UserAuthData,
-} from "../../socket/socketUtils";
-import { EventHandlerService } from "./EventHandler";
-
-type InputSocket = Socket<ClientToServerEvents, ServerToClientEvents>;
+import { JoinGameData, UserAuthData } from "../../socket/socketUtils";
+import { InputSocket } from "../types/socketType";
 
 export class JoinGameService {
   constructor(
     private socket: InputSocket,
     private setTurnTimerUseCase: SetTurnTimer,
-    private eventEmitter: DomainEventEmitter,
-    private gameStartUseCase: GameStart,
-  ) {
-
-  }
+    private gameStartUseCase: GameStart
+  ) {}
   /**
    * joinGame: A client should emit to this event after joining 'onQueue' and having received roomId for them to join
    * 1. Client should join game/roomId socket and as user on the game room
@@ -48,7 +35,6 @@ export class JoinGameService {
     // When room is full we startGame and send gameUpdate to the players
     const responseData = await this.gameStartUseCase.execute(data.roomId);
     if (responseData != null) {
-
       this.setTurnTimerUseCase.execute({ timerId: data.roomId });
       return GameServices.preparePublicResponse(responseData);
     }

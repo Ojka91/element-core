@@ -1,22 +1,21 @@
 import PlaceElement from "@/app/use-cases/game/PlaceElement";
 import { GameServices } from "@/domain/service/GameServices";
-import { PrivateServerResponse, PublicServerResponse } from "@/infra/schemas/server_response";
-import { logger } from "@/utils/logger";
-import { Socket } from "socket.io";
 import {
-  ClientToServerEvents,
-  PlaceElementData,
-  ServerToClientEvents,
-} from "../../socket/socketUtils";
-
-type InputSocket = Socket<ClientToServerEvents, ServerToClientEvents>;
+  PrivateServerResponse,
+  PublicServerResponse,
+} from "@/infra/schemas/server_response";
+import { logger } from "@/utils/logger";
+import { PlaceElementData } from "../../socket/socketUtils";
+import { InputSocket } from "../types/socketType";
 
 export class PlaceElementService {
   constructor(private socket: InputSocket) {}
   /**
    * placeElement: Client which turn is playing should place element
    */
-  public async execute(data: PlaceElementData): Promise<PublicServerResponse | null> {
+  public async execute(
+    data: PlaceElementData
+  ): Promise<PublicServerResponse | null> {
     try {
       const room = await PlaceElement.execute(
         data.roomId,
