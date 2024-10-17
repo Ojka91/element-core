@@ -29,6 +29,12 @@ describe("JoinGameUseCase", () => {
       room: new RoomModel(0),
       player_turn_uuid: "playerUUID",
     });
+    jest
+      .spyOn(RoomController.prototype, "getPlayerBySocketId")
+      .mockReturnValue({
+        uuid: 'string',
+        ...{} as any // Don't care the rest
+      });
 
     let response = await JoinGame.execute("123", {
       socketId: "1234",

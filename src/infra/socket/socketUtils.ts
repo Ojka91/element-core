@@ -90,7 +90,8 @@ export type ChatServerToClient = {
 }
 export type UserAuthData = {
   userUuid: string,
-  roomUuid: string
+  roomUuid: string,
+  playerUuid: string,
 }
 
 export type ForfeitData = {

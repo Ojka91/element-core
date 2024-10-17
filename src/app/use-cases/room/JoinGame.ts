@@ -1,8 +1,8 @@
 import RoomController from "@/domain/game/controllers/room_controller";
 import { RoomModel } from "@/domain/game/models/room";
+import { UserModel } from "@/domain/game/models/user";
 import GameCache from "@/infra/service/gameCache";
 import { UserAuthData } from "@/infra/socket/socketUtils";
-import { UserModel } from "@/domain/game/models/user";
 
 export type UserDataType = {
     socketId: string;
@@ -23,9 +23,13 @@ export default class JoinGame {
         
             roomController.addUser(user);
             await roomController.save();
+            
+            const player = roomController.getPlayerBySocketId(userData.socketId);
+
             return {
                 userUuid: user.uuid,
-                roomUuid: roomController.getUuid()
+                roomUuid: roomController.getUuid(),
+                playerUuid: player.uuid
             }
         
         } catch (error) {
