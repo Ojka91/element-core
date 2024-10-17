@@ -34,8 +34,6 @@ export default class DrawElements {
 
       await roomController.save();
 
-      this.setTurnTimerUseCase.restart({ timerId: roomId });
-
       return roomModel;
     } catch (error) {
       throw new Error((error as Error).message);
