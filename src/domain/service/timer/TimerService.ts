@@ -1,5 +1,5 @@
 type Timer = {
-  timeoutId: NodeJS.Timeout;
+  timeoutId: ReturnType<typeof setTimeout>;
   startTime: number;
   duration: number;
 };
@@ -13,12 +13,16 @@ export default class TimerService {
     }
 
     const startTime = Date.now();
-    const timeoutId = setTimeout(() => {
+    const timeoutId: ReturnType<typeof setTimeout> = setTimeout(() => {
       this.timers.delete(timerId);
       callback();
     }, duration);
-
-    this.timers.set(timerId, { timeoutId, startTime, duration });
+    const timer: Timer = {
+      timeoutId: timeoutId,
+      startTime: startTime,
+      duration: duration
+    }
+    this.timers.set(timerId, timer);
   }
 
   cancelTimer(timerId: string): void {
