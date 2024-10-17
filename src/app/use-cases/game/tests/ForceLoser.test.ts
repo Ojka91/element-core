@@ -41,7 +41,7 @@ describe("ForceLoserUseCase", () => {
     await forceLoserUseCase.execute("roomUUID", "SocketUuid");
 
     expect(RoomController.prototype.loadRoomById).toHaveBeenCalledTimes(1);
-    expect(RoomController.prototype.save).toHaveBeenCalledTimes(1);
+    expect(RoomController.prototype.deleteRoomById).toHaveBeenCalledTimes(1);
     expect(GameController.prototype.forceLoser).toHaveBeenCalledTimes(1);
   });
 });
