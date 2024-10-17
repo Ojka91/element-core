@@ -16,7 +16,7 @@ export default class ForceLoser {
 
             gameController.forceLoser(player.sage.uuid);
             
-            await roomController.save();
+            await roomController.deleteRoomById(roomId);
             
             return roomModel
             

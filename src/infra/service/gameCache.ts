@@ -10,6 +10,10 @@ export class GameCache {
     public static async loadRoom(room_id: string): Promise<IRoomModel> {
         return new RoomModelMap().toDomain(await RedisSingleton.getInstance().get(room_id));
     }
+
+    public static async deleteRoom(room_id: string): Promise<void> {
+        await RedisSingleton.getInstance().delete(room_id);
+    }
 }
 
 export default GameCache;

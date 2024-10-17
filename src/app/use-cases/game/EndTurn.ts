@@ -29,6 +29,7 @@ export default class EndTurn {
       if (gameController.getWinner() != null) {
         // End of the game therefore no need for keep the timer running
         this.setTurnTimerUseCase.cancel({ timerId: roomId });
+        roomController.deleteRoomById(roomId);
       } else {
         this.setTurnTimerUseCase.restart({ timerId: roomId });
       }

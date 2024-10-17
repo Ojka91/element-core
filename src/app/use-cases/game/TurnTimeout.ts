@@ -28,6 +28,7 @@ export default class TurnTimeout {
         // Force the player to lose
         gameController.forceCurrentPlayerLoser();
         this.setTurnTimerUseCase.cancel({ timerId: roomId });
+        roomController.deleteRoomById(roomId);
       } else {
         innactivityCounter = gameController.increaseCurrentPlayerInnactivityCounter();
         gameController.endOfPlayerTurn();

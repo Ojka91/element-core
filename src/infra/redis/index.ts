@@ -54,6 +54,21 @@ class Redis {
         }
     }
 
+    /**
+     * Remove game data from redis
+     * By default game will be expired (deleted) after one day (86400 seconds) from redis
+     * @param id game room/id
+     * @param data game data
+     */
+    async delete(id: string): Promise<any> { // TODO data type to define?
+        try {
+            return await this.client.del(id);
+        } catch (error) {
+            logger.error(error, `Failed removing data from redis game id: ${id}`)
+            throw new Error(`Failed removing data from redis game id: ${id}`)
+        }
+    }
+
 }
 
 export class RedisSingleton {

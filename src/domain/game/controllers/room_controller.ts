@@ -9,6 +9,7 @@ import PlayerController from './player_controller'
 interface IGameCache {
     saveRoom(room: IRoomModel): Promise<void>;
     loadRoom(room_id: string): Promise<IRoomModel>;
+    deleteRoom(room_id: string): Promise<void>;
 }
 
 interface IRoomController {
@@ -129,6 +130,10 @@ class RoomController implements IRoomController {
 
     public async save(): Promise<void> {
         await this.cache.saveRoom(this.model);
+    }
+
+    public async deleteRoomById(room_id: string): Promise<void> {
+        await this.cache.deleteRoom(room_id);
     }
 }
 
