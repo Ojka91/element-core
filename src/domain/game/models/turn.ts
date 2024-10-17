@@ -35,6 +35,7 @@ export class TurnModelMap extends Mapper {
         turn.player = raw.player;
         turn.available_sage_moves = raw.available_sage_moves;
         turn.chosen_elements = raw.chosen_elements;
+        turn.remainingTurnTime = raw.remainingTurnTime;
         return turn;
     }
 }
