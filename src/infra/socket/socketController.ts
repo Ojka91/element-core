@@ -164,7 +164,7 @@ class SocketController {
          * placeElement: Client which turn is playing should place element
          */
         socket.on("placeElement", async (data: PlaceElementData) => {
-          const placeElementService = new PlaceElementService(socket);
+          const placeElementService = new PlaceElementService(socket, setTurnTimerUseCase);
           const response = await placeElementService.execute(data);
           if (response != null) {
             gameUpdateService.execute(response.room_uuid, response);
@@ -175,7 +175,7 @@ class SocketController {
          * moveSage: Client which turn is playing should move sage
          */
         socket.on("moveSage", async (data: MoveSageData) => {
-          const moveSageService = new MoveSageService(socket);
+          const moveSageService = new MoveSageService(socket, setTurnTimerUseCase);
           const response = await moveSageService.execute(data);
           if (response != null) {
             gameUpdateService.execute(response.room_uuid, response);

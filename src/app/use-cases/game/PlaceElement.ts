@@ -5,9 +5,11 @@ import { IRoomModel, RoomModel } from "@/domain/game/models/room";
 import { Position } from "@/domain/game/utils/position_utils";
 import { Reaction } from "@/infra/schemas/player_actions";
 import GameCache from "@/infra/service/gameCache";
+import SetTurnTimer from "../timer/SetTurnTimer";
 
 export default class PlaceElement {
-  static async execute(
+  constructor(private turnTimerUseCase: SetTurnTimer) {}
+  async execute(
     roomId: string,
     currentId: string,
     element: ElementTypes,
@@ -33,6 +35,11 @@ export default class PlaceElement {
       }
 
       gameController.placeElement(element, position, reaction);
+
+      if (gameController.isEndOfTurn()) {
+        gameController.endOfPlayerTurn();
+        this.turnTimerUseCase.restart({ timerId: roomId });
+      }
 
       await roomController.save();
 

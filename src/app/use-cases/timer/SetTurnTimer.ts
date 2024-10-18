@@ -8,7 +8,7 @@ import {
 } from "@/domain/service/timer/TimerCommands";
 import TimerService from "@/domain/service/timer/TimerService";
 
-const DEFAULT_TURN_MINUTES = 0;
+const DEFAULT_TURN_MINUTES = 1;
 const DEFAULT_TURN_SECONDS = 30;
 
 export default class SetTurnTimer {
