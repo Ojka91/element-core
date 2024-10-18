@@ -108,23 +108,6 @@ describe('GameController', () => {
 
         game_controller.placeElement(game.turn.chosen_elements[0], {row: 5, column: 8});
         jest.restoreAllMocks();
-
-        jest.spyOn(TurnController.prototype, 'isEndOfTurn').mockImplementation(() => false);
-        game_controller.placeElement(game.turn.chosen_elements[0], {row: 5, column: 7});
-        expect(game.turn.player).toStrictEqual(0);
-
-        jest.restoreAllMocks();
-        
-        jest.spyOn(TurnController.prototype, 'isEndOfTurn').mockImplementation(() => true);
-        game_controller.placeElement(game.turn.chosen_elements[0], {row: 5, column: 5});
-        expect(game.turn.player).toStrictEqual(1);
-        jest.restoreAllMocks();
-
-        jest.spyOn(TurnController.prototype, 'isEndOfTurn').mockImplementation(() => true);
-        game_controller.drawingElements(3);
-        game_controller.placeElement(game.turn.chosen_elements[0], {row: 5, column: 6});
-        expect(game.turn.player).toStrictEqual(0);
-        jest.restoreAllMocks();
     })
 
     it('movePlayerSage: move the sage around the board', async () => {
@@ -150,19 +133,6 @@ describe('GameController', () => {
         game.turn.state = TurnStates.MovesAvailables;
         game.turn.available_sage_moves = 0;
         expect(() => game_controller.movePlayerSage(player0.uuid, sage_pos)).toThrow("Cannot move sage, not available moves to spend");
-
-        game.turn.available_sage_moves = 2;
-        jest.spyOn(TurnController.prototype, 'isEndOfTurn').mockImplementation(() => false);
-        game_controller.movePlayerSage(player0.uuid, sage_pos);
-        expect(game.turn.player).toStrictEqual(0);
-        jest.restoreAllMocks();
-
-        sage_pos = { row: 4, column: 5 };
-        game.turn.available_sage_moves = 1;
-        jest.spyOn(TurnController.prototype, 'isEndOfTurn').mockImplementation(() => true);
-        game_controller.movePlayerSage(player0.uuid, sage_pos);
-        expect(game.turn.player).toStrictEqual(1);
-        jest.restoreAllMocks();
 
     })
 

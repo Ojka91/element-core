@@ -7,9 +7,10 @@ import {
 import { logger } from "@/utils/logger";
 import { MoveSageData } from "../../socket/socketUtils";
 import { InputSocket } from "../types/socketType";
+import SetTurnTimer from "@/app/use-cases/timer/SetTurnTimer";
 
 export class MoveSageService {
-  constructor(private socket: InputSocket) {}
+  constructor(private socket: InputSocket, private turnTimerUseCase: SetTurnTimer) {}
 
   /**
    * moveSage: Client which turn is playing should move sage
@@ -20,8 +21,8 @@ export class MoveSageService {
   ): Promise<PublicServerResponse | null> {
     try {
       // TODO TBD !!! We should check if game ended => delete roomId from array
-
-      const room = await MoveSage.execute(
+      const moveSageUseCase = new MoveSage(this.turnTimerUseCase)
+      const room = await moveSageUseCase.execute(
         data.roomId,
         this.socket.id,
         data.position

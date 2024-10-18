@@ -7,9 +7,10 @@ import {
 import { logger } from "@/utils/logger";
 import { PlaceElementData } from "../../socket/socketUtils";
 import { InputSocket } from "../types/socketType";
+import SetTurnTimer from "@/app/use-cases/timer/SetTurnTimer";
 
 export class PlaceElementService {
-  constructor(private socket: InputSocket) {}
+  constructor(private socket: InputSocket, private turnTimerUseCase: SetTurnTimer) {}
   /**
    * placeElement: Client which turn is playing should place element
    */
@@ -17,7 +18,8 @@ export class PlaceElementService {
     data: PlaceElementData
   ): Promise<PublicServerResponse | null> {
     try {
-      const room = await PlaceElement.execute(
+      const placeElementUseCase = new PlaceElement(this.turnTimerUseCase)
+      const room = await placeElementUseCase.execute(
         data.roomId,
         this.socket.id,
         data.element,

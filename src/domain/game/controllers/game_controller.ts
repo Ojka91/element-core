@@ -98,13 +98,14 @@ export class GameController implements IGameController {
         }
         board_controller.placeElement(element, position);
         board_controller.performElementReaction(element, position, reaction);
-
-        if (turn_controller.isEndOfTurn()) {
-            this.nextPlayerTurn();
-        }
     }
 
-    private nextPlayerTurn(): void {
+    public isEndOfTurn(): boolean {
+        const turn_controller: TurnController = new TurnController(this.model.turn);
+        return turn_controller.isEndOfTurn();
+    }
+
+    private setNextPlayerTurn(): void {
         const turn_controller: TurnController = new TurnController(this.model.turn);
         const board_controller: BoardController = new BoardController(this.model.board);
 
@@ -140,10 +141,6 @@ export class GameController implements IGameController {
         catch (error) {
             throw error;
         }
-
-        if (turn_controller.isEndOfTurn()) {
-            this.endOfPlayerTurn();
-        }
     }
 
     public endOfPlayerTurn(): void {
@@ -156,7 +153,7 @@ export class GameController implements IGameController {
         for (let element of remaining_elements) {
             board_controller.returnElementToPool(element);
         }
-        this.nextPlayerTurn();
+        this.setNextPlayerTurn();
     }
 
     public increaseCurrentPlayerInnactivityCounter(): number {

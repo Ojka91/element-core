@@ -3,9 +3,11 @@ import RoomController from "@/domain/game/controllers/room_controller";
 import { IRoomModel, RoomModel } from "@/domain/game/models/room";
 import { Position } from "@/domain/game/utils/position_utils";
 import GameCache from "@/infra/service/gameCache";
+import SetTurnTimer from "../timer/SetTurnTimer";
 
 export default class MoveSage {
-  static async execute(
+  constructor(private turnTimerUseCase: SetTurnTimer) {}
+  async execute(
     roomId: string,
     currentId: string,
     position: Position
@@ -29,6 +31,11 @@ export default class MoveSage {
       }
 
       gameController.movePlayerSage(playerId, position);
+
+      if (gameController.isEndOfTurn()) {
+        gameController.endOfPlayerTurn();
+        this.turnTimerUseCase.restart({ timerId: roomId });
+      }
 
       await roomController.save();
 
