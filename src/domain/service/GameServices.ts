@@ -20,7 +20,7 @@ export class GameServices {
             room_uuid: roomId,
             status: PrivateServerResponseStatus.ERROR,
             message: error.message,
-          };
+        };
     }
 }
 

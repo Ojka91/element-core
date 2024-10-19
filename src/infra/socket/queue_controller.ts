@@ -54,7 +54,7 @@ export class QueueController {
 
     public deleteUserFromArray(socketId: string, queue?: Queue): void {
         if (queue) {
-            let index = this.queueTypes[queue].users.indexOf(socketId)
+            const index = this.queueTypes[queue].users.indexOf(socketId)
             this.deleteItemByIndexFromQueue(queue, index);
 
         } else {

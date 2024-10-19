@@ -43,7 +43,7 @@ describe('RoomModelMap', () => {
         const room_map: RoomModelMap = new RoomModelMap()
         const stringified: string = room_map.toDao(room);
 
-        const obj: Object = JSON.parse(stringified);
+        const obj: object = JSON.parse(stringified);
 
         const load_room: RoomModel = room_map.toDomain(obj);
 

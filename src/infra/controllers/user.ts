@@ -1,6 +1,5 @@
 import { Bcrypt } from "@/infra/security/bcrypt";
 import { IUser } from "@/infra/database/models/user";
-import UserRepository from "@/infra/database/repositories/user-repository";
 import { logger } from "@/utils/logger";
 
 

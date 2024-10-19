@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
  
- export class Bcrypt {
+export class Bcrypt {
 
     private saltRounds = 10;
 
@@ -12,4 +12,4 @@ const bcrypt = require('bcrypt');
     public isValid(password: string, hash: string): boolean {
         return bcrypt.compareSync(password, hash); 
     }
- }
+}

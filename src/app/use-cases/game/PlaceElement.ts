@@ -8,44 +8,44 @@ import GameCache from "@/infra/service/gameCache";
 import SetTurnTimer from "../timer/SetTurnTimer";
 
 export default class PlaceElement {
-  constructor(private turnTimerUseCase: SetTurnTimer) {}
-  async execute(
-    roomId: string,
-    currentId: string,
-    element: ElementTypes,
-    position: Position,
-    reaction?: Reaction
-  ): Promise<IRoomModel> {
-    try {
-      const roomModel: RoomModel = new RoomModel(0);
-      const roomController: RoomController = new RoomController(
-        roomModel,
-        GameCache
-      );
-      await roomController.loadRoomById(roomId);
+    constructor(private turnTimerUseCase: SetTurnTimer) {}
+    async execute(
+        roomId: string,
+        currentId: string,
+        element: ElementTypes,
+        position: Position,
+        reaction?: Reaction
+    ): Promise<IRoomModel> {
+        try {
+            const roomModel: RoomModel = new RoomModel(0);
+            const roomController: RoomController = new RoomController(
+                roomModel,
+                GameCache
+            );
+            await roomController.loadRoomById(roomId);
 
-      const gameController: GameController = new GameController(
-        roomController.getGame()
-      );
+            const gameController: GameController = new GameController(
+                roomController.getGame()
+            );
 
-      const playerId: string =
+            const playerId: string =
         roomController.getPlayerBySocketId(currentId).uuid;
-      if (!gameController.isPlayerTurn(playerId)) {
-        throw new Error("Its not your turn");
-      }
+            if (!gameController.isPlayerTurn(playerId)) {
+                throw new Error("Its not your turn");
+            }
 
-      gameController.placeElement(element, position, reaction);
+            gameController.placeElement(element, position, reaction);
 
-      if (gameController.isEndOfTurn()) {
-        gameController.endOfPlayerTurn();
-        this.turnTimerUseCase.restart({ timerId: roomId });
-      }
+            if (gameController.isEndOfTurn()) {
+                gameController.endOfPlayerTurn();
+                this.turnTimerUseCase.restart({ timerId: roomId });
+            }
 
-      await roomController.save();
+            await roomController.save();
 
-      return roomModel;
-    } catch (error) {
-      throw new Error((error as Error).message);
+            return roomModel;
+        } catch (error) {
+            throw new Error((error as Error).message);
+        }
     }
-  }
 }

@@ -8,7 +8,6 @@ import { TurnStates } from "@/domain/game/models/turn";
 import { Position } from "@/domain/game/utils/position_utils";
 import BoardController from "@/domain/game/controllers/board_controller";
 import { GameController } from "@/domain/game/controllers/game_controller";
-import { TurnController } from "@/domain/game/controllers/turn_controller";
 
 describe('GameController', () => {
 
@@ -80,7 +79,7 @@ describe('GameController', () => {
         const game: GameModel = new GameModel();
         const game_controller: GameController = new GameController(game);
 
-        let elements: Array<ElementTypes> = [ElementTypes.Fire, ElementTypes.Water, ElementTypes.Earth];
+        const elements: Array<ElementTypes> = [ElementTypes.Fire, ElementTypes.Water, ElementTypes.Earth];
 
         const player0: PlayerModel = new PlayerModel(0);
         const player1: PlayerModel = new PlayerModel(1);
@@ -124,7 +123,7 @@ describe('GameController', () => {
         game_controller.setupGame(GameType.TwoPlayersGame);
         
         // Game set
-        let sage_pos: Position = { row: 3, column: 5 };
+        const sage_pos: Position = { row: 3, column: 5 };
 
         game.state = GameStates.EndGame;
         expect(() => game_controller.movePlayerSage(player0.uuid, sage_pos)).toThrow("Moving sage is not allowed in the current game state");

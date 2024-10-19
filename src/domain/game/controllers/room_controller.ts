@@ -2,7 +2,7 @@ import { GameController } from './game_controller'
 import { UserController } from './user_controller'
 import { UserModel } from '../models/user'
 import { IGameModel } from '../models/game'
-import { IRoomModel, RoomModel, UserToPlayerMap } from '../models/room'
+import { IRoomModel, RoomModel } from '../models/room'
 import { IPlayerModel, PlayerModel } from '../models/player'
 import PlayerController from './player_controller'
 
@@ -86,7 +86,7 @@ class RoomController implements IRoomController {
      */
     public getPlayerBySocketId(user_id: string): IPlayerModel {
         const game_controller: GameController = new GameController(this.model.game);
-        for (let user of this.model.user_to_player_map) {
+        for (const user of this.model.user_to_player_map) {
             if (user_id === user.socket_uuid) {
                 return game_controller.getPlayerById(user.player_uuid);
             }

@@ -12,40 +12,40 @@ import DrawElements from "../DrawElements";
 jest.mock("@/domain/game/controllers/room_controller");
 jest.mock("@/domain/game/controllers/game_controller");
 describe("DrawElementsUseCase", () => {
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it("Should draw elements", async () => {
-    jest.spyOn(RoomController.prototype, "loadRoomById").mockResolvedValue();
-    jest
-      .spyOn(RoomController.prototype, "getGame")
-      .mockReturnValue(new GameModel());
-    jest.spyOn(RoomController.prototype, "save").mockResolvedValueOnce();
-    jest
-      .spyOn(RoomController.prototype, "getPlayerBySocketId")
-      .mockReturnValue({ uuid: "playerUUID" } as IPlayerModel);
-    jest.spyOn(GameController.prototype, "drawingElements").mockReturnValue();
-    jest.spyOn(GameController.prototype, "isPlayerTurn").mockReturnValue(true);
-    jest.spyOn(GameServices, "preparePublicResponse").mockReturnValue({
-      room_uuid: "roomUUID",
-      room: new RoomModel(0),
-      player_turn_uuid: "playerUUID",
+    afterEach(() => {
+        jest.clearAllMocks();
     });
-    const timerService = new TimerService();
-    const eventEmitter = new DomainEventEmitter();
-    const setTurnTimerUseCase = new SetTurnTimer(timerService, eventEmitter);
-    const drawElementsUseCase = new DrawElements(setTurnTimerUseCase);
-    await drawElementsUseCase.execute("roomId", 1, "socketId");
 
-    expect(RoomController.prototype.loadRoomById).toHaveBeenCalledTimes(1);
-    expect(RoomController.prototype.save).toHaveBeenCalledTimes(1);
-    expect(GameController.prototype.drawingElements).toHaveBeenCalledTimes(1);
+    it("Should draw elements", async () => {
+        jest.spyOn(RoomController.prototype, "loadRoomById").mockResolvedValue();
+        jest
+            .spyOn(RoomController.prototype, "getGame")
+            .mockReturnValue(new GameModel());
+        jest.spyOn(RoomController.prototype, "save").mockResolvedValueOnce();
+        jest
+            .spyOn(RoomController.prototype, "getPlayerBySocketId")
+            .mockReturnValue({ uuid: "playerUUID" } as IPlayerModel);
+        jest.spyOn(GameController.prototype, "drawingElements").mockReturnValue();
+        jest.spyOn(GameController.prototype, "isPlayerTurn").mockReturnValue(true);
+        jest.spyOn(GameServices, "preparePublicResponse").mockReturnValue({
+            room_uuid: "roomUUID",
+            room: new RoomModel(0),
+            player_turn_uuid: "playerUUID",
+        });
+        const timerService = new TimerService();
+        const eventEmitter = new DomainEventEmitter();
+        const setTurnTimerUseCase = new SetTurnTimer(timerService, eventEmitter);
+        const drawElementsUseCase = new DrawElements(setTurnTimerUseCase);
+        await drawElementsUseCase.execute("roomId", 1, "socketId");
 
-    jest.spyOn(GameController.prototype, "isPlayerTurn").mockReturnValue(false);
+        expect(RoomController.prototype.loadRoomById).toHaveBeenCalledTimes(1);
+        expect(RoomController.prototype.save).toHaveBeenCalledTimes(1);
+        expect(GameController.prototype.drawingElements).toHaveBeenCalledTimes(1);
 
-    await expect(
-      drawElementsUseCase.execute("roomId", 1, "socketId")
-    ).rejects.toThrow("Its not your turn");
-  });
+        jest.spyOn(GameController.prototype, "isPlayerTurn").mockReturnValue(false);
+
+        await expect(
+            drawElementsUseCase.execute("roomId", 1, "socketId")
+        ).rejects.toThrow("Its not your turn");
+    });
 });

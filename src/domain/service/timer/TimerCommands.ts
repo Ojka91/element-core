@@ -1,21 +1,21 @@
 export class SetTimerCommand {
-  constructor(
+    constructor(
     public readonly timerId: string,
     public readonly duration?: number
-  ) {}
+    ) {}
 }
 
 export class CancelTimerCommand {
-  constructor(public readonly timerId: string) {}
+    constructor(public readonly timerId: string) {}
 }
 
 export class RestartTimerCommand {
-  constructor(
+    constructor(
     public readonly timerId: string,
     public readonly duration?: number
-  ) {}
+    ) {}
 }
 
 export class GetRemainingTimeCommand {
-  constructor(public readonly timerId: string) {}
+    constructor(public readonly timerId: string) {}
 }

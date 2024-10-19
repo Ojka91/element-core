@@ -5,28 +5,28 @@ import { TurnTimerFinishedEvent } from "@/domain/service/domainEvents/TurnTimerF
 import { GameUpdateService } from "./GameUpdate";
 
 export class EventHandlerService {
-  constructor(
+    constructor(
     private gameUpdateService: GameUpdateService,
     private setTurnTimerUseCase: SetTurnTimer
-  ) {}
+    ) {}
 
-  public async execute(event: DomainEvent) {
-    switch (event.constructor) {
-      case TurnTimerFinishedEvent:
-        const roomId = (event as TurnTimerFinishedEvent).timerId;
+    public async execute(event: DomainEvent) {
+        switch (event.constructor) {
+        case TurnTimerFinishedEvent:
+            const roomId = (event as TurnTimerFinishedEvent).timerId;
 
-        try {
-          const turnTimeoutUseCase = new TurnTimeout(this.setTurnTimerUseCase);
-          const response = await turnTimeoutUseCase.execute(roomId);
-          this.gameUpdateService.execute(roomId, response);
-        } catch (error) {
-          console.log((error as Error).message);
-          this.setTurnTimerUseCase.cancel({ timerId: roomId });
+            try {
+                const turnTimeoutUseCase = new TurnTimeout(this.setTurnTimerUseCase);
+                const response = await turnTimeoutUseCase.execute(roomId);
+                this.gameUpdateService.execute(roomId, response);
+            } catch (error) {
+                console.log((error as Error).message);
+                this.setTurnTimerUseCase.cancel({ timerId: roomId });
+            }
+            break;
+        default:
+            console.log(`Event ${event.constructor.name} not registered`);
+            break;
         }
-        break;
-      default:
-        console.log(`Event ${event.constructor.name} not registered`);
-        break;
     }
-  }
 }

@@ -34,7 +34,7 @@ export class GameController implements IGameController {
     }
 
     public setupGame(game_type: number): void {
-        // Resets the board
+    // Resets the board
 
         this.model.board = new BoardModel();
         const board_controller: BoardController = new BoardController(this.model.board);
@@ -150,7 +150,7 @@ export class GameController implements IGameController {
 
         const remaining_elements: Array<ElementTypes> = turn_controller.getRemainingElements();
 
-        for (let element of remaining_elements) {
+        for (const element of remaining_elements) {
             board_controller.returnElementToPool(element);
         }
         this.setNextPlayerTurn();
@@ -189,7 +189,7 @@ export class GameController implements IGameController {
 
     public getWinner(): string | null {
         if (this.model.loser_uuid != "") {
-            for (let player of this.model.player_list) {
+            for (const player of this.model.player_list) {
                 const player_controller: PlayerController = new PlayerController(player)
                 if (player_controller.getSage().uuid === this.model.loser_uuid) {
                     return this.model.player_list.filter(p => p.target == player_controller.getPlayerNumber())[0].uuid;
@@ -212,7 +212,7 @@ export class GameController implements IGameController {
      * getPlayerById
      */
     public getPlayerById(player_id: string): IPlayerModel {
-        for (let player of this.model.player_list) {
+        for (const player of this.model.player_list) {
             if (player.uuid === player_id) {
                 return player;
             }

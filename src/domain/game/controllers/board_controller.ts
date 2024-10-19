@@ -1,6 +1,6 @@
 import { ElementPieceCreator, SagePieceCreator } from "@/domain/game/models/pieces_factory";
 import { Reaction, WaterReaction } from "@/infra/schemas/player_actions";
-import { PositionUtils, Position } from "@/domain/game/utils/position_utils";
+import { Position } from "@/domain/game/utils/position_utils";
 import { BoardModel } from "../models/board";
 import { IGridModel } from "../models/grid";
 import { ISageModel, SageModel } from "../models/pieces/sage";
@@ -75,7 +75,7 @@ class BoardController {
 
     /** Method to place the player sage in the board */
     public placePlayerSage(player: IPlayerModel, new_position: Position): void {
-        let sage = new PlayerController(player).getSage();
+        const sage = new PlayerController(player).getSage();
         
         if (!this.grid_controller.isPositionValid(new_position)) {
             throw new Error("Incorrect new row or new column dimensions");
@@ -97,18 +97,18 @@ class BoardController {
         }
         let element_controller: ElementController;
         switch (element_type) {
-            case ElementTypes.Earth:
-                element_controller = new EarthController(element as EarthModel);
-                break;
-            case ElementTypes.Water:
-                element_controller = new WaterController(element as WaterModel);
-                break;
-            case ElementTypes.Fire:
-                element_controller = new FireController(element as FireModel);
-                break;
-            case ElementTypes.Wind:
-                element_controller = new WindController(element as WindModel);
-                break;
+        case ElementTypes.Earth:
+            element_controller = new EarthController(element as EarthModel);
+            break;
+        case ElementTypes.Water:
+            element_controller = new WaterController(element as WaterModel);
+            break;
+        case ElementTypes.Fire:
+            element_controller = new FireController(element as FireModel);
+            break;
+        case ElementTypes.Wind:
+            element_controller = new WindController(element as WindModel);
+            break;
         }
 
         element_controller.updatePosition(position);
@@ -122,27 +122,27 @@ class BoardController {
         const element: IElementModel = new ElementPieceCreator(element_type).createPieceModel() as ElementModel
         let element_controller;
         switch (element_type) {
-            case ElementTypes.Water:
-                element_controller = new WaterController(element as IWaterModel);
-                if (reaction != null) {
-                    const water_reaction: WaterReaction = reaction as WaterReaction
-                    element_controller.reaction(this.model.grid, position, water_reaction.initial_river, water_reaction.new_river, this.element_pool_manager);
-                } else {
-                    element_controller.reaction(this.model.grid, position);
-                }
-                break;
-            case ElementTypes.Fire:
-                element_controller = new FireController(element as IFireModel);
-                element_controller.reaction(this.model.grid, position, this.model.elementPool);
-                break;
-            case ElementTypes.Earth:
-                element_controller = new EarthController(element as IEarthModel);
+        case ElementTypes.Water:
+            element_controller = new WaterController(element as IWaterModel);
+            if (reaction != null) {
+                const water_reaction: WaterReaction = reaction as WaterReaction
+                element_controller.reaction(this.model.grid, position, water_reaction.initial_river, water_reaction.new_river, this.element_pool_manager);
+            } else {
                 element_controller.reaction(this.model.grid, position);
-                break;
-            case ElementTypes.Wind:
-                element_controller = new WindController(element as IWindModel);
-                element_controller.reaction(this.model.grid, position);
-                break;
+            }
+            break;
+        case ElementTypes.Fire:
+            element_controller = new FireController(element as IFireModel);
+            element_controller.reaction(this.model.grid, position, this.model.elementPool);
+            break;
+        case ElementTypes.Earth:
+            element_controller = new EarthController(element as IEarthModel);
+            element_controller.reaction(this.model.grid, position);
+            break;
+        case ElementTypes.Wind:
+            element_controller = new WindController(element as IWindModel);
+            element_controller.reaction(this.model.grid, position);
+            break;
         }
     }
 
@@ -156,7 +156,7 @@ class BoardController {
 
     private isSageCaptured(sage: ISageModel): boolean {
         const piece_list: Array<IPieceModel> = this.grid_controller.getSurroundingPieces(sage.position);
-        for (let piece of piece_list) {
+        for (const piece of piece_list) {
             if (this.grid_controller.isWindCell(piece.position)) {
                 if (MovementManager.isWindBlocked(this.model.grid, sage.position, piece as WindModel) == false) {
                     return false;

@@ -9,37 +9,37 @@ import SetTurnTimer from "../timer/SetTurnTimer";
 const TURN_INNACTIVITY_ALLOWANCE = 3;
 
 export default class TurnTimeout {
-  constructor(private setTurnTimerUseCase: SetTurnTimer) {}
-  async execute(roomId: string): Promise<PublicServerResponse> {
-    try {
-      const roomModel: RoomModel = new RoomModel(0);
-      const roomController: RoomController = new RoomController(
-        roomModel,
-        GameCache
-      );
-      await roomController.loadRoomById(roomId);
+    constructor(private setTurnTimerUseCase: SetTurnTimer) {}
+    async execute(roomId: string): Promise<PublicServerResponse> {
+        try {
+            const roomModel: RoomModel = new RoomModel(0);
+            const roomController: RoomController = new RoomController(
+                roomModel,
+                GameCache
+            );
+            await roomController.loadRoomById(roomId);
 
-      const gameController: GameController = new GameController(
-        roomController.getGame()
-      );
+            const gameController: GameController = new GameController(
+                roomController.getGame()
+            );
 
-      let innactivityCounter = gameController.getCurrentPlayerInnactivityCounter();
-      if(innactivityCounter >= TURN_INNACTIVITY_ALLOWANCE){
-        // Force the player to lose
-        gameController.forceCurrentPlayerLoser();
-        this.setTurnTimerUseCase.cancel({ timerId: roomId });
-        roomController.deleteRoomById(roomId);
-      } else {
-        innactivityCounter = gameController.increaseCurrentPlayerInnactivityCounter();
-        gameController.endOfPlayerTurn();
-        this.setTurnTimerUseCase.restart({ timerId: roomId });
-      }
-      await roomController.save()
-      const response = GameServices.preparePublicResponse(roomModel);
-      response.winner = gameController.getWinner();
-      return response;
-    } catch (error) {
-      throw new Error((error as Error).message);
+            let innactivityCounter = gameController.getCurrentPlayerInnactivityCounter();
+            if(innactivityCounter >= TURN_INNACTIVITY_ALLOWANCE){
+                // Force the player to lose
+                gameController.forceCurrentPlayerLoser();
+                this.setTurnTimerUseCase.cancel({ timerId: roomId });
+                roomController.deleteRoomById(roomId);
+            } else {
+                innactivityCounter = gameController.increaseCurrentPlayerInnactivityCounter();
+                gameController.endOfPlayerTurn();
+                this.setTurnTimerUseCase.restart({ timerId: roomId });
+            }
+            await roomController.save()
+            const response = GameServices.preparePublicResponse(roomModel);
+            response.winner = gameController.getWinner();
+            return response;
+        } catch (error) {
+            throw new Error((error as Error).message);
+        }
     }
-  }
 }

@@ -44,7 +44,7 @@ export class GameModelMap extends Mapper {
         game.board = new BoardModelMap().toDomain(raw.board);
         game.turn = new TurnModelMap().toDomain(raw.turn);
         const player_mapper: PlayerModelMap = new PlayerModelMap();
-        for (let player of raw.player_list) {
+        for (const player of raw.player_list) {
             game.player_list.push(player_mapper.toDomain(player));
         }
         return game;

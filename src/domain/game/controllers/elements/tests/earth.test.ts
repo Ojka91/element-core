@@ -65,7 +65,7 @@ describe('EarthModel: reaction', () => {
     const earth_positions: Array<Position> = alone_earth_pos.concat(rangeable_earth_positions);
 
     it('Ensure earths are in being put in the grid', () => {
-        /* 
+    /* 
         PE: Place EarthModel
         E: EarthModel
         PM: Promoted Mountain
@@ -104,13 +104,13 @@ describe('EarthModel: reaction', () => {
             grid_controller.updateGridCell(earth);
         });
 
-        for (let pos of earth_positions) {
+        for (const pos of earth_positions) {
             expect(grid_controller.isEarthCell(pos)).toBe(true);
         }
     });
 
     it('place: only water must be replaced by earth', () => {
-        /* 
+    /* 
         PE: Place EarthModel
         E: EarthModel
         PM: Promoted Mountain
@@ -173,7 +173,7 @@ describe('EarthModel: reaction', () => {
     })
 
     it('place: earth must be promoted to mountain', () => {
-        /* 
+    /* 
         PE: Place EarthModel
         E: EarthModel
         PM: Promoted Mountain
@@ -227,7 +227,7 @@ describe('EarthModel: reaction', () => {
     })
 
     it('place: earth must be attached to a range and form a new range from new position', () => {
-        /* 
+    /* 
         PE: Place EarthModel
         E: EarthModel
         R: Range
@@ -268,13 +268,13 @@ describe('EarthModel: reaction', () => {
             row: 1, column: 3
         }
 
-        for(let earth_pos of range) {
+        for(const earth_pos of range) {
             const earth = new EarthModel();
             new EarthController(earth).updatePosition(earth_pos);
             grid_controller.updateGridCell(earth);
         };
 
-        for(let earth_pos of earths) {
+        for(const earth_pos of earths) {
             const earth = new EarthModel();
             new EarthController(earth).updatePosition(earth_pos);
             grid_controller.updateGridCell(earth);
@@ -285,11 +285,11 @@ describe('EarthModel: reaction', () => {
         const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
         
         // Check earths are not range yet
-        for( let _earth of range){
+        for( const _earth of range){
             expect(grid_controller.isRangeCell(_earth)).toBe(false);
         }
 
-        for( let _earth of earths){
+        for( const _earth of earths){
             expect(grid_controller.isRangeCell(_earth)).toBe(false);
         }
 
@@ -298,7 +298,7 @@ describe('EarthModel: reaction', () => {
         expect(grid_controller.isRangeCell(newEarthPos)).toBe(false);
 
         // Check all row are still simple earths
-        for( let _earth of range){
+        for( const _earth of range){
             expect(grid_controller.isRangeCell(_earth)).toBe(false);
         }
         grid_controller.clearCell(newEarthPos);
@@ -308,20 +308,20 @@ describe('EarthModel: reaction', () => {
         expect(grid_controller.isRangeCell(range[0])).toBe(true);
 
         // Check all row of range became a range
-        for( let _earth of range){
+        for( const _earth of range){
             expect(grid_controller.isRangeCell(_earth)).toBe(true);
         }
         expect(new EarthController(new_earth).place(grid, newEarthPos, element_pool_manager)).toBe(true);
         expect(grid_controller.isRangeCell(newEarthPos)).toBe(true);
 
         // Check all earth row became a range
-        for( let _earth of earths){
+        for( const _earth of earths){
             expect(grid_controller.isRangeCell(_earth)).toBe(true);
         }
     })
 
     it('formRange: range formation', () => {
-        /* 
+    /* 
             PE: Place EarthModel
             E: EarthModel
             PM: Promoted Mountain
@@ -359,18 +359,18 @@ describe('EarthModel: reaction', () => {
         const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
         new EarthController(new_earth).place(grid, place_earth_pos, element_pool_manager);
 
-        for (let pos of rangeable_earth_positions) {
+        for (const pos of rangeable_earth_positions) {
             expect(grid_controller.isRangeCell(pos)).toBe(true);
         }
 
-        for (let pos of alone_earth_pos) {
+        for (const pos of alone_earth_pos) {
             expect(grid_controller.isEarthCell(pos)).toBe(true);
             expect(grid_controller.isRangeCell(pos)).toBe(false);
         }
     })
 
     it('reaction: There is no earth reaction', () => {
-        /* 
+    /* 
             PE: Place EarthModel
             E: EarthModel
             PM: Promoted Mountain

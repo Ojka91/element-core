@@ -26,21 +26,21 @@ export class GridModelMap extends Mapper{
         const grid: IGridModel = new GridModel();
         grid.width = raw.width;
         grid.height = raw.height;
-        for (let row of raw.cells){
-            let row_cells: Array<PieceModel> = [];
-            for (let piece of row){
+        for (const row of raw.cells){
+            const row_cells: Array<PieceModel> = [];
+            for (const piece of row){
                 let mapper: SageModelMap | EmptyModelMap | ElementModelMap;
                 switch(piece.type){
-                    case PieceTypes.Element:
-                        mapper = elementTypeToMapper(piece.element_type);
-                        break;
-                    case PieceTypes.Sage:
-                        mapper = new SageModelMap();
-                        break;
-                    case PieceTypes.Empty:
-                    default:
-                        mapper = new EmptyModelMap();
-                        break;
+                case PieceTypes.Element:
+                    mapper = elementTypeToMapper(piece.element_type);
+                    break;
+                case PieceTypes.Sage:
+                    mapper = new SageModelMap();
+                    break;
+                case PieceTypes.Empty:
+                default:
+                    mapper = new EmptyModelMap();
+                    break;
                 }
                 row_cells.push(mapper.toDomain(piece))
             }
@@ -53,18 +53,18 @@ export class GridModelMap extends Mapper{
 function elementTypeToMapper(element_type: ElementTypes): ElementModelMap {
     let mapper: ElementModelMap;
     switch(element_type){
-        case ElementTypes.Fire:
-            mapper = new FireModelMap();
-            break;
-        case ElementTypes.Water:
-            mapper = new WaterModelMap();
-            break;
-        case ElementTypes.Earth:
-            mapper = new EarthModelMap();
-            break;
-        case ElementTypes.Wind:
-            mapper = new WindModelMap();
-            break;
+    case ElementTypes.Fire:
+        mapper = new FireModelMap();
+        break;
+    case ElementTypes.Water:
+        mapper = new WaterModelMap();
+        break;
+    case ElementTypes.Earth:
+        mapper = new EarthModelMap();
+        break;
+    case ElementTypes.Wind:
+        mapper = new WindModelMap();
+        break;
     }
     return mapper;
 }
