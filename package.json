@@ -12,7 +12,9 @@
     "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
     "test": "jest --coverage",
     "start": "npm run build && dotenv -e .env-dev -- node dist/app.js",
-    "dev": "nodemon src/app.ts"
+    "dev": "nodemon src/app.ts",
+    "lint": "npx eslint .",
+    "lint:fix": "npx eslint --fix ."
   },
   "keywords": [],
   "author": "",
