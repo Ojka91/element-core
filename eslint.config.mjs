@@ -22,6 +22,8 @@ export default tseslint.config(
             '@typescript-eslint/no-unused-vars': ['error'],
             'indent': ["error", 4],
             "unused-imports/no-unused-imports": "error",
+            "@typescript-eslint/no-empty-object-type": "off",
+            "@typescript-eslint/no-explicit-any": "off",
         },
     },
 );

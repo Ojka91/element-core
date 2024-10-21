@@ -65,7 +65,6 @@ describe('BoardController', () => {
         const grid_controller: GridController = new GridController(board.grid);
         grid_controller.generateInitialGrid(5, 5)
 
-        const player: PlayerModel = new PlayerModel(0);
         expect(board_controller.getGrid() instanceof GridModel).toBe(true);
     })
 

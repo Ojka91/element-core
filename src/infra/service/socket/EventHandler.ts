@@ -6,13 +6,13 @@ import { GameUpdateService } from "./GameUpdate";
 
 export class EventHandlerService {
     constructor(
-    private gameUpdateService: GameUpdateService,
-    private setTurnTimerUseCase: SetTurnTimer
+        private gameUpdateService: GameUpdateService,
+        private setTurnTimerUseCase: SetTurnTimer
     ) {}
 
     public async execute(event: DomainEvent) {
         switch (event.constructor) {
-        case TurnTimerFinishedEvent:
+        case TurnTimerFinishedEvent: {
             const roomId = (event as TurnTimerFinishedEvent).timerId;
 
             try {
@@ -24,6 +24,7 @@ export class EventHandlerService {
                 this.setTurnTimerUseCase.cancel({ timerId: roomId });
             }
             break;
+        }
         default:
             console.log(`Event ${event.constructor.name} not registered`);
             break;

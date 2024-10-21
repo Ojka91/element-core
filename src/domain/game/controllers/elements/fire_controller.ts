@@ -50,7 +50,7 @@ export class FireController extends ElementController implements IFireController
         }
         const grid_controller: GridController = new GridController(grid);
 
-        propagation_map.forEach((value: AxisIncrement, key: string) => {
+        propagation_map.forEach((value: AxisIncrement) => {
             const evaluation_cell: Position = {
                 row: cell.row + value.y,
                 column: cell.column + value.x

@@ -145,11 +145,12 @@ export class WaterController extends ElementController implements IWaterControll
         }
         return this.isRiverOrthogonal(river_pos_list);
     }
+    
 
     private getSurroundingWaters(grid: IGridModel, cell: Position): Array<Position> {
         const grid_controller: GridController = new GridController(grid);
         const surr_waters_position: Array<Position> = [];
-        PositionUtils.orthogonal_increment_map.forEach((value: AxisIncrement, key: string) => {
+        PositionUtils.orthogonal_increment_map.forEach((value: AxisIncrement) => {
             const evaluate_pos: Position = {
                 row: cell.row + value.y,
                 column: cell.column + value.x

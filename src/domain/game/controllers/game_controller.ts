@@ -134,13 +134,9 @@ export class GameController implements IGameController {
             throw new Error("Cannot move sage, not available moves to spend");
         }
 
-        try {
-            board_controller.placePlayerSage(this.getPlayerById(player_id), position);
-            turn_controller.decreaseSageMoves();
-        }
-        catch (error) {
-            throw error;
-        }
+        board_controller.placePlayerSage(this.getPlayerById(player_id), position);
+        turn_controller.decreaseSageMoves();
+
     }
 
     public endOfPlayerTurn(): void {

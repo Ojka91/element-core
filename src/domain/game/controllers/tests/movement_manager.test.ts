@@ -122,11 +122,10 @@ describe('movement_manager', () => {
         grid_controller.generateInitialGrid(10, 8);
 
         const wind: WindModel = new WindModel();
-        let result;
 
         new WindController(wind).updatePosition(wind_pos);
         grid_controller.updateGridCell(wind);
-        result = MovementManager.isSageMoveValid(grid, cur_pos, new_pos);
+        const result = MovementManager.isSageMoveValid(grid, cur_pos, new_pos);
         expect(result).toBe(true);
     })
 
@@ -163,11 +162,10 @@ describe('movement_manager', () => {
         grid_controller.generateInitialGrid(10, 8);
 
         const wind: WindModel = new WindModel();
-        let result;
 
         new WindController(wind).updatePosition(wind_pos);
         grid_controller.updateGridCell(wind);
-        result = MovementManager.isSageMoveValid(grid, cur_pos, new_pos);
+        const result = MovementManager.isSageMoveValid(grid, cur_pos, new_pos);
         expect(result).toBe(false);
     })
 
@@ -205,12 +203,11 @@ describe('movement_manager', () => {
         grid_controller.generateInitialGrid(10, 8);
 
         const wind: WindModel = new WindModel();
-        let result;
         new WindController(wind).updatePosition(wind_pos);
         // convert wind to whirlwind
         new WindController(wind).increaseStackedWinds();
         grid_controller.updateGridCell(wind);
-        result = MovementManager.isSageMoveValid(grid, cur_pos, new_pos);
+        let result = MovementManager.isSageMoveValid(grid, cur_pos, new_pos);
         expect(result).toBe(false);
 
         new_pos.row = 4;
@@ -254,14 +251,13 @@ describe('movement_manager', () => {
         grid_controller.generateInitialGrid(10, 8);
 
         let wind: WindModel = new WindModel();
-        let result;
         new WindController(wind).updatePosition(wind_1_pos);
         grid_controller.updateGridCell(wind);
         wind = new WindModel();
         new WindController(wind).updatePosition(wind_2_pos);
         grid_controller.updateGridCell(wind);
 
-        result = MovementManager.isSageMoveValid(grid, cur_pos, new_pos);
+        const result = MovementManager.isSageMoveValid(grid, cur_pos, new_pos);
         expect(result).toBe(true);
     })
 
@@ -298,12 +294,11 @@ describe('movement_manager', () => {
         grid_controller.generateInitialGrid(11, 8);
 
         const wind: WindModel = new WindModel();
-        let result;
 
         new WindController(wind).updatePosition(wind_pos);
         grid_controller.updateGridCell(wind);
 
-        result = MovementManager.isSageMoveValid(grid, cur_pos, new_pos);
+        const result = MovementManager.isSageMoveValid(grid, cur_pos, new_pos);
         expect(result).toBe(false);
     })
 
@@ -344,14 +339,13 @@ describe('movement_manager', () => {
         new WindController(wind).increaseStackedWinds();
 
         const earth: EarthModel = new EarthModel();
-        let result;
 
         new EarthController(earth).updatePosition(earth_pos);
         grid_controller.updateGridCell(earth);
         new WindController(wind).updatePosition(wind_pos);
         grid_controller.updateGridCell(wind);
 
-        result = MovementManager.isSageMoveValid(grid, cur_pos, new_pos);
+        const result = MovementManager.isSageMoveValid(grid, cur_pos, new_pos);
         expect(result).toBe(true);
     })
 
@@ -394,14 +388,13 @@ describe('movement_manager', () => {
         const earth: EarthModel = new EarthModel();
         new EarthController(earth).promoteToMountain();
 
-        let result;
 
         new EarthController(earth).updatePosition(earth_pos);
         grid_controller.updateGridCell(earth);
         new WindController(wind).updatePosition(wind_pos);
         grid_controller.updateGridCell(wind);
 
-        result = MovementManager.isSageMoveValid(grid, cur_pos, new_pos);
+        const result = MovementManager.isSageMoveValid(grid, cur_pos, new_pos);
         expect(result).toBe(false);
     })
 

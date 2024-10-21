@@ -810,7 +810,6 @@ describe('FireModelController: reaction', () => {
         const grid: GridModel = new GridModel();
         const grid_controller: GridController = new GridController(grid);
         grid_controller.generateInitialGrid(10, 8);
-        const element_pool_manager: ElementPoolManagerModel = new ElementPoolManagerModel();
         const pf_pos: Position = {
             row: 4,
             column: 3

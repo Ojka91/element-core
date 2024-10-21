@@ -3,10 +3,6 @@ import { ElementPoolManagerModel, ElementPoolManagerModelMap } from "./element_p
 import { SageModel, SageModelMap } from "./pieces/sage";
 
 import { Mapper } from "../utils/mapper";
-
-const COLUMN_PIECES_WIDTH: number = 11;
-const ROW_PIECES_HEIGHT: number = 11;
-
 export interface IBoardModel {
     grid: GridModel;
     sage_list: Array<SageModel>;

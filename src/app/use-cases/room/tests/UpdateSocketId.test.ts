@@ -11,7 +11,7 @@ describe("UpdateSocketIdUseCase", () => {
     it("Should update the socket id", async () => {
         jest.spyOn(RoomController.prototype, "save").mockResolvedValueOnce();
 
-        const response = await UpdateSocketId.execute(
+        await UpdateSocketId.execute(
             new RoomModel(0),
             "RoomUUID",
             "NewSocketId"

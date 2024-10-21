@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { Express } from 'express';
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
