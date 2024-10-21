@@ -65,7 +65,6 @@ describe('BoardController', () => {
         const grid_controller: GridController = new GridController(board.grid);
         grid_controller.generateInitialGrid(5, 5)
 
-        const player: PlayerModel = new PlayerModel(0);
         expect(board_controller.getGrid() instanceof GridModel).toBe(true);
     })
 
@@ -182,7 +181,7 @@ describe('BoardController', () => {
         expect(board_controller.placeElement(ElementTypes.Earth, pos1) == null).toBe(true);
         expect(board_controller.placeElement(ElementTypes.Earth, pos2) == null).toBe(true);
         expect(board_controller.performElementReaction(ElementTypes.Earth, pos1) == null).toBe(true);
-        //expect(() => {board_controller.placeElement(ElementTypes.Earth, pos);}).toThrow("Cannot replace the cell due to a rule of replacement");
+    //expect(() => {board_controller.placeElement(ElementTypes.Earth, pos);}).toThrow("Cannot replace the cell due to a rule of replacement");
     })
 
     it('performElementReaction: it should react to wind elements', async () => {
@@ -203,7 +202,7 @@ describe('BoardController', () => {
         expect(board_controller.placeElement(ElementTypes.Wind, pos1) == null).toBe(true);
         expect(board_controller.placeElement(ElementTypes.Wind, pos2) == null).toBe(true);
         expect(board_controller.performElementReaction(ElementTypes.Wind, pos1) == null).toBe(true);
-        //expect(() => {board_controller.placeElement(ElementTypes.Earth, pos);}).toThrow("Cannot replace the cell due to a rule of replacement");
+    //expect(() => {board_controller.placeElement(ElementTypes.Earth, pos);}).toThrow("Cannot replace the cell due to a rule of replacement");
     })
 
     it('performElementReaction: it should react to water elements', async () => {
@@ -219,7 +218,7 @@ describe('BoardController', () => {
 
         expect(board_controller.placeElement(ElementTypes.Water, pos1) == null).toBe(true);
         expect(board_controller.performElementReaction(ElementTypes.Water, pos1) == null).toBe(true);
-        //expect(() => {board_controller.placeElement(ElementTypes.Earth, pos);}).toThrow("Cannot replace the cell due to a rule of replacement");
+    //expect(() => {board_controller.placeElement(ElementTypes.Earth, pos);}).toThrow("Cannot replace the cell due to a rule of replacement");
     })
 
     it('checkElementPoolAvailability: check it is being called', async () => {

@@ -5,15 +5,15 @@ import { PublicServerResponse } from "@/infra/schemas/server_response";
 import { InputSocket } from "../types/socketType";
 
 export class ForceGameUpdateService {
-  constructor(private socket: InputSocket) {}
+    constructor(private socket: InputSocket) {}
 
-  public async execute(): Promise<PublicServerResponse> {
+    public async execute(): Promise<PublicServerResponse> {
     /**
      * When client triggers this event, an event is sent to the room1 under boardMovement event
      */
-    const room: IRoomModel = await GetRoom.execute(
-      this.socket.handshake.auth.roomUuid
-    );
-    return GameServices.preparePublicResponse(room);
-  }
+        const room: IRoomModel = await GetRoom.execute(
+            this.socket.handshake.auth.roomUuid
+        );
+        return GameServices.preparePublicResponse(room);
+    }
 }

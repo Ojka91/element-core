@@ -1,3 +1,5 @@
+/* eslint @typescript-eslint/no-unused-vars: 0 */ 
+
 import { EarthModel } from "@/domain/game/models/elements/earth";
 import { ElementTypes } from "@/domain/game/models/elements/elements";
 import { IWindModel, WindModel } from "@/domain/game/models/elements/wind";
@@ -33,6 +35,10 @@ export class WindController extends ElementController implements IWindController
     constructor(model: IWindModel) {
         super(model);
         this.model = model;
+    }
+
+    public reaction(grid: IGridModel, cell: Position): void {
+        return;
     }
 
     // Override parent method
@@ -84,10 +90,5 @@ export class WindController extends ElementController implements IWindController
             return !new WindController(this.model).isMaxWhirlwind()
         }
         return false;
-    }
-
-    public reaction(grid: IGridModel, cell: Position): void {
-
-        return;
     }
 }

@@ -12,12 +12,12 @@ export interface IUser {
 }
 
 const User = new Schema<IUser>({
-  username: {type: String, required: true},
-  email: {type: String, required: true},
-  password: {type: String, required: true},
-  createdAt: {type: Date, required: true},
-  recoverPasswordToken: {type: String, required: false},
-  recoverPasswordTokenExpiry: {type: Date, required: false},
+    username: {type: String, required: true},
+    email: {type: String, required: true},
+    password: {type: String, required: true},
+    createdAt: {type: Date, required: true},
+    recoverPasswordToken: {type: String, required: false},
+    recoverPasswordTokenExpiry: {type: Date, required: false},
 });
 
 export default mongoose.model('User', User);

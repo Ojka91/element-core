@@ -185,7 +185,7 @@ describe('WaterController: reaction', () => {
     })
 
     it('reaction: Invalid original river passed should throw error', async () => {
-        /* 
+    /* 
             PW: Placed Water
             W: Water
             NW: New Water Spot
@@ -256,7 +256,7 @@ describe('WaterController: reaction', () => {
     })
 
     it('reaction: Should move river horizontally to placed water', async () => {
-        /* 
+    /* 
             PW: Placed Water
             W: Water
             NW: New Water Spot
@@ -312,11 +312,11 @@ describe('WaterController: reaction', () => {
         // Perform water reaction
         new WaterController(placed_water).reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
 
-        for (let pos of new_water_sequence) {
+        for (const pos of new_water_sequence) {
             expect(grid_controller.isWaterCell(pos)).toBe(true);
         }
 
-        for (let pos of water_pos_list) {
+        for (const pos of water_pos_list) {
             expect(grid_controller.isWaterCell(pos)).toBe(false);
         }
         expect(grid_controller.isWaterCell(placed_water_pos)).toBe(false);
@@ -324,7 +324,7 @@ describe('WaterController: reaction', () => {
     })
 
     it('reaction: Should move river vertically to placed water', async () => {
-        /* 
+    /* 
             PW: Placed Water
             W: Water
             NW: New Water Spot
@@ -382,11 +382,11 @@ describe('WaterController: reaction', () => {
         // Perform water reaction
         new WaterController(placed_water).reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
 
-        for (let pos of new_water_sequence) {
+        for (const pos of new_water_sequence) {
             expect(grid_controller.isWaterCell(pos)).toBe(true);
         }
 
-        for (let pos of water_pos_list) {
+        for (const pos of water_pos_list) {
             expect(grid_controller.isWaterCell(pos)).toBe(false);
         }
         expect(grid_controller.isWaterCell(placed_water_pos)).toBe(false);
@@ -394,7 +394,7 @@ describe('WaterController: reaction', () => {
     })
 
     it('reaction: River can change directions but always orthogonally', async () => {
-        /* 
+    /* 
             PW: Placed Water
             W: Water
             NW: New Water Spot
@@ -460,11 +460,11 @@ describe('WaterController: reaction', () => {
         // Perform water reaction
         new WaterController(placed_water).reaction(grid, placed_water_pos, water_pos_list, new_water_sequence);
 
-        for (let pos of new_water_sequence) {
+        for (const pos of new_water_sequence) {
             expect(grid_controller.isWaterCell(pos)).toBe(true);
         }
 
-        for (let pos of water_pos_list) {
+        for (const pos of water_pos_list) {
             expect(grid_controller.isWaterCell(pos)).toBe(false);
         }
         expect(grid_controller.isWaterCell(placed_water_pos)).toBe(false);
@@ -472,7 +472,7 @@ describe('WaterController: reaction', () => {
     })
 
     it('reaction: River can replace fire', async () => {
-        /* 
+    /* 
             PW: Placed Water
             W: Water
             NW: New Water Spot
@@ -552,11 +552,11 @@ describe('WaterController: reaction', () => {
         // Perform water reaction
         new WaterController(placed_water).reaction(grid, placed_water_pos, water_pos_list, new_water_sequence, element_pool_manager);
 
-        for (let pos of new_water_sequence) {
+        for (const pos of new_water_sequence) {
             expect(grid_controller.isWaterCell(pos)).toBe(true);
         }
 
-        for (let pos of water_pos_list) {
+        for (const pos of water_pos_list) {
             expect(grid_controller.isWaterCell(pos)).toBe(false);
         }
         expect(grid_controller.isWaterCell(placed_water_pos)).toBe(false);
@@ -564,7 +564,7 @@ describe('WaterController: reaction', () => {
     })
 
     it('reaction: cannot allow river formation over earth, winds or other waters', async () => {
-        /* 
+    /* 
             PW: Placed Water
             W: Water
             NW: New Water Spot
@@ -682,7 +682,7 @@ describe('WaterController: reaction', () => {
     })
 
     it('reaction: cannot move outside boundaries', async () => {
-        /* 
+    /* 
             PW: Placed Water
             W: Water
             NW: New Water Spot
@@ -745,7 +745,7 @@ describe('WaterController: reaction', () => {
     })
 
     it('reaction: Should throw error on non-orthogonal old river', async () => {
-        /* 
+    /* 
             PW: Placed Water
             W: Water
             NW: New Water Spot
@@ -816,7 +816,7 @@ describe('WaterController: reaction', () => {
 
     it('getRivers: Should return rivers available when placing a water', async () => {
 
-      /* 
+        /* 
         W: Water
         PW: Placed Water
 
@@ -844,58 +844,58 @@ describe('WaterController: reaction', () => {
       
          */
         
-            const placed_water_pos: Position = { row: 3, column: 3 }
+        const placed_water_pos: Position = { row: 3, column: 3 }
         
-            const river_1: Array<Position> = [
-                { row: 3, column: 4 },
-                { row: 3, column: 5 }
-            ]
+        const river_1: Array<Position> = [
+            { row: 3, column: 4 },
+            { row: 3, column: 5 }
+        ]
             
-            const river_2: Array<Position> = [
-                { row: 4, column: 3 },
-                { row: 5, column: 3 },
-                { row: 6, column: 3 }
-            ]
+        const river_2: Array<Position> = [
+            { row: 4, column: 3 },
+            { row: 5, column: 3 },
+            { row: 6, column: 3 }
+        ]
         
-            const rivers: Array<Array<Position>> = [river_1, river_2];
+        const rivers: Array<Array<Position>> = [river_1, river_2];
         
-            const waterPositions: Array<Position> = [
-                { row: 2, column: 4 },
-                { row: 3, column: 4 },
-                { row: 3, column: 5 },
-                { row: 4, column: 3 },
-                { row: 5, column: 3 },
-                { row: 6, column: 3 },
-                { row: 6, column: 4 }
-            ]
+        const waterPositions: Array<Position> = [
+            { row: 2, column: 4 },
+            { row: 3, column: 4 },
+            { row: 3, column: 5 },
+            { row: 4, column: 3 },
+            { row: 5, column: 3 },
+            { row: 6, column: 3 },
+            { row: 6, column: 4 }
+        ]
         
-            const firePosition: Position = {
-                row: 3,
-                column: 6
-            }
+        const firePosition: Position = {
+            row: 3,
+            column: 6
+        }
         
-            const grid: GridModel = new GridModel();
-            const grid_controller: GridController = new GridController(grid);
-            grid_controller.generateInitialGrid(10, 8);
+        const grid: GridModel = new GridModel();
+        const grid_controller: GridController = new GridController(grid);
+        grid_controller.generateInitialGrid(10, 8);
         
-            const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
-            const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
+        const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
+        const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
         
-            // Prepare grid
-            waterPositions.forEach((water_pos) => {
-                const water: WaterModel = new WaterModel();
-                new WaterController(water).place(grid, water_pos, element_pool_manager);
+        // Prepare grid
+        waterPositions.forEach((water_pos) => {
+            const water: WaterModel = new WaterModel();
+            new WaterController(water).place(grid, water_pos, element_pool_manager);
         
-            })
+        })
         
-            const fire: FireModel = new FireModel();
-            new FireController(fire).place(grid, firePosition, element_pool_manager);
+        const fire: FireModel = new FireModel();
+        new FireController(fire).place(grid, firePosition, element_pool_manager);
         
-            // Place water
-            const placed_water: WaterModel = new WaterModel();
-            new WaterController(placed_water).place(grid, placed_water_pos, element_pool_manager);
+        // Place water
+        const placed_water: WaterModel = new WaterModel();
+        new WaterController(placed_water).place(grid, placed_water_pos, element_pool_manager);
         
-            expect(new WaterController(placed_water).getRivers(grid, placed_water_pos).sort()).toEqual(rivers.sort());
+        expect(new WaterController(placed_water).getRivers(grid, placed_water_pos).sort()).toEqual(rivers.sort());
     })
 
 })

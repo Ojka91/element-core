@@ -3,7 +3,6 @@ import RoomController from "@/domain/game/controllers/room_controller";
 import { GameModel } from "@/domain/game/models/game";
 import { RoomModel } from "@/domain/game/models/room";
 import { GameServices } from "@/domain/service/GameServices";
-import EndTurnUseCase from "../EndTurn";
 import TimerService from "@/domain/service/timer/TimerService";
 import { DomainEventEmitter } from "@/domain/service/DomainEventEmitter";
 import SetTurnTimer from "../../timer/SetTurnTimer";

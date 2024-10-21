@@ -1,3 +1,5 @@
+/* eslint @typescript-eslint/no-unused-vars: 0 */ 
+
 import { PositionUtils, AxisIncrement, Position } from "@/domain/game/utils/position_utils";
 import { EarthModel, IEarthModel } from "@/domain/game/models/elements/earth";
 import GridController from "../grid_controller";
@@ -70,6 +72,10 @@ export class EarthController extends ElementController implements IEarthControll
         return false;
     }
 
+    public reaction(grid: IGridModel, cell: Position): void {
+        return;
+    }
+
     public isMountain(): boolean {
         return this.model.is_mountain;
     }
@@ -100,10 +106,6 @@ export class EarthController extends ElementController implements IEarthControll
         return false;
     }
 
-    public reaction(grid: IGridModel, cell: Position): void {
-
-    }
-
     private formRange(grid: IGridModel, cell: Position) {
 
         const grid_controller: GridController = new GridController(grid);
@@ -132,7 +134,7 @@ export class EarthController extends ElementController implements IEarthControll
 
         const grid_controller: GridController = new GridController(grid);
 
-        all_direction_map.forEach((value: AxisIncrement, key: string) => {
+        all_direction_map.forEach((value: AxisIncrement) => {
             evaluation_cell = {
                 row: cell.row + value.y,
                 column: cell.column + value.x
@@ -151,7 +153,7 @@ export class EarthController extends ElementController implements IEarthControll
 
         const grid_controller: GridController = new GridController(grid);
 
-        all_direction_map.forEach((value: AxisIncrement, key: string) => {
+        all_direction_map.forEach((value: AxisIncrement) => {
             evaluation_cell = {
                 row: cell.row + value.y,
                 column: cell.column + value.x

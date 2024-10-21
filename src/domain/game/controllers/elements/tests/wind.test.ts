@@ -14,23 +14,21 @@ import { WindController } from "../wind_controller";
 describe('WindController: Rule of replacement', () => {
 
     it('Rule of replacement: Should return true if replaces Earth', async () => {
-        let result;
         const wind = new WindModel();
         const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
         const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
         element_pool_manager.emptyPool(); // Empty pool so when replacement happens and element go back to pool, the pool is not full
 
-        result = new WindController(wind).ruleOfReplacement(new EarthModel(), element_pool_manager)
+        const result = new WindController(wind).ruleOfReplacement(new EarthModel(), element_pool_manager)
 
         expect(result).toBe(true)
     })
 
     it('Rule of replacement: Should return true if replaces Wind', async () => {
-        let result;
         const wind = new WindModel();
         const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
         const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
-        result = new WindController(wind).ruleOfReplacement(new WindModel(), element_pool_manager)
+        const result = new WindController(wind).ruleOfReplacement(new WindModel(), element_pool_manager)
 
         expect(result).toBe(true)
     })
@@ -49,7 +47,6 @@ describe('WindController: Rule of replacement', () => {
     })
 
     it('Rule of replacement: Should return false if replacing a max whirlwind', async () => {
-        let result;
         const wind = new WindModel();
 
         const whirlwind: WindModel = new WindModel();
@@ -62,7 +59,7 @@ describe('WindController: Rule of replacement', () => {
         const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)
         
         expect(new WindController(whirlwind).isMaxWhirlwind()).toBe(true);
-        result = new WindController(wind).ruleOfReplacement(whirlwind, element_pool_manager);
+        const result = new WindController(wind).ruleOfReplacement(whirlwind, element_pool_manager);
 
         expect(result).toBe(true)
 
@@ -99,7 +96,6 @@ describe('WindController: place', () => {
         grid_controller.generateInitialGrid(10, 8);
 
         let wind: WindModel = new WindModel();
-        const new_wind: WindModel = new WindModel();
         const pos: Position = { row: 1, column: 1 };
         const element_pool_manager_model: ElementPoolManagerModel = new ElementPoolManagerModel()
         const element_pool_manager: ElementPoolManager = new ElementPoolManager(element_pool_manager_model)

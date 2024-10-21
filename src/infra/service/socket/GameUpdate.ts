@@ -1,12 +1,12 @@
 import { Server } from "socket.io";
 import {
-  ClientToServerEvents,
-  InterServerEvents,
-  ServerToClientEvents,
-  SocketData,
+    ClientToServerEvents,
+    InterServerEvents,
+    ServerToClientEvents,
+    SocketData,
 } from "../../socket/socketUtils";
 import {
-  PublicServerResponse,
+    PublicServerResponse,
 } from "@/infra/schemas/server_response";
 
 import SetTurnTimer from "@/app/use-cases/timer/SetTurnTimer";
@@ -19,18 +19,18 @@ type SocketIo = Server<
 >;
 
 export class GameUpdateService {
-  constructor(
+    constructor(
     private io: SocketIo,
     private setTurnTimerUseCase: SetTurnTimer
-  ) {
-  }
-
-  public execute(roomId: string, data: PublicServerResponse | null) {
-    
-    let remainingTurnTime = this.setTurnTimerUseCase.getRemainingTime({timerId: roomId})!;
-    if (data != null && remainingTurnTime != null) {
-      data.room.game.turn.remainingTurnTime = remainingTurnTime;
+    ) {
     }
-    this.io.to(roomId).emit("gameUpdate", data);
-  }
+
+    public execute(roomId: string, data: PublicServerResponse | null) {
+    
+        const remainingTurnTime = this.setTurnTimerUseCase.getRemainingTime({timerId: roomId})!;
+        if (data != null && remainingTurnTime != null) {
+            data.room.game.turn.remainingTurnTime = remainingTurnTime;
+        }
+        this.io.to(roomId).emit("gameUpdate", data);
+    }
 }

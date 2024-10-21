@@ -3,7 +3,6 @@ import { IGridModel } from "../../models/grid";
 import { PieceModel } from "../../models/pieces/pieces";
 import { Position } from '../../utils/position_utils'
 import GridController from '../grid_controller';
-import { IElementModel } from '@/domain/game/models/elements/elements';
 import ElementPoolManager from '../element_pool_controller';
 
 export interface IElementController {

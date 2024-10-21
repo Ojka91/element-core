@@ -21,7 +21,7 @@ If you want to play with your friends visit [here](https://element-online.netlif
 
 ### Prerequisites
 
-* [NodeJS version 16 or later](https://nodejs.org/en/download/) - or use [nvm](https://github.com/nvm-sh/nvm)
+* [NodeJS version 20 or later](https://nodejs.org/en/download/) - or use [nvm](https://github.com/nvm-sh/nvm)
 * [Docker](https://docs.docker.com/install)
 
 ### Running for first time

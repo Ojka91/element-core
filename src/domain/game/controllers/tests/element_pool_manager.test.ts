@@ -6,7 +6,7 @@ import ElementPoolManager from "../element_pool_controller";
 describe('ElementPoolManager', () => {
     const NUM_PIECES_PER_ELEMENT: number = 30;
     it('addElement: adding an element updates the pool ', async () => {
-        let pool_manager = new ElementPoolManagerModel();
+        const pool_manager = new ElementPoolManagerModel();
         const pool_controller: ElementPoolManager = new ElementPoolManager(pool_manager);
         pool_manager.fire.amount = 0;
         pool_controller.addElement(ElementTypes.Fire);
@@ -14,7 +14,7 @@ describe('ElementPoolManager', () => {
     });
 
     it('addElement: adding an element to the pool when full ', async () => {
-        let pool_manager = new ElementPoolManagerModel();
+        const pool_manager = new ElementPoolManagerModel();
         const pool_controller: ElementPoolManager = new ElementPoolManager(pool_manager);
         // By default it's initialized to the maximum value
         expect(() => {
@@ -24,7 +24,7 @@ describe('ElementPoolManager', () => {
     });
 
     it('removeElement: removing an element updates the pool ', async () => {
-        let pool_manager = new ElementPoolManagerModel();
+        const pool_manager = new ElementPoolManagerModel();
         const pool_controller: ElementPoolManager = new ElementPoolManager(pool_manager);
         pool_manager.fire.amount = 30;
         pool_controller.removeElement(ElementTypes.Fire);
@@ -32,7 +32,7 @@ describe('ElementPoolManager', () => {
     });
 
     it('removeElement: removing an element to the pool when empty ', async () => {
-        let pool_manager = new ElementPoolManagerModel();
+        const pool_manager = new ElementPoolManagerModel();
         const pool_controller: ElementPoolManager = new ElementPoolManager(pool_manager);
         pool_manager.fire.amount = 0;
         expect(() => {
@@ -42,7 +42,7 @@ describe('ElementPoolManager', () => {
     });
 
     it('fillPool: every element pool must be filled ', async () => {
-        let pool_manager = new ElementPoolManagerModel();
+        const pool_manager = new ElementPoolManagerModel();
         const pool_controller: ElementPoolManager = new ElementPoolManager(pool_manager);
         pool_controller.fillPool(); 
         let result = pool_manager.fire.amount == NUM_PIECES_PER_ELEMENT;
@@ -55,7 +55,7 @@ describe('ElementPoolManager', () => {
     });
 
     it('emptyPool: every element pool must be emptied ', async () => {
-        let pool_manager = new ElementPoolManagerModel();
+        const pool_manager = new ElementPoolManagerModel();
         const pool_controller: ElementPoolManager = new ElementPoolManager(pool_manager);
         pool_controller.emptyPool(); 
         let result = pool_manager.fire.amount == 0;
@@ -68,7 +68,7 @@ describe('ElementPoolManager', () => {
     });
 
     it('checkElementAvailable: checks whether the element is available ', async () => {
-        let pool_manager = new ElementPoolManagerModel();
+        const pool_manager = new ElementPoolManagerModel();
         const pool_controller: ElementPoolManager = new ElementPoolManager(pool_manager);
 
         const element: ElementTypes = ElementTypes.Earth;
@@ -82,7 +82,7 @@ describe('ElementPoolManager', () => {
     });
     
     it('checkElementListAvailability: checks whether the elements are available ', async () => {
-        let pool_manager = new ElementPoolManagerModel();
+        const pool_manager = new ElementPoolManagerModel();
         const pool_controller: ElementPoolManager = new ElementPoolManager(pool_manager);
 
         const elements: Array<ElementTypes> = [ElementTypes.Earth, ElementTypes.Fire, ElementTypes.Water, ElementTypes.Wind];

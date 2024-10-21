@@ -2,10 +2,10 @@ import pino from "pino";
 
 export const logger = pino({
     formatters: {
-      level: (label) => {
-        return {
-          level: label
+        level: (label) => {
+            return {
+                level: label
+            }
         }
-      }
     }
-  })
+})

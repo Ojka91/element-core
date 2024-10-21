@@ -38,7 +38,7 @@ export class RoomModelMap extends Mapper {
         room.uuid = raw.uuid;
         room.size = raw.size;
         room.game = new GameModelMap().toDomain(raw.game);
-        for (let user of raw.user_to_player_map) {
+        for (const user of raw.user_to_player_map) {
             room.user_to_player_map.push({
                 user_uuid: user.user_uuid,
                 player_uuid: user.player_uuid,
@@ -46,7 +46,7 @@ export class RoomModelMap extends Mapper {
             });
         }
         const user_mapper: UserModelMap = new UserModelMap();
-        for (let user of raw.user_list) {
+        for (const user of raw.user_list) {
             room.user_list.push(user_mapper.toDomain(user));
         }
         return room;
